@@ -9,10 +9,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import axios from 'axios';
-import { useQuery } from '@tanstack/react-query';
+import axios, { AxiosError } from 'axios';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from './ui/spinner';
 import { Phone, Clock, CheckCircle, Eye, AlertCircle, Plus } from "lucide-react";
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
+import toast, { Toaster } from 'react-hot-toast';
 
 
 export default function DashboardComponent() {
@@ -72,9 +74,14 @@ export default function DashboardComponent() {
 
             <div className='relative w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                 {data?.today.map(item => (
-                    <FollowUpCard key={item.id} item={item} />
+                    <FollowUpCard key={item.id} item={item}
+                        page={paginationModel.page}
+                        pageSize={paginationModel.pageSize}
+                        currentState={currentState}
+                    />
                 ))}
             </div>
+            <Toaster />
         </div>
     )
 }
@@ -97,8 +104,34 @@ function extractLeadInfo(response: ResponseDetails) {
 
     return info;
 }
-function FollowUpCard({ item }: { item: FollowUpItem }) {
+const CLOSED_BUSINESS_STATUSES = ["Client Converted", "Client not Interested"];
+const BUSINESS_STATUSES = [
+    "Client Converted",
+    "Client will Call",
+    "Client will Visit",
+    "Client will Message",
+    "Call Client",
+    "Message Client",
+    "Visit Client",
+    "Put on Backburner",
+    "Client not Interested",
+];
+const FOLLOWUP_TYPES = [
+    { value: "NOTE", label: "Note" },
+    { value: "CALL", label: "Phone Call" },
+    { value: "EMAIL", label: "Sent Email" },
+    { value: "WHATSAPP", label: "WhatsApp Message" },
+    { value: "MEETING", label: "Meeting" },
+    { value: "STATUS_CHANGE", label: "Status Change" },
+];
+function FollowUpCard({ item, page, pageSize, currentState }: { item: FollowUpItem, page: number, pageSize: number, currentState: string }) {
+    const [openResponse, setOpenResponse] = useState<FollowUpItem | null>(null);
+    const [followType, setFollowType] = useState<string>("NOTE");
+    const [followNote, setFollowNote] = useState<string>("");
+    const [followNextDate, setFollowNextDate] = useState<string>("");
+    const [followBusinessStatus, setFollowBusinessStatus] = useState<string>("");
     const info = extractLeadInfo(item.response);
+    const queryClient = useQueryClient();
 
     const due = new Date(item?.nextFollowUpDate);
     const today = new Date();
@@ -129,6 +162,53 @@ function FollowUpCard({ item }: { item: FollowUpItem }) {
         Math.min(maxDays, Math.floor((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)))
     );
     const progress = Math.round(((maxDays - diffDays) / maxDays) * 100);
+
+    const addFollowUpMutation = useMutation({
+        mutationFn: async (payload: {
+            responseId: string;
+            type: string;
+            note?: string | null;
+            nextFollowUpDate?: string | null;
+            businessStatus: string;
+        }) => {
+            const res = await axios.post("/api/v1/followup", payload, { withCredentials: true });
+            return res.data;
+        },
+        onSuccess: async (_, payload) => {
+            toast.success("Follow-up added");
+            await queryClient.invalidateQueries({
+                queryKey: ["dashboard", page, pageSize, currentState],
+            });
+            setFollowNote("");
+            setFollowNextDate("");
+            setFollowType("NOTE");
+            setFollowBusinessStatus("");
+        },
+        onError: (err: AxiosError) => {
+            console.log(
+                "Follow-up creation failed:",
+                ((err.response?.data as any)?.error) ?? err.message
+            );
+            toast.error(((err.response?.data as any)?.error) ?? err.message);
+        },
+    });
+
+    const handleAddFollowUp = () => {
+        if (!openResponse) return;
+        if (!followBusinessStatus) {
+            toast.error("Please choose a business status");
+            return;
+        }
+
+        addFollowUpMutation.mutate({
+            responseId: openResponse.responseId,
+            type: followType,
+            note: followNote || null,
+            nextFollowUpDate: followNextDate || null,
+            businessStatus: followBusinessStatus,
+        });
+    };
+
 
     return (
         <div className="relative rounded-xl bg-white p-5 shadow-md border border-zinc-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col gap-3">
@@ -185,13 +265,95 @@ function FollowUpCard({ item }: { item: FollowUpItem }) {
             {
                 item.status !== "COMPLETED" && item.status !== "CANCELLED" && (
                     <div className="flex gap-2 mt-2">
-                        <button className="flex-1 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg flex items-center justify-center gap-1 hover:bg-blue-700 cursor-pointer">
+                        <button className="flex-1 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg flex items-center justify-center gap-1 hover:bg-blue-700 cursor-pointer"
+                            onClick={() => setOpenResponse(item as FollowUpItem)}
+                        >
                             <Plus size={15} />
                             Add New Follow Up
                         </button>
                     </div>
                 )
             }
+            <Dialog open={!!openResponse} onClose={() => setOpenResponse(null)} maxWidth="lg" fullWidth>
+                <DialogTitle>View Lead</DialogTitle>
+
+                <DialogContent dividers>
+                    {openResponse && (
+                        <Box display="flex" flexDirection="column" gap={2}>
+                            <TextField
+                                label="Follow-Up Type"
+                                select
+                                value={followType}
+                                onChange={(e) => setFollowType(e.target.value)}
+                                SelectProps={{ native: true }}
+                                fullWidth
+                            >
+                                {FOLLOWUP_TYPES.map((t) => (
+                                    <option key={t.value} value={t.value}>
+                                        {t.label}
+                                    </option>
+                                ))}
+                            </TextField>
+
+                            <TextField
+                                // label="Lead Status"
+                                select
+                                value={followBusinessStatus}
+                                onChange={(e) => {
+                                    setFollowBusinessStatus(e.target.value);
+                                    if (CLOSED_BUSINESS_STATUSES.includes(e.target.value)) {
+                                        setFollowNextDate("");
+                                    }
+                                }}
+                                SelectProps={{ native: true }}
+                                fullWidth
+                            >
+                                <option value="">Select status</option>
+                                {BUSINESS_STATUSES.map((s) => (
+                                    <option key={s} value={s}>
+                                        {s}
+                                    </option>
+                                ))}
+                            </TextField>
+
+                            <TextField
+                                label="Note"
+                                multiline
+                                rows={3}
+                                value={followNote}
+                                onChange={(e) => setFollowNote(e.target.value)}
+                                placeholder="Write note..."
+                                fullWidth
+                            />
+
+                            {followBusinessStatus && !CLOSED_BUSINESS_STATUSES.includes(followBusinessStatus) && (
+                                <TextField
+                                    label="Next Follow-Up Date"
+                                    type="date"
+                                    value={followNextDate}
+                                    onChange={(e) => setFollowNextDate(e.target.value)}
+                                    InputLabelProps={{ shrink: true }}
+                                    fullWidth
+                                />
+                            )}
+
+                            <Button
+                                variant="contained"
+                                size="large"
+                                onClick={handleAddFollowUp}
+                                sx={{ mt: 1 }}
+                                disabled={addFollowUpMutation.isPending || !followBusinessStatus}
+                            >
+                                {addFollowUpMutation.isPending ? <Spinner color="white" /> : "Add Follow-Up"}
+                            </Button>
+                        </Box>
+                    )}
+                </DialogContent>
+
+                <DialogActions>
+                    <Button onClick={() => setOpenResponse(null)}>Close</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }

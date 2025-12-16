@@ -61,19 +61,21 @@ export default function ViewForm() {
                 return (
                     <input
                         type={field.type}
-                        placeholder={field.label}
+                        placeholder={`${field.label}${field.required && '*'}`}
                         className={baseClass}
                         onChange={(e) => handleChange(field, e.target.value)}
+                        required={field.required}
                     />
                 );
 
             case "textarea":
                 return (
                     <textarea
-                        placeholder={field.label}
+                        placeholder={`${field.label}${field.required && '*'}`}
                         rows={3}
                         className={baseClass}
                         onChange={(e) => handleChange(field, e.target.value)}
+                        required={field.required}
                     />
                 );
 
@@ -84,6 +86,7 @@ export default function ViewForm() {
                         className={baseClass}
                         multiple
                         onChange={(e) => handleChange(field, e.target.files)}
+                        required={field.required}
                     />
                 );
 
@@ -92,6 +95,7 @@ export default function ViewForm() {
                     <select
                         className={baseClass}
                         onChange={(e) => handleChange(field, e.target.value)}
+                        required={field.required}
                     >
                         <option value="">Select...</option>
                         {options.map((opt) => (
@@ -112,6 +116,7 @@ export default function ViewForm() {
                                     name={field.id}
                                     value={opt}
                                     onChange={() => handleChange(field, opt)}
+                                    required={field.required}
                                 />
                                 <span>{opt}</span>
                             </label>
@@ -127,6 +132,7 @@ export default function ViewForm() {
                                 <input
                                     type="checkbox"
                                     value={opt}
+                                    required={field.required}
                                     onChange={(e) => {
                                         const checked = e.target.checked;
                                         setFormValues((prev) => {
@@ -247,17 +253,21 @@ export default function ViewForm() {
                                         className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp"
                                         style={{ animationDelay: `${index * 0.08}s` }}
                                     >
-                                        <div className="flex justify-between mb-2">
-                                            <label className="font-medium text-zinc-800 group-hover:text-black transition">
-                                                {field.label}
-                                            </label>
-
-                                            {field.required && (
+                                        {options.length > 0 &&
+                                            <div className="flex justify-between mb-2">
+                                                <label 
+                                                className={`relative text-sm text-zinc-800 group-hover:text-black transition ${field.required ? "after:content-['*'] after:text-red-600 after:ml-1" : ""} `}
+                                                >
+                                                    {field.label}
+                                                </label>
+                                                {/* {field.required && (
                                                 <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
                                                     Required
                                                 </span>
-                                            )}
-                                        </div>
+                                            )} */}
+                                            </div>
+                                        }
+
 
                                         <div className="transform group-hover:scale-[1.01] transition-transform">
                                             {renderField(field, options)}
