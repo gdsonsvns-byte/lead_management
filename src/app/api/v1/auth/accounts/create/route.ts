@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         }
         const data = parsed.data;
         const email = data.email.toLowerCase().trim();
-
+        
         const existingUser = await prisma.user.findUnique({
             where: { email },
         });
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
 
         const existingAccount = await prisma.account.findUnique({
             where: { email }
-        });        
+        });
         if (existingAccount) {
             return NextResponse.json({ error: "Account with this email already exists" }, { status: 409 });
         }
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
                 phone: data.phone,
                 location: data.location,
                 email,
-
+                whatsappApiKey: data.whatsappApiKey,
                 users: {
                     create: {
                         name: data.name,

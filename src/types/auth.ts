@@ -49,6 +49,11 @@ export const createAccountUserSchema = z.object({
     .trim()
     .max(200, "Location too long")
     .optional(),
+  whatsappApiKey: z
+    .string()
+    .trim()
+    .max(300, "WhatsApp API key is too long")
+    .optional(),
 });
 
 export type LoginSchema = z.infer<typeof loginSchema>

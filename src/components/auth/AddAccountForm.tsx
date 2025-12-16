@@ -4,8 +4,9 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import Input from "../ui/Input";
-import { User, Mail, Building2, Phone, MapPin } from "lucide-react";
+import { User, Mail, Building2, Phone, MapPin, Key } from "lucide-react";
 import Spinner from "../ui/spinner";
+import Textarea from "../ui/Textarea";
 
 interface AddAccountSchema {
     name: string;
@@ -13,6 +14,7 @@ interface AddAccountSchema {
     businessName: string;
     phone: string;
     location: string;
+    whatsappApiKey?: string;
 }
 
 interface AddAccountResponse {
@@ -28,11 +30,12 @@ export default function AddAccountForm() {
         businessName: "",
         phone: "",
         location: "",
+        whatsappApiKey: ""
     });
 
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-    function handleChange(e: ChangeEvent<HTMLInputElement>) {
+    function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
         const { name, value } = e.target;
 
         setFormValue((prev) => ({
@@ -64,13 +67,14 @@ export default function AddAccountForm() {
         },
 
         onSuccess: () => {
-            setFieldErrors({}); // clear old errors
+            setFieldErrors({});
             setFormValue({
                 name: "",
                 email: "",
                 businessName: "",
                 phone: "",
                 location: "",
+                whatsappApiKey: "",
             });
         },
     });
@@ -139,6 +143,17 @@ export default function AddAccountForm() {
                 label="Location"
                 placeholder="Enter location"
                 leftIcon={<MapPin size={18} />}
+                onChange={handleChange}
+                error={!!fieldErrors.location}
+                helperText={fieldErrors.location?.join(", ")}
+            />
+
+            <Textarea
+                value={formValue.whatsappApiKey}
+                name="whatsappApiKey"
+                label="WhatsApp Api Key"
+                placeholder="Enter WhatsApp Api Key"
+                leftIcon={<Key size={18} />}
                 onChange={handleChange}
                 error={!!fieldErrors.location}
                 helperText={fieldErrors.location?.join(", ")}
