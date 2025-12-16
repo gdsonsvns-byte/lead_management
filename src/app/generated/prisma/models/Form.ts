@@ -32,6 +32,8 @@ export type FormMinAggregateOutputType = {
   description: string | null
   slug: string | null
   createdAt: Date | null
+  adminWhatsappCampaignName: string | null
+  userWhatsappCampaignName: string | null
   accountId: string | null
 }
 
@@ -43,6 +45,8 @@ export type FormMaxAggregateOutputType = {
   description: string | null
   slug: string | null
   createdAt: Date | null
+  adminWhatsappCampaignName: string | null
+  userWhatsappCampaignName: string | null
   accountId: string | null
 }
 
@@ -54,6 +58,8 @@ export type FormCountAggregateOutputType = {
   description: number
   slug: number
   createdAt: number
+  adminWhatsappCampaignName: number
+  userWhatsappCampaignName: number
   accountId: number
   _all: number
 }
@@ -67,6 +73,8 @@ export type FormMinAggregateInputType = {
   description?: true
   slug?: true
   createdAt?: true
+  adminWhatsappCampaignName?: true
+  userWhatsappCampaignName?: true
   accountId?: true
 }
 
@@ -78,6 +86,8 @@ export type FormMaxAggregateInputType = {
   description?: true
   slug?: true
   createdAt?: true
+  adminWhatsappCampaignName?: true
+  userWhatsappCampaignName?: true
   accountId?: true
 }
 
@@ -89,6 +99,8 @@ export type FormCountAggregateInputType = {
   description?: true
   slug?: true
   createdAt?: true
+  adminWhatsappCampaignName?: true
+  userWhatsappCampaignName?: true
   accountId?: true
   _all?: true
 }
@@ -173,6 +185,8 @@ export type FormGroupByOutputType = {
   description: string | null
   slug: string
   createdAt: Date
+  adminWhatsappCampaignName: string | null
+  userWhatsappCampaignName: string | null
   accountId: string | null
   _count: FormCountAggregateOutputType | null
   _min: FormMinAggregateOutputType | null
@@ -205,6 +219,8 @@ export type FormWhereInput = {
   description?: Prisma.StringNullableFilter<"Form"> | string | null
   slug?: Prisma.StringFilter<"Form"> | string
   createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
+  adminWhatsappCampaignName?: Prisma.StringNullableFilter<"Form"> | string | null
+  userWhatsappCampaignName?: Prisma.StringNullableFilter<"Form"> | string | null
   accountId?: Prisma.StringNullableFilter<"Form"> | string | null
   fields?: Prisma.FormFieldListRelationFilter
   responses?: Prisma.ResponseListRelationFilter
@@ -220,6 +236,8 @@ export type FormOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   slug?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  adminWhatsappCampaignName?: Prisma.SortOrderInput | Prisma.SortOrder
+  userWhatsappCampaignName?: Prisma.SortOrderInput | Prisma.SortOrder
   accountId?: Prisma.SortOrderInput | Prisma.SortOrder
   fields?: Prisma.FormFieldOrderByRelationAggregateInput
   responses?: Prisma.ResponseOrderByRelationAggregateInput
@@ -238,6 +256,8 @@ export type FormWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"Form"> | string
   description?: Prisma.StringNullableFilter<"Form"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
+  adminWhatsappCampaignName?: Prisma.StringNullableFilter<"Form"> | string | null
+  userWhatsappCampaignName?: Prisma.StringNullableFilter<"Form"> | string | null
   accountId?: Prisma.StringNullableFilter<"Form"> | string | null
   fields?: Prisma.FormFieldListRelationFilter
   responses?: Prisma.ResponseListRelationFilter
@@ -253,6 +273,8 @@ export type FormOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   slug?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  adminWhatsappCampaignName?: Prisma.SortOrderInput | Prisma.SortOrder
+  userWhatsappCampaignName?: Prisma.SortOrderInput | Prisma.SortOrder
   accountId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.FormCountOrderByAggregateInput
   _max?: Prisma.FormMaxOrderByAggregateInput
@@ -270,6 +292,8 @@ export type FormScalarWhereWithAggregatesInput = {
   description?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
   slug?: Prisma.StringWithAggregatesFilter<"Form"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Form"> | Date | string
+  adminWhatsappCampaignName?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
+  userWhatsappCampaignName?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
   accountId?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
 }
 
@@ -280,6 +304,8 @@ export type FormCreateInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  adminWhatsappCampaignName?: string | null
+  userWhatsappCampaignName?: string | null
   fields?: Prisma.FormFieldCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
   user: Prisma.UserCreateNestedOneWithoutFormsInput
@@ -294,6 +320,8 @@ export type FormUncheckedCreateInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  adminWhatsappCampaignName?: string | null
+  userWhatsappCampaignName?: string | null
   accountId?: string | null
   fields?: Prisma.FormFieldUncheckedCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
@@ -306,6 +334,8 @@ export type FormUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutFormsNestedInput
@@ -320,6 +350,8 @@ export type FormUncheckedUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
@@ -333,6 +365,8 @@ export type FormCreateManyInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  adminWhatsappCampaignName?: string | null
+  userWhatsappCampaignName?: string | null
   accountId?: string | null
 }
 
@@ -343,6 +377,8 @@ export type FormUpdateManyMutationInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type FormUncheckedUpdateManyInput = {
@@ -353,6 +389,8 @@ export type FormUncheckedUpdateManyInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -374,6 +412,8 @@ export type FormCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  adminWhatsappCampaignName?: Prisma.SortOrder
+  userWhatsappCampaignName?: Prisma.SortOrder
   accountId?: Prisma.SortOrder
 }
 
@@ -385,6 +425,8 @@ export type FormMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  adminWhatsappCampaignName?: Prisma.SortOrder
+  userWhatsappCampaignName?: Prisma.SortOrder
   accountId?: Prisma.SortOrder
 }
 
@@ -396,6 +438,8 @@ export type FormMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  adminWhatsappCampaignName?: Prisma.SortOrder
+  userWhatsappCampaignName?: Prisma.SortOrder
   accountId?: Prisma.SortOrder
 }
 
@@ -523,6 +567,8 @@ export type FormCreateWithoutAccountInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  adminWhatsappCampaignName?: string | null
+  userWhatsappCampaignName?: string | null
   fields?: Prisma.FormFieldCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
   user: Prisma.UserCreateNestedOneWithoutFormsInput
@@ -536,6 +582,8 @@ export type FormUncheckedCreateWithoutAccountInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  adminWhatsappCampaignName?: string | null
+  userWhatsappCampaignName?: string | null
   fields?: Prisma.FormFieldUncheckedCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
 }
@@ -577,6 +625,8 @@ export type FormScalarWhereInput = {
   description?: Prisma.StringNullableFilter<"Form"> | string | null
   slug?: Prisma.StringFilter<"Form"> | string
   createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
+  adminWhatsappCampaignName?: Prisma.StringNullableFilter<"Form"> | string | null
+  userWhatsappCampaignName?: Prisma.StringNullableFilter<"Form"> | string | null
   accountId?: Prisma.StringNullableFilter<"Form"> | string | null
 }
 
@@ -587,6 +637,8 @@ export type FormCreateWithoutUserInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  adminWhatsappCampaignName?: string | null
+  userWhatsappCampaignName?: string | null
   fields?: Prisma.FormFieldCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
   account?: Prisma.AccountCreateNestedOneWithoutFormsInput
@@ -599,6 +651,8 @@ export type FormUncheckedCreateWithoutUserInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  adminWhatsappCampaignName?: string | null
+  userWhatsappCampaignName?: string | null
   accountId?: string | null
   fields?: Prisma.FormFieldUncheckedCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
@@ -637,6 +691,8 @@ export type FormCreateWithoutFieldsInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  adminWhatsappCampaignName?: string | null
+  userWhatsappCampaignName?: string | null
   responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
   user: Prisma.UserCreateNestedOneWithoutFormsInput
   account?: Prisma.AccountCreateNestedOneWithoutFormsInput
@@ -650,6 +706,8 @@ export type FormUncheckedCreateWithoutFieldsInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  adminWhatsappCampaignName?: string | null
+  userWhatsappCampaignName?: string | null
   accountId?: string | null
   responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
 }
@@ -677,6 +735,8 @@ export type FormUpdateWithoutFieldsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutFormsNestedInput
   account?: Prisma.AccountUpdateOneWithoutFormsNestedInput
@@ -690,6 +750,8 @@ export type FormUncheckedUpdateWithoutFieldsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
 }
@@ -701,6 +763,8 @@ export type FormCreateWithoutResponsesInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  adminWhatsappCampaignName?: string | null
+  userWhatsappCampaignName?: string | null
   fields?: Prisma.FormFieldCreateNestedManyWithoutFormInput
   user: Prisma.UserCreateNestedOneWithoutFormsInput
   account?: Prisma.AccountCreateNestedOneWithoutFormsInput
@@ -714,6 +778,8 @@ export type FormUncheckedCreateWithoutResponsesInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  adminWhatsappCampaignName?: string | null
+  userWhatsappCampaignName?: string | null
   accountId?: string | null
   fields?: Prisma.FormFieldUncheckedCreateNestedManyWithoutFormInput
 }
@@ -741,6 +807,8 @@ export type FormUpdateWithoutResponsesInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutFormsNestedInput
   account?: Prisma.AccountUpdateOneWithoutFormsNestedInput
@@ -754,6 +822,8 @@ export type FormUncheckedUpdateWithoutResponsesInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
 }
@@ -766,6 +836,8 @@ export type FormCreateManyAccountInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  adminWhatsappCampaignName?: string | null
+  userWhatsappCampaignName?: string | null
 }
 
 export type FormUpdateWithoutAccountInput = {
@@ -775,6 +847,8 @@ export type FormUpdateWithoutAccountInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutFormsNestedInput
@@ -788,6 +862,8 @@ export type FormUncheckedUpdateWithoutAccountInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
 }
@@ -800,6 +876,8 @@ export type FormUncheckedUpdateManyWithoutAccountInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type FormCreateManyUserInput = {
@@ -809,6 +887,8 @@ export type FormCreateManyUserInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  adminWhatsappCampaignName?: string | null
+  userWhatsappCampaignName?: string | null
   accountId?: string | null
 }
 
@@ -819,6 +899,8 @@ export type FormUpdateWithoutUserInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
   account?: Prisma.AccountUpdateOneWithoutFormsNestedInput
@@ -831,6 +913,8 @@ export type FormUncheckedUpdateWithoutUserInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
@@ -843,6 +927,8 @@ export type FormUncheckedUpdateManyWithoutUserInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -894,6 +980,8 @@ export type FormSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   description?: boolean
   slug?: boolean
   createdAt?: boolean
+  adminWhatsappCampaignName?: boolean
+  userWhatsappCampaignName?: boolean
   accountId?: boolean
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
   responses?: boolean | Prisma.Form$responsesArgs<ExtArgs>
@@ -910,6 +998,8 @@ export type FormSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   description?: boolean
   slug?: boolean
   createdAt?: boolean
+  adminWhatsappCampaignName?: boolean
+  userWhatsappCampaignName?: boolean
   accountId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   account?: boolean | Prisma.Form$accountArgs<ExtArgs>
@@ -923,6 +1013,8 @@ export type FormSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   description?: boolean
   slug?: boolean
   createdAt?: boolean
+  adminWhatsappCampaignName?: boolean
+  userWhatsappCampaignName?: boolean
   accountId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   account?: boolean | Prisma.Form$accountArgs<ExtArgs>
@@ -936,10 +1028,12 @@ export type FormSelectScalar = {
   description?: boolean
   slug?: boolean
   createdAt?: boolean
+  adminWhatsappCampaignName?: boolean
+  userWhatsappCampaignName?: boolean
   accountId?: boolean
 }
 
-export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "formsId" | "userId" | "title" | "description" | "slug" | "createdAt" | "accountId", ExtArgs["result"]["form"]>
+export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "formsId" | "userId" | "title" | "description" | "slug" | "createdAt" | "adminWhatsappCampaignName" | "userWhatsappCampaignName" | "accountId", ExtArgs["result"]["form"]>
 export type FormInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
   responses?: boolean | Prisma.Form$responsesArgs<ExtArgs>
@@ -972,6 +1066,8 @@ export type $FormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     description: string | null
     slug: string
     createdAt: Date
+    adminWhatsappCampaignName: string | null
+    userWhatsappCampaignName: string | null
     accountId: string | null
   }, ExtArgs["result"]["form"]>
   composites: {}
@@ -1407,6 +1503,8 @@ export interface FormFieldRefs {
   readonly description: Prisma.FieldRef<"Form", 'String'>
   readonly slug: Prisma.FieldRef<"Form", 'String'>
   readonly createdAt: Prisma.FieldRef<"Form", 'DateTime'>
+  readonly adminWhatsappCampaignName: Prisma.FieldRef<"Form", 'String'>
+  readonly userWhatsappCampaignName: Prisma.FieldRef<"Form", 'String'>
   readonly accountId: Prisma.FieldRef<"Form", 'String'>
 }
     

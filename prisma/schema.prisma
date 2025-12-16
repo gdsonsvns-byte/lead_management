@@ -29,14 +29,14 @@ enum FollowUpStatus {
 }
 
 model Account {
-  id           String  @id @default(uuid())
-  businessName String?
-  phone        String?
-  location     String?
-  email        String  @unique
-
-  users User[]
-  forms Form[]
+  id             String  @id @default(uuid())
+  businessName   String?
+  phone          String?
+  location       String?
+  email          String  @unique
+  whatsappApiKey String?
+  users          User[]
+  forms          Form[]
 
   createdAt DateTime @default(now())
 }
@@ -73,15 +73,17 @@ model ManagedUser {
 }
 
 model Form {
-  id          String      @id @default(uuid())
-  formsId     String
-  userId      String
-  title       String
-  description String?
-  slug        String      @unique
-  fields      FormField[]
-  responses   Response[]
-  createdAt   DateTime    @default(now())
+  id                        String      @id @default(uuid())
+  formsId                   String
+  userId                    String
+  title                     String
+  description               String?
+  slug                      String      @unique
+  fields                    FormField[]
+  responses                 Response[]
+  createdAt                 DateTime    @default(now())
+  adminWhatsappCampaignName String?
+  userWhatsappCampaignName  String?
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   account   Account? @relation(fields: [accountId], references: [id], onDelete: Cascade)
