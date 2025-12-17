@@ -211,33 +211,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             await sendResponseAlertEmail(form.account.email, form.account.businessName ?? "User", form.title);
         }
 
-        if (
-            form.userWhatsappCampaignName &&
-            form.account?.whatsappApiKey &&
-            userPhone
-        ) {
-            const phoneStr = String(userPhone).trim();
+        if (form.userWhatsappCampaignName && form.account?.whatsappApiKey && userPhone) {
 
+            const phoneStr = String(userPhone).trim();
             const destination = phoneStr.startsWith("+")
                 ? phoneStr
                 : `+91${phoneStr}`;
 
-            await sendWhatsappToUser({
+            const res = await sendWhatsappToUser({
                 apiKey: form.account.whatsappApiKey,
                 campaignName: form.userWhatsappCampaignName,
                 destination,
                 userName: form.account.businessName ?? "User",
-                templateParams: [],
+                templateParams: fieldValuesForAdmin,
             });
+            // console.log(res);
         }
 
 
-        if (
-            form.adminWhatsappCampaignName &&
-            form.account?.whatsappApiKey &&
-            form.account.phone
-        ) {
-            await sendWhatsappToAdmin({
+        if (form.adminWhatsappCampaignName && form.account?.whatsappApiKey && form.account.phone) {
+            const res = await sendWhatsappToAdmin({
                 apiKey: form.account.whatsappApiKey,
                 campaignName: form.adminWhatsappCampaignName,
                 destination: form.account.phone.startsWith("+")
