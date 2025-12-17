@@ -16,9 +16,9 @@ export async function sendWhatsappToUser({
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "x-api-key": apiKey
             },
             body: JSON.stringify({
+                apiKey,
                 campaignName,
                 destination,
                 userName,
@@ -50,17 +50,17 @@ export async function sendWhatsappToAdmin({
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "x-api-key": apiKey
             },
             body: JSON.stringify({
+                apiKey,
                 campaignName,
                 destination,
                 userName,
                 templateParams
             })
         });
-        // console.log(apiKey, campaignName, destination, userName, templateParams);
-
+        // console.log(apiKey, campaignName, destination, userName, templateParams);;
+        
         return await res.json();
     } catch (err) {
         console.error("Admin WhatsApp send failed:", err);
