@@ -37,6 +37,8 @@ export default function AddNewForm({ accountId }: { accountId?: string }) {
 interface CreateFormPayload {
   title: string;
   description: string;
+  adminCampaign?:string;
+  userCampaign?:string;
   fields: FormField[];
 }
 interface Props {
@@ -47,6 +49,8 @@ interface Props {
 function OpenForm({ onClose, accountId }: Props) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [adminCampaign, setAdminCampaign] = useState<string | "">("");
+  const [userCampaign, setUserCampaign] = useState<string | "">("");
   const [fields, setFields] = useState<FormField[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -109,8 +113,7 @@ function OpenForm({ onClose, accountId }: Props) {
       showMessage("error", "Form name is required.");
       return;
     }
-
-    const payload = { title, description, fields };
+    const payload = { title, description, adminCampaign,userCampaign, fields };
     mutate(payload);
   };
 
@@ -150,6 +153,23 @@ function OpenForm({ onClose, accountId }: Props) {
             placeholder="Short description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+
+        <div className="mt-4 flex gap-2">
+          <Input
+            type="text"
+            label="Admin Campaign Name"
+            placeholder="Example: admin_new_lead_alert"
+            value={adminCampaign}
+            onChange={(e) => setAdminCampaign(e.target.value)}
+          />
+          <Input
+            type="text"
+            label="User Campaign Name"
+            placeholder="Example: user_lead_received"
+            value={userCampaign}
+            onChange={(e) => setUserCampaign(e.target.value)}
           />
         </div>
 

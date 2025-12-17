@@ -30,6 +30,7 @@ export type AccountMinAggregateOutputType = {
   phone: string | null
   location: string | null
   email: string | null
+  whatsappApiKey: string | null
   createdAt: Date | null
 }
 
@@ -39,6 +40,7 @@ export type AccountMaxAggregateOutputType = {
   phone: string | null
   location: string | null
   email: string | null
+  whatsappApiKey: string | null
   createdAt: Date | null
 }
 
@@ -48,6 +50,7 @@ export type AccountCountAggregateOutputType = {
   phone: number
   location: number
   email: number
+  whatsappApiKey: number
   createdAt: number
   _all: number
 }
@@ -59,6 +62,7 @@ export type AccountMinAggregateInputType = {
   phone?: true
   location?: true
   email?: true
+  whatsappApiKey?: true
   createdAt?: true
 }
 
@@ -68,6 +72,7 @@ export type AccountMaxAggregateInputType = {
   phone?: true
   location?: true
   email?: true
+  whatsappApiKey?: true
   createdAt?: true
 }
 
@@ -77,6 +82,7 @@ export type AccountCountAggregateInputType = {
   phone?: true
   location?: true
   email?: true
+  whatsappApiKey?: true
   createdAt?: true
   _all?: true
 }
@@ -159,6 +165,7 @@ export type AccountGroupByOutputType = {
   phone: string | null
   location: string | null
   email: string
+  whatsappApiKey: string | null
   createdAt: Date
   _count: AccountCountAggregateOutputType | null
   _min: AccountMinAggregateOutputType | null
@@ -189,6 +196,7 @@ export type AccountWhereInput = {
   phone?: Prisma.StringNullableFilter<"Account"> | string | null
   location?: Prisma.StringNullableFilter<"Account"> | string | null
   email?: Prisma.StringFilter<"Account"> | string
+  whatsappApiKey?: Prisma.StringNullableFilter<"Account"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Account"> | Date | string
   users?: Prisma.UserListRelationFilter
   forms?: Prisma.FormListRelationFilter
@@ -200,6 +208,7 @@ export type AccountOrderByWithRelationInput = {
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrder
+  whatsappApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   users?: Prisma.UserOrderByRelationAggregateInput
   forms?: Prisma.FormOrderByRelationAggregateInput
@@ -214,6 +223,7 @@ export type AccountWhereUniqueInput = Prisma.AtLeast<{
   businessName?: Prisma.StringNullableFilter<"Account"> | string | null
   phone?: Prisma.StringNullableFilter<"Account"> | string | null
   location?: Prisma.StringNullableFilter<"Account"> | string | null
+  whatsappApiKey?: Prisma.StringNullableFilter<"Account"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Account"> | Date | string
   users?: Prisma.UserListRelationFilter
   forms?: Prisma.FormListRelationFilter
@@ -225,6 +235,7 @@ export type AccountOrderByWithAggregationInput = {
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrder
+  whatsappApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.AccountCountOrderByAggregateInput
   _max?: Prisma.AccountMaxOrderByAggregateInput
@@ -240,6 +251,7 @@ export type AccountScalarWhereWithAggregatesInput = {
   phone?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
   location?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
   email?: Prisma.StringWithAggregatesFilter<"Account"> | string
+  whatsappApiKey?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Account"> | Date | string
 }
 
@@ -249,6 +261,7 @@ export type AccountCreateInput = {
   phone?: string | null
   location?: string | null
   email: string
+  whatsappApiKey?: string | null
   createdAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutAccountInput
   forms?: Prisma.FormCreateNestedManyWithoutAccountInput
@@ -260,6 +273,7 @@ export type AccountUncheckedCreateInput = {
   phone?: string | null
   location?: string | null
   email: string
+  whatsappApiKey?: string | null
   createdAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutAccountInput
   forms?: Prisma.FormUncheckedCreateNestedManyWithoutAccountInput
@@ -271,6 +285,7 @@ export type AccountUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutAccountNestedInput
   forms?: Prisma.FormUpdateManyWithoutAccountNestedInput
@@ -282,6 +297,7 @@ export type AccountUncheckedUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutAccountNestedInput
   forms?: Prisma.FormUncheckedUpdateManyWithoutAccountNestedInput
@@ -293,6 +309,7 @@ export type AccountCreateManyInput = {
   phone?: string | null
   location?: string | null
   email: string
+  whatsappApiKey?: string | null
   createdAt?: Date | string
 }
 
@@ -302,6 +319,7 @@ export type AccountUpdateManyMutationInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -311,6 +329,7 @@ export type AccountUncheckedUpdateManyInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -320,6 +339,7 @@ export type AccountCountOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   location?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  whatsappApiKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -329,6 +349,7 @@ export type AccountMaxOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   location?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  whatsappApiKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -338,6 +359,7 @@ export type AccountMinOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   location?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  whatsappApiKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -399,6 +421,7 @@ export type AccountCreateWithoutUsersInput = {
   phone?: string | null
   location?: string | null
   email: string
+  whatsappApiKey?: string | null
   createdAt?: Date | string
   forms?: Prisma.FormCreateNestedManyWithoutAccountInput
 }
@@ -409,6 +432,7 @@ export type AccountUncheckedCreateWithoutUsersInput = {
   phone?: string | null
   location?: string | null
   email: string
+  whatsappApiKey?: string | null
   createdAt?: Date | string
   forms?: Prisma.FormUncheckedCreateNestedManyWithoutAccountInput
 }
@@ -435,6 +459,7 @@ export type AccountUpdateWithoutUsersInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   forms?: Prisma.FormUpdateManyWithoutAccountNestedInput
 }
@@ -445,6 +470,7 @@ export type AccountUncheckedUpdateWithoutUsersInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   forms?: Prisma.FormUncheckedUpdateManyWithoutAccountNestedInput
 }
@@ -455,6 +481,7 @@ export type AccountCreateWithoutFormsInput = {
   phone?: string | null
   location?: string | null
   email: string
+  whatsappApiKey?: string | null
   createdAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutAccountInput
 }
@@ -465,6 +492,7 @@ export type AccountUncheckedCreateWithoutFormsInput = {
   phone?: string | null
   location?: string | null
   email: string
+  whatsappApiKey?: string | null
   createdAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutAccountInput
 }
@@ -491,6 +519,7 @@ export type AccountUpdateWithoutFormsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutAccountNestedInput
 }
@@ -501,6 +530,7 @@ export type AccountUncheckedUpdateWithoutFormsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsappApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutAccountNestedInput
 }
@@ -551,6 +581,7 @@ export type AccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   phone?: boolean
   location?: boolean
   email?: boolean
+  whatsappApiKey?: boolean
   createdAt?: boolean
   users?: boolean | Prisma.Account$usersArgs<ExtArgs>
   forms?: boolean | Prisma.Account$formsArgs<ExtArgs>
@@ -563,6 +594,7 @@ export type AccountSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   phone?: boolean
   location?: boolean
   email?: boolean
+  whatsappApiKey?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["account"]>
 
@@ -572,6 +604,7 @@ export type AccountSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   phone?: boolean
   location?: boolean
   email?: boolean
+  whatsappApiKey?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["account"]>
 
@@ -581,10 +614,11 @@ export type AccountSelectScalar = {
   phone?: boolean
   location?: boolean
   email?: boolean
+  whatsappApiKey?: boolean
   createdAt?: boolean
 }
 
-export type AccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "businessName" | "phone" | "location" | "email" | "createdAt", ExtArgs["result"]["account"]>
+export type AccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "businessName" | "phone" | "location" | "email" | "whatsappApiKey" | "createdAt", ExtArgs["result"]["account"]>
 export type AccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Account$usersArgs<ExtArgs>
   forms?: boolean | Prisma.Account$formsArgs<ExtArgs>
@@ -605,6 +639,7 @@ export type $AccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     phone: string | null
     location: string | null
     email: string
+    whatsappApiKey: string | null
     createdAt: Date
   }, ExtArgs["result"]["account"]>
   composites: {}
@@ -1036,6 +1071,7 @@ export interface AccountFieldRefs {
   readonly phone: Prisma.FieldRef<"Account", 'String'>
   readonly location: Prisma.FieldRef<"Account", 'String'>
   readonly email: Prisma.FieldRef<"Account", 'String'>
+  readonly whatsappApiKey: Prisma.FieldRef<"Account", 'String'>
   readonly createdAt: Prisma.FieldRef<"Account", 'DateTime'>
 }
     

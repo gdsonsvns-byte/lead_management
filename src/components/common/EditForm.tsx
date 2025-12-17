@@ -1,13 +1,12 @@
 'use client';
 
-import { ClipboardListIcon, X, Plus, Trash2, PlusIcon } from "lucide-react";
+import { ClipboardListIcon, X, PlusIcon } from "lucide-react";
 import Spinner from "../ui/spinner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
 import Input from "../ui/Input";
-import { UpdateFormFields, UpdateFormSchema } from "@/src/types/form";
 import FieldItem from "../FieldItem";
 import toast from "react-hot-toast";
 

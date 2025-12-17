@@ -5,6 +5,7 @@ import { isRateLimited } from "@/src/lib/limiter";
 import prisma from "@/src/lib/prisma";
 import { verifyRole } from "@/src/lib/verifyRole";
 import { sendResponseAlertEmail } from "@/src/lib/sendResponseAlertEmail";
+import { sendWhatsappToAdmin, sendWhatsappToUser } from "@/src/lib/whatsapp";
 
 export const runtime = "nodejs";
 
@@ -77,7 +78,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
 
         const form = await prisma.form.findFirst({
             where: { id: formId },
-            include: { fields: true, account: true },
+            select: {
+                id: true,
+                title: true,
+                userId: true,
+                userWhatsappCampaignName: true,
+                adminWhatsappCampaignName: true,
+                fields: true,
+                account: true,
+            },
         });
 
         if (!form) {
@@ -142,10 +151,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             }
         }
 
+        let userPhone: string | null = null;
+        const fieldValuesForAdmin: string[] = [];
+
         const result = await prisma.$transaction(async (tx) => {
             const response = await tx.response.create({
                 data: { formId: form.id },
             });
+
 
             for (const ff of form.fields) {
                 const simpleValue = incoming[ff.id];
@@ -159,6 +172,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                     finalValue = Array.isArray(simpleValue)
                         ? JSON.stringify(simpleValue)
                         : String(simpleValue);
+                }
+                fieldValuesForAdmin.push(finalValue || "");
+                if (ff.label.toLowerCase().includes("phone") || ff.label.toLowerCase().includes("mobile") || ff.label.toLowerCase().includes("phone no.")) {
+                    userPhone = finalValue;
                 }
 
                 await tx.responseAnswer.create({
@@ -192,6 +209,43 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
 
         if (form.account?.email) {
             await sendResponseAlertEmail(form.account.email, form.account.businessName ?? "User", form.title);
+        }
+
+        if (
+            form.userWhatsappCampaignName &&
+            form.account?.whatsappApiKey &&
+            userPhone
+        ) {
+            const phoneStr = String(userPhone).trim();
+
+            const destination = phoneStr.startsWith("+")
+                ? phoneStr
+                : `+91${phoneStr}`;
+
+            await sendWhatsappToUser({
+                apiKey: form.account.whatsappApiKey,
+                campaignName: form.userWhatsappCampaignName,
+                destination,
+                userName: form.account.businessName ?? "User",
+                templateParams: [],
+            });
+        }
+
+
+        if (
+            form.adminWhatsappCampaignName &&
+            form.account?.whatsappApiKey &&
+            form.account.phone
+        ) {
+            await sendWhatsappToAdmin({
+                apiKey: form.account.whatsappApiKey,
+                campaignName: form.adminWhatsappCampaignName,
+                destination: form.account.phone.startsWith("+")
+                    ? form.account.phone
+                    : `+91${form.account.phone}`,
+                userName: form.account.businessName ?? "Admin",
+                templateParams: fieldValuesForAdmin,
+            });
         }
 
         return NextResponse.json(

@@ -1,5 +1,6 @@
 import Accounts from '@/src/components/Accounts'
-import React from 'react'
+import Spinner from '@/src/components/ui/spinner'
+import React, { Suspense } from 'react'
 
 export default function ListAccountPage() {
   return (
@@ -8,7 +9,9 @@ export default function ListAccountPage() {
         Accounts List
       </h1>
       <div className='relative mt-8'>
-        <Accounts />
+        <Suspense fallback={<Spinner />} >
+          <Accounts />
+        </Suspense>
       </div>
     </section>
   )

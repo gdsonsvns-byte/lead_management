@@ -166,7 +166,25 @@ export async function POST(req: Request) {
         }
 
         const { title, description, fields } = parsed.data;
+        const rawAdmin = body.adminCampaign;
+        const rawUser = body.userCampaign;
 
+        const adminCampaign = typeof rawAdmin === "string" ? rawAdmin.trim() : null;
+        const userCampaign = typeof rawUser === "string" ? rawUser.trim() : null;
+        
+        if (adminCampaign && adminCampaign.length > 100) {
+            return NextResponse.json(
+                { error: "Admin campaign name too long. Max 100 chars." },
+                { status: 400 }
+            );
+        }
+
+        if (userCampaign && userCampaign.length > 100) {
+            return NextResponse.json(
+                { error: "User campaign name too long. Max 100 chars." },
+                { status: 400 }
+            );
+        }
         const cleanTitle = title.trim();
         const cleanDescription = description?.trim() || "";
 
@@ -204,6 +222,8 @@ export async function POST(req: Request) {
                     slug,
                     userId: formOwnerUserId,
                     accountId: formOwnerAccountId,
+                    adminWhatsappCampaignName: adminCampaign ?? null,
+                    userWhatsappCampaignName: userCampaign ?? null,
                     fields: {
                         create: fields?.map((f, idx) => ({
                             label: f.label.trim(),

@@ -46,8 +46,8 @@ export const ADMIN_TABS: SidebarItem[] = [
         icon: ClipboardPenIcon,
     },
     {
-        name: "Add Account",
-        page: "/admin/create-account",
+        name: "Add New User",
+        page: "/admin/add_user",
         icon: ShieldUserIcon,
     },
     {

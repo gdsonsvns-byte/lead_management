@@ -1048,6 +1048,7 @@ export const AccountScalarFieldEnum = {
   phone: 'phone',
   location: 'location',
   email: 'email',
+  whatsappApiKey: 'whatsappApiKey',
   createdAt: 'createdAt'
 } as const
 
@@ -1091,6 +1092,8 @@ export const FormScalarFieldEnum = {
   description: 'description',
   slug: 'slug',
   createdAt: 'createdAt',
+  adminWhatsappCampaignName: 'adminWhatsappCampaignName',
+  userWhatsappCampaignName: 'userWhatsappCampaignName',
   accountId: 'accountId'
 } as const
 
