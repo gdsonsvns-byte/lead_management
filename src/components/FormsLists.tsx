@@ -1,14 +1,15 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import axios, { AxiosError } from "axios";
 import { useQuery } from "@tanstack/react-query";
 import Spinner from "./ui/spinner";
 import Link from "next/link";
-import { ArrowRight, ListChecks, CalendarDays } from "lucide-react";
+import { ArrowRight, ListChecks, CalendarDays, MessageCircle, CheckCircle, XCircle } from "lucide-react";
 import ViewForm from "./common/ViewForm";
 import { Toaster } from 'react-hot-toast';
 import EditForm from "./common/EditForm";
 import FormDropDown from "./FormDropDown";
+import ConfigureWapCampaign from "./common/configure_whatsapp_campaign_for_user_and_admin";
 
 interface FormField {
     id: string;
@@ -28,6 +29,8 @@ interface FormItem {
     description: string;
     slug: string;
     createdAt: string;
+    adminWhatsappCampaignName?: string,
+    userWhatsappCampaignName?: string,
     accountId: string;
     fields: FormField[];
 }
@@ -115,6 +118,53 @@ export default function FormsList({ accountId }: { accountId?: string }) {
                             {form.description || "No description"}
                         </p>
 
+                        <div className="flex flex-row gap-1 mt-2">
+                            <div className="flex items-center gap-2">
+                                <span
+                                    className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${form.adminWhatsappCampaignName ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"} `}
+                                    title={
+                                        form.adminWhatsappCampaignName
+                                            ? "Admin WhatsApp campaign connected"
+                                            : "Admin WhatsApp campaign missing"
+                                    }
+                                >
+                                    {form.adminWhatsappCampaignName ? (
+                                        <CheckCircle className="w-3 h-3 text-green-600" />
+                                    ) : (
+                                        <XCircle className="w-3 h-3 text-red-600" />
+                                    )}
+                                    Admin: {form.adminWhatsappCampaignName ? "Connected" : "Pending"}
+                                </span>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <span
+                                    className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${form.userWhatsappCampaignName ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}
+                                    title={
+                                        form.userWhatsappCampaignName
+                                            ? "User WhatsApp campaign connected"
+                                            : "User WhatsApp campaign missing"
+                                    }
+                                >
+                                    {form.adminWhatsappCampaignName ? (
+                                        <CheckCircle className="w-3 h-3 text-green-600" />
+                                    ) : (
+                                        <XCircle className="w-3 h-3 text-red-600" />
+                                    )}
+                                    User: {form.userWhatsappCampaignName ? "Connected" : "Pending"}
+                                </span>
+                            </div>
+                        </div>
+
+                        {!form.adminWhatsappCampaignName && !form.userWhatsappCampaignName && <div>
+                            <Link
+                                href={`?configure_wap=${form.id}`}
+                                className="inline-flex items-center justify-center px-3 py-1 text-xs font-medium border border-blue-600 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition"
+                            >
+                                Configure
+                            </Link>
+                        </div>}
+
                         <div className="flex items-center gap-2 text-sm text-zinc-700 mt-2">
                             <ListChecks className="w-4 h-4" />
                             <span>{form.fields.length} Fields</span>
@@ -166,9 +216,16 @@ export default function FormsList({ accountId }: { accountId?: string }) {
 
                 </div>
             )}
-            <ViewForm />
-            <EditForm />
-            <Toaster />
+            <Suspense fallback={<Spinner />} >
+                <ViewForm />
+                <EditForm />
+                <Toaster />
+                <ConfigureWapCampaign
+                    page={page}
+                    limit={limit}
+                    accountId={accountId}
+                />
+            </Suspense>
         </div>
     );
 }

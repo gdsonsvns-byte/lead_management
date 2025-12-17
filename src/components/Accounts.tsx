@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import Spinner from "./ui/spinner";
 import { generateNameInitials } from "../lib/generatePassword";
 import Link from "next/link";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight, CheckCircle, MessageCircle, XCircle } from "lucide-react";
 import AccountDropDown from "./AccountDropDown";
 import { Toaster } from "react-hot-toast";
 import AddWhatsappAPIKey from "./add_whatsapp_api_key";
@@ -118,7 +118,8 @@ export default function Accounts() {
                                 <span
                                     className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${isConnected ? "bg-green-100 text-green-700" : "bg-red-100 text-red-500"}`}
                                 >
-                                    <MessageCircle className="w-3 h-3" />
+                                    {isConnected ? <CheckCircle className="w-3 h-3 text-green-600" /> :
+                                        <XCircle className="w-3 h-3 text-red-600" />}
                                     {isConnected ? "Connected" : "Pending"}
                                 </span>
 
