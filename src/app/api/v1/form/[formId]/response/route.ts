@@ -239,6 +239,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                 userName: form.account.businessName ?? "Admin",
                 templateParams: fieldValuesForAdmin,
             });
+            // console.log(res);
         }
 
         return NextResponse.json(

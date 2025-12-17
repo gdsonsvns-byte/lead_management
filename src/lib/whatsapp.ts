@@ -1,10 +1,4 @@
-export async function sendWhatsappToUser({
-    apiKey,
-    campaignName,
-    destination,
-    userName,
-    templateParams = []
-}: {
+export async function sendWhatsappToUser({ apiKey, campaignName, destination, userName, templateParams = [] }: {
     apiKey: string;
     campaignName: string;
     destination: string;
@@ -12,6 +6,7 @@ export async function sendWhatsappToUser({
     templateParams?: string[];
 }) {
     try {
+        const safeParams = normalizeTemplateParams(templateParams);
         const res = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
             method: "POST",
             headers: {
@@ -22,7 +17,7 @@ export async function sendWhatsappToUser({
                 campaignName,
                 destination,
                 userName,
-                templateParams
+                templateParams: safeParams
             })
         });
 
@@ -32,13 +27,7 @@ export async function sendWhatsappToUser({
     }
 }
 
-export async function sendWhatsappToAdmin({
-    apiKey,
-    campaignName,
-    destination,
-    userName,
-    templateParams
-}: {
+export async function sendWhatsappToAdmin({ apiKey, campaignName, destination, userName, templateParams }: {
     apiKey: string;
     campaignName: string;
     destination: string;
@@ -46,6 +35,7 @@ export async function sendWhatsappToAdmin({
     templateParams: string[];
 }) {
     try {
+        const safeParams = normalizeTemplateParams(templateParams);
         const res = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
             method: "POST",
             headers: {
@@ -56,13 +46,32 @@ export async function sendWhatsappToAdmin({
                 campaignName,
                 destination,
                 userName,
-                templateParams
+                templateParams: safeParams,
             })
         });
-        // console.log(apiKey, campaignName, destination, userName, templateParams);;
-        
+
         return await res.json();
     } catch (err) {
         console.error("Admin WhatsApp send failed:", err);
     }
+}
+
+
+function normalizeTemplateParams(params: any[], emptyValue = "—"): string[] {
+    return params.map((p) => {
+        if (p === null || p === undefined) return emptyValue;
+
+        const value = String(p).trim();
+
+        if (
+            value === "" ||
+            value === "null" ||
+            value === "undefined" ||
+            value === "[]" ||
+            value === "{}"
+        ) {
+            return emptyValue;
+        }
+        return value;
+    });
 }
