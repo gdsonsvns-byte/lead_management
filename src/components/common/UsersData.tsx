@@ -136,7 +136,7 @@ export default function UsersData({ formId }: { formId: string }) {
     const [followBusinessStatus, setFollowBusinessStatus] = useState<string>("");
     const [columnVisibilityModel, setColumnVisibilityModel] = useState<any>({});
     const [openResponse, setOpenResponse] = useState<FormResponseItem | null>(null);
-    const [paginationModel, setPaginationModel] = useState({ pageSize: 20, page: 0 });
+    const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
 
     useEffect(() => {
         if (typeof window === "undefined") return;
