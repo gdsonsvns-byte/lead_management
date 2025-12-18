@@ -134,7 +134,10 @@ export async function GET(req: NextRequest) {
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";
         if (isRateLimited(ip)) {
-            return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 });
+            return NextResponse.json(
+                { error: "Too many requests. Try again later." },
+                { status: 429 }
+            );
         }
 
         const user = await verifyRole(["ADMIN", "SUPERADMIN"]);
@@ -144,11 +147,14 @@ export async function GET(req: NextRequest) {
 
         const userAccount = await prisma.user.findUnique({
             where: { id: user.id },
-            select: { accountId: true, role: true }
+            select: { accountId: true },
         });
 
         if (!userAccount?.accountId) {
-            return NextResponse.json({ error: "User account not found" }, { status: 404 });
+            return NextResponse.json(
+                { error: "User account not found" },
+                { status: 404 }
+            );
         }
 
         const { searchParams } = new URL(req.url);
@@ -159,9 +165,16 @@ export async function GET(req: NextRequest) {
         const skip = (page - 1) * limit;
 
         const now = new Date();
-        const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+        const endOfToday = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            23,
+            59,
+            59
+        );
 
-        const rawFollowUps = await prisma.followUp.findMany({
+        const followUps = await prisma.followUp.findMany({
             where: {
                 response: {
                     form: {
@@ -171,48 +184,89 @@ export async function GET(req: NextRequest) {
             },
             orderBy: { createdAt: "desc" },
             include: {
-                addedBy: { select: { id: true, name: true, email: true } },
+                addedBy: {
+                    select: { id: true, name: true, email: true },
+                },
                 response: {
-                    include: {
+                    select: {
+                        id: true,
+                        submittedAt: true,
                         answers: {
-                            include: {
+                            select: {
+                                value: true,
                                 field: {
-                                    select: {
-                                        label: true
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                    select: { label: true },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         });
 
-        const latestMap = new Map<string, (typeof rawFollowUps)[0]>();
-
-        for (const fu of rawFollowUps) {
-            if (!latestMap.has(fu.responseId)) {
-                latestMap.set(fu.responseId, fu);
+        const responseMap = new Map<
+            string,
+            {
+                responseId: string;
+                response: any;
+                lastFollowUp: any;
+                followUpHistory: any[];
             }
+        >();
+
+        for (const fu of followUps) {
+            if (!responseMap.has(fu.responseId)) {
+                responseMap.set(fu.responseId, {
+                    responseId: fu.responseId,
+                    response: fu.response, 
+                    lastFollowUp: {
+                        id: fu.id,
+                        status: fu.status,
+                        type:fu.type,
+                        businessStatus: fu.businessStatus,
+                        note: fu.note,
+                        nextFollowUpDate: fu.nextFollowUpDate,
+                        createdAt: fu.createdAt,
+                        addedBy: fu.addedBy,
+                    },
+                    followUpHistory: [],
+                });
+            }
+
+            responseMap.get(fu.responseId)!.followUpHistory.push({
+                id: fu.id,
+                status: fu.status,
+                type:fu.type,
+                businessStatus: fu.businessStatus,
+                note: fu.note,
+                nextFollowUpDate: fu.nextFollowUpDate,
+                createdAt: fu.createdAt,
+                addedBy: fu.addedBy,
+            });
         }
 
-        const filtered = Array.from(latestMap.values()).filter((fu) => {
-            const latestStatus = fu.status;
-            const nextDate = fu.nextFollowUpDate ? new Date(fu.nextFollowUpDate) : null;
+        /**
+         * 3️⃣ Apply state filter on LAST follow-up only
+         */
+        const filtered = Array.from(responseMap.values()).filter((item) => {
+            const last = item.lastFollowUp;
+            const nextDate = last.nextFollowUpDate
+                ? new Date(last.nextFollowUpDate)
+                : null;
 
             switch (state) {
                 case "pending":
                     return (
-                        latestStatus === "PENDING" &&
+                        last.status === "PENDING" &&
                         nextDate &&
                         nextDate <= endOfToday
                     );
 
                 case "completed":
-                    return latestStatus === "COMPLETED";
+                    return last.status === "COMPLETED";
 
                 case "cancelled":
-                    return latestStatus === "CANCELLED";
+                    return last.status === "CANCELLED";
 
                 case "all":
                     return true;
@@ -222,6 +276,9 @@ export async function GET(req: NextRequest) {
             }
         });
 
+        /**
+         * 4️⃣ Pagination
+         */
         const total = filtered.length;
         const paginated = filtered.slice(skip, skip + limit);
         const pageCount = Math.ceil(total / limit);
@@ -240,9 +297,12 @@ export async function GET(req: NextRequest) {
             },
             { status: 200 }
         );
-
     } catch (error: any) {
-        console.error("Fetch Today's FollowUps Error:", error.message);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        console.error("Fetch FollowUps Error:", error.message);
+        return NextResponse.json(
+            { error: "Internal Server Error" },
+            { status: 500 }
+        );
     }
 }
+
