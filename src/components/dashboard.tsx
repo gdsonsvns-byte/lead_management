@@ -136,7 +136,7 @@ function extractLeadInfo(response: LeadResponse) {
         const value = ans.value;
         if (!value) return;
 
-        if (label.includes("name")) info.name = value;
+        if (label.includes("name") || label.includes("contact person")) info.name = value;
         else if (label.includes("phone") || label.includes("mobile")) info.phone = value;
         else if (label.includes("email")) info.email = value;
         else if (label.includes("location") || label.includes("city")) info.location = value;
