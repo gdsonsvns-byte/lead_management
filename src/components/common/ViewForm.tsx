@@ -30,7 +30,6 @@ export default function ViewForm() {
         }));
     };
 
-
     const { data, isLoading, isError } = useQuery({
         queryKey: ["view-form", formId],
         queryFn: async () => {
@@ -61,7 +60,7 @@ export default function ViewForm() {
                 return (
                     <input
                         type={field.type}
-                        placeholder={`${field.label}${field.required && '*'}`}
+                        placeholder={`${field.label}${field.required ? '*' : ''}`}
                         className={baseClass}
                         onChange={(e) => handleChange(field, e.target.value)}
                         required={field.required}
@@ -71,7 +70,7 @@ export default function ViewForm() {
             case "textarea":
                 return (
                     <textarea
-                        placeholder={`${field.label}${field.required && '*'}`}
+                        placeholder={`${field.label}${field.required ? '*' : ''}`}
                         rows={3}
                         className={baseClass}
                         onChange={(e) => handleChange(field, e.target.value)}
@@ -167,10 +166,12 @@ export default function ViewForm() {
             return res.data;
         },
         onSuccess: () => {
-            setMessage({ type: "success", text: "Form data successfully!" });
+            setMessage({ type: "success", text: "Form data submitted successfully!" });
             toast.success('Form updated successfully!', {
                 duration: 5000
             });
+            setTimeout(closeModal,500);
+            setFormValues({})
         },
         onError: (err: any) => {
             const msg = err?.response?.data?.error || "Data submission failed";

@@ -160,7 +160,7 @@ export default function UsersData({ formId }: { formId: string }) {
     }, [openResponse]);
 
 
-    const { data, isLoading, isError } = useQuery<FormResponsesData>({
+    const { data, isLoading, isError, isFetching } = useQuery<FormResponsesData>({
         queryKey: ["form_responses", formId, paginationModel.page, paginationModel.pageSize, currentState],
         queryFn: async () => {
             const res = await axios.get(`/api/v1/form/${formId}/response`, {
@@ -334,7 +334,11 @@ export default function UsersData({ formId }: { formId: string }) {
                     </SelectContent>
                 </Select>
             </div>
-
+            {isFetching && !isLoading && (
+                <div className="absolute inset-0 bg-white/60 flex justify-center items-center z-10">
+                    <Spinner />
+                </div>
+            )}
             <DataGrid
                 showToolbar
                 rows={responses}
@@ -507,7 +511,18 @@ export default function UsersData({ formId }: { formId: string }) {
                                                     </TextField>
 
                                                     <TextField
-                                                        // label="Lead Status"
+                                                        label="Follow Up details"
+                                                        multiline
+                                                        rows={3}
+                                                        value={followNote}
+                                                        onChange={(e) => setFollowNote(e.target.value)}
+                                                        placeholder="Write note..."
+                                                        fullWidth
+                                                    />
+
+
+                                                    <TextField
+                                                        label="Next Action"
                                                         select
                                                         value={followBusinessStatus}
                                                         onChange={(e) => {
@@ -526,16 +541,6 @@ export default function UsersData({ formId }: { formId: string }) {
                                                             </option>
                                                         ))}
                                                     </TextField>
-
-                                                    <TextField
-                                                        label="Note"
-                                                        multiline
-                                                        rows={3}
-                                                        value={followNote}
-                                                        onChange={(e) => setFollowNote(e.target.value)}
-                                                        placeholder="Write note..."
-                                                        fullWidth
-                                                    />
 
                                                     {followBusinessStatus && !CLOSED_BUSINESS_STATUSES.includes(followBusinessStatus) && (
                                                         <TextField
