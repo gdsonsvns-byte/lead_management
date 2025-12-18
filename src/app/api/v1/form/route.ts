@@ -55,7 +55,23 @@ export async function GET(req: Request) {
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
-            include: { fields: true },
+            select: {
+                id: true,
+                formsId: true,
+                userId: true,
+                title: true,
+                description: true,
+                slug: true,
+                createdAt: true,
+                adminWhatsappCampaignName: true,
+                userWhatsappCampaignName: true,
+                accountId: true,
+                _count: {
+                    select: {
+                        fields: true,
+                    },
+                },
+            },
         });
 
         const totalForm = await prisma.form.count({
@@ -171,7 +187,7 @@ export async function POST(req: Request) {
 
         const adminCampaign = typeof rawAdmin === "string" ? rawAdmin.trim() : null;
         const userCampaign = typeof rawUser === "string" ? rawUser.trim() : null;
-        
+
         if (adminCampaign && adminCampaign.length > 100) {
             return NextResponse.json(
                 { error: "Admin campaign name too long. Max 100 chars." },

@@ -8,16 +8,6 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import Spinner from "./ui/spinner";
 
-
-interface FormField {
-    id: string;
-    formId: string;
-    label: string;
-    type: string;
-    options: string;
-    required: boolean;
-    order: number;
-}
 interface FormItem {
     id: string;
     formsId: string;
@@ -27,7 +17,9 @@ interface FormItem {
     slug: string;
     createdAt: string;
     accountId: string;
-    fields: FormField[];
+    _count: {
+        fields: number;
+    };
 }
 interface Props {
     formData: FormItem
@@ -99,7 +91,7 @@ export default function FormDropDown({ formData }: Props) {
                             View Form
                             <EyeIcon size={14} className="text-zinc-700" />
                         </Link>
-                        
+
                     </DropdownMenuItem>
 
                     <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
