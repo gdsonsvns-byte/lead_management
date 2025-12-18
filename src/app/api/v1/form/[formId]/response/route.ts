@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isRateLimited } from "@/src/lib/limiter";
 import prisma from "@/src/lib/prisma";
 import { verifyRole } from "@/src/lib/verifyRole";
-import { sendResponseAlertEmail } from "@/src/lib/sendResponseAlertEmail";
+import { sendResponseAlertEmail, sendResponseAlertEmailToUser } from "@/src/lib/sendResponseAlertEmail";
 import { sendWhatsappToAdmin, sendWhatsappToUser } from "@/src/lib/whatsapp";
 
 export const runtime = "nodejs";
@@ -152,6 +152,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
         }
 
         let userPhone: string | null = null;
+        let userEmail: string | null = null;
         const fieldValuesForAdmin: string[] = [];
 
         const result = await prisma.$transaction(async (tx) => {
@@ -174,8 +175,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                         : String(simpleValue);
                 }
                 fieldValuesForAdmin.push(finalValue || "");
-                if (ff.label.toLowerCase().includes("phone") || ff.label.toLowerCase().includes("mobile") || ff.label.toLowerCase().includes("phone no.")) {
+                if (ff.label.toLowerCase().includes("phone") || ff.label.toLowerCase().includes("mobile") || ff.label.toLowerCase().includes("phone no.") || ff.label.toLowerCase().includes("contact no.") || ff.label.toLowerCase().includes("contact")) {
                     userPhone = finalValue;
+                }
+                if (ff.label.toLowerCase().includes("email") || ff.label.toLowerCase().includes("email id") || ff.label.toLowerCase().includes("emailId") || ff.label.toLowerCase().includes("email Id")) {
+                    userEmail = finalValue;
                 }
 
                 await tx.responseAnswer.create({
@@ -207,30 +211,45 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             },
         });
 
+        const emailPromises: Promise<any>[] = [];
+        const whatsappPromises: Promise<any>[] = [];
+
         if (form.account?.email) {
-            await sendResponseAlertEmail(form.account.email, form.account.businessName ?? "User", form.title);
+            emailPromises.push(sendResponseAlertEmail({
+                userEmail: form.account.email,
+                allFields: fieldValuesForAdmin,
+                accountName: form.account.businessName ?? "Admin",
+                formName: form.title
+            }))
+        }
+        if (userEmail) {
+            emailPromises.push(sendResponseAlertEmailToUser({
+                userEmail, allFields: fieldValuesForAdmin, accountName: form.account?.businessName ?? "User"
+            })
+            );
+        }
+
+        if (emailPromises.length > 0) {
+            await Promise.allSettled(emailPromises);
         }
 
         if (form.userWhatsappCampaignName && form.account?.whatsappApiKey && userPhone) {
-
             const phoneStr = String(userPhone).trim();
             const destination = phoneStr.startsWith("+")
                 ? phoneStr
                 : `+91${phoneStr}`;
 
-            const res = await sendWhatsappToUser({
+            whatsappPromises.push(sendWhatsappToUser({
                 apiKey: form.account.whatsappApiKey,
                 campaignName: form.userWhatsappCampaignName,
                 destination,
                 userName: form.account.businessName ?? "User",
                 templateParams: fieldValuesForAdmin,
-            });
-            // console.log(res);
+            }));
         }
 
-
         if (form.adminWhatsappCampaignName && form.account?.whatsappApiKey && form.account.phone) {
-            const res = await sendWhatsappToAdmin({
+            whatsappPromises.push(sendWhatsappToAdmin({
                 apiKey: form.account.whatsappApiKey,
                 campaignName: form.adminWhatsappCampaignName,
                 destination: form.account.phone.startsWith("+")
@@ -238,8 +257,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                     : `+91${form.account.phone}`,
                 userName: form.account.businessName ?? "Admin",
                 templateParams: fieldValuesForAdmin,
-            });
-            // console.log(res);
+            }));
+        }
+
+        if (whatsappPromises.length > 0) {
+            await Promise.allSettled(whatsappPromises);
         }
 
         return NextResponse.json(
