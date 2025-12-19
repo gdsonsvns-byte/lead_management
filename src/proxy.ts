@@ -13,8 +13,9 @@ const ROLE_ROUTES = {
     ADMIN: ["/admin"],
     SUPERADMIN: ["/system_admin", "/superadmin"],
 };
-const ROLE_DASHBOARD: Record<"ADMIN" | "SUPERADMIN", string> = {
+const ROLE_DASHBOARD: Record<"ADMIN" | "MANAGER" | "SUPERADMIN", string> = {
     ADMIN: "/admin/dashboard",
+    MANAGER: "/admin/dashboard",
     SUPERADMIN: "/system_admin/dashboard",
 };
 
@@ -22,9 +23,9 @@ function safeVerifyToken(token: string | null) {
     if (!token) return null;
     try {
         return jwt.verify(token, JWT_SECRET) as {
-            id: string;
-            email: string;
-            role: "ADMIN" | "SUPERADMIN";
+            sub: string;
+            accountId: string;
+            role: "ADMIN" | "SUPERADMIN" | "MANAGER";
         };
     } catch {
         return null;
@@ -46,7 +47,7 @@ export function proxy(req: NextRequest) {
     }
 
     if (isPublic) {
-        if (decoded.role === "ADMIN") {
+        if (decoded.role === "ADMIN" || decoded.role === "MANAGER") {
             return NextResponse.redirect(new URL("/admin/dashboard", req.url));
         }
         if (decoded.role === "SUPERADMIN") {
