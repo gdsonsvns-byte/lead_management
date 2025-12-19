@@ -1,13 +1,17 @@
 "use server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { DecodedUser } from "./auth";
 const JWT_SECRET = process.env.JWT_SECRET!;
 
 export interface AuthContext {
     sub: string;
     accountId: string;
     role: string;
+}
+interface DecodedUser {
+    sub: string;
+    accountId: string;
+    role: "ADMIN" | "SUPERADMIN" | "MANAGER";
 }
 
 export async function verifyRole(allowedRoles: string[] | string): Promise<AuthContext | null> {
@@ -20,6 +24,7 @@ export async function verifyRole(allowedRoles: string[] | string): Promise<AuthC
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET) as DecodedUser;
+        
         const roles = Array.isArray(allowedRoles)
             ? allowedRoles
             : [allowedRoles];

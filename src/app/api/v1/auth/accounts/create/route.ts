@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
         if (!isSuperAdmin) {
             return NextResponse.json(
                 { error: "Unauthorized" },
-                { status: 403 }
+                { status: 401 }
             );
         }
 
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         }
         const data = parsed.data;
         const email = data.email.toLowerCase().trim();
-        
+
         const existingUser = await prisma.user.findUnique({
             where: { email },
         });
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
                         email,
                         password: hashedPassword,
                         role: "ADMIN",
-                        createdById: isSuperAdmin.id,
+                        createdById: isSuperAdmin.sub,
                     },
                 },
             },

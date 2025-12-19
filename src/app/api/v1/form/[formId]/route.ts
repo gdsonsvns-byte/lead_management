@@ -53,19 +53,16 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ f
             );
         }
         const user = await verifyRole(["ADMIN", "SUPERADMIN"])
+        if (!user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
         const { formId } = await params
 
         if (!formId || formId.trim() === "") {
             return NextResponse.json({ error: "Invalid form ID" }, { status: 400 })
-        }
-
-        const userAccount = await prisma.user.findUnique({
-            where: { id: user.id },
-            select: { accountId: true, role: true }
-        });
-
-        if (!userAccount?.accountId) {
-            return NextResponse.json({ error: "User account not found" }, { status: 404 });
         }
 
         const form = await prisma.form.findUnique({
@@ -77,7 +74,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ f
             return NextResponse.json({ error: "Form not found" }, { status: 404 });
         }
 
-        if (user.role === "ADMIN" && form.accountId !== userAccount.accountId) {
+        if (user.role === "ADMIN" && form.accountId !== user.accountId) {
             return NextResponse.json(
                 { error: "You do not have permission to delete this form." },
                 { status: 403 }
@@ -161,18 +158,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
         }
 
         const user = await verifyRole(["ADMIN", "SUPERADMIN"])
+        if (!user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
         const contentLength = Number(req.headers.get("content-length") || 0)
         if (contentLength > 50_000) {
             return NextResponse.json({ error: "Payload too large" }, { status: 413 })
-        }
-
-        const userAccount = await prisma.user.findUnique({
-            where: { id: user.id },
-            select: { accountId: true, role: true }
-        });
-
-        if (!userAccount?.accountId) {
-            return NextResponse.json({ error: "User account not found" }, { status: 404 });
         }
 
         const { formId } = await params
@@ -189,7 +183,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
             return NextResponse.json({ error: "Form not found" }, { status: 404 });
         }
 
-        if (user.role === "ADMIN" && form.accountId !== userAccount.accountId) {
+        if (user.role === "ADMIN" && form.accountId !== user.accountId) {
             return NextResponse.json(
                 { error: "You do not have permission to update this form." },
                 { status: 403 }

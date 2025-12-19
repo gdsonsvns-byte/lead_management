@@ -7,7 +7,7 @@ export async function getAuthUser() {
         if (!user) return null;
 
         const dbUser = await prisma.user.findFirst({
-            where: { email: user.email },
+            where: { id: user.sub },
             select: {
                 id: true,
                 name: true,

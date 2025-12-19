@@ -17,6 +17,12 @@ export async function GET(req: Request) {
         }
 
         const user = await verifyRole(["ADMIN", "SUPERADMIN"])
+        if (!user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
         const { searchParams } = new URL(req.url);
         const page = Math.max(Number(searchParams.get("page")) || 1, 1);
         const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 10, 1), 50);
@@ -35,20 +41,16 @@ export async function GET(req: Request) {
                 );
             }
         }
+        console.log(user.accountId, user.role, user.sub);
 
-        const account = await prisma.user.findUnique({
-            where: { id: user?.sub },
-            select: { accountId: true }
-        });
-
-        if (!account?.accountId && queryAccountId === "") {
+        if (!user.accountId && queryAccountId === "") {
             return NextResponse.json(
                 { error: "Account not found." },
                 { status: 404 }
             );
         }
 
-        const finalAccountId = queryAccountId !== "" ? queryAccountId : account?.accountId;
+        const finalAccountId = queryAccountId !== "" ? queryAccountId : user.accountId;
 
         const forms = await prisma.form.findMany({
             where: { accountId: finalAccountId },
@@ -101,7 +103,6 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: err.message }, { status: 500 })
     }
 }
-
 // create form 
 export async function POST(req: Request) {
     try {
@@ -114,6 +115,12 @@ export async function POST(req: Request) {
         }
 
         const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        if (!user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
         const contentLength = Number(req.headers.get("content-length") || 0);
         if (contentLength > 50_000) {
             return NextResponse.json({ error: "Payload too large" }, { status: 413 });
@@ -125,16 +132,16 @@ export async function POST(req: Request) {
         const body = await req.json();
 
         const userAccount = await prisma.user.findUnique({
-            where: { id: user?.sub },
-            select: { accountId: true, role: true, name: true }
+            where: { id: user.sub },
+            select: { role: true, name: true }
         });
 
-        if (!userAccount?.accountId) {
+        if (!userAccount) {
             return NextResponse.json({ error: "User account not found" }, { status: 404 });
         }
 
         let formOwnerUserId = user?.sub;
-        let formOwnerAccountId = userAccount.accountId;
+        let formOwnerAccountId = user.accountId;
         let formOwnerName = userAccount.name;
 
         if (user?.role === "SUPERADMIN") {
