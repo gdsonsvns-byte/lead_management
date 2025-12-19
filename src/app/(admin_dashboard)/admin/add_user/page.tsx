@@ -1,6 +1,6 @@
 import AddNewUser from '@/src/components/common/add_new_user'
 import Spinner from '@/src/components/ui/spinner'
-import React, { Suspense } from 'react'
+import { Suspense } from 'react'
 
 export default function page() {
   return (

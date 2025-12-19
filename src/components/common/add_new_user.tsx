@@ -22,7 +22,7 @@ type CreateUserPayload = {
 export default function AddNewUser() {
     const searchParams = useSearchParams();
     const accountId = searchParams.get("account_id") ?? undefined;
-
+    
     const [formValue, setFormValue] = useState<NewUser>({
         name: "",
         email: "",

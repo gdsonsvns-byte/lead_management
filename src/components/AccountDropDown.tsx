@@ -60,12 +60,17 @@ export default function AccountDropDown({ details, page, limit }: Props) {
                 <DropdownMenuGroup>
                     <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
                         <Link href={`/system_admin/accounts/${details.id}/view`}>
-                            View all forms
+                            View all Forms
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
                         <Link href={`/system_admin/accounts/${details.id}/add`}>
-                            Add new form
+                            Add New Form
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
+                        <Link href={`/system_admin/accounts/add_new_user?account_id=${details.id}`}>
+                            Add New User
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-gray-300" />
