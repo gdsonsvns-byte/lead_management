@@ -87,30 +87,26 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
                 </div>
             </div>
 
-            {
-                !currentPath.startsWith('/admin') && (
-                    <div className="p-6 rounded-xl bg-white shadow">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                            Users
-                        </h2>
+            <div className="p-6 rounded-xl bg-white shadow">
+                <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                    Users
+                </h2>
 
-                        <div className="space-y-3">
-                            {account.users.map((u) => (
-                                <div
-                                    key={u.id}
-                                    className="p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition"
-                                >
-                                    <p className="text-gray-800 font-medium">{u.name}</p>
-                                    <p className="text-gray-500 text-sm">{u.email}</p>
-                                    <span className="mt-1 inline-block text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700">
-                                        {u.role}
-                                    </span>
-                                </div>
-                            ))}
+                <div className="space-y-3">
+                    {account.users.map((u) => (
+                        <div
+                            key={u.id}
+                            className="p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition"
+                        >
+                            <p className="text-gray-800 font-medium">{u.name}</p>
+                            <p className="text-gray-500 text-sm">{u.email}</p>
+                            <span className="mt-1 inline-block text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700">
+                                {u.role}
+                            </span>
                         </div>
-                    </div>
-                )
-            }
+                    ))}
+                </div>
+            </div>
             <Toaster />
         </div>
     );

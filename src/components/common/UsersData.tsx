@@ -309,7 +309,7 @@ export default function UsersData({ formId }: { formId: string }) {
 
 
     return (
-        <div className="w-full">
+        <div className="w-full overflow-hidden">
             <div className="flex justify-between items-center mb-5">
                 <h1 className="font-bold text-zinc-800 text-xl">{data?.title ? `Responses of ${data.title}` : "Responses"}</h1>
             </div>
