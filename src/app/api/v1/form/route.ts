@@ -37,7 +37,7 @@ export async function GET(req: Request) {
         }
 
         const account = await prisma.user.findUnique({
-            where: { id: user.id },
+            where: { id: user?.sub },
             select: { accountId: true }
         });
 
@@ -125,7 +125,7 @@ export async function POST(req: Request) {
         const body = await req.json();
 
         const userAccount = await prisma.user.findUnique({
-            where: { id: user.id },
+            where: { id: user?.sub },
             select: { accountId: true, role: true, name: true }
         });
 
@@ -133,11 +133,11 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "User account not found" }, { status: 404 });
         }
 
-        let formOwnerUserId = user.id;
+        let formOwnerUserId = user?.sub;
         let formOwnerAccountId = userAccount.accountId;
         let formOwnerName = userAccount.name;
 
-        if (user.role === "SUPERADMIN") {
+        if (user?.role === "SUPERADMIN") {
             if (!targetAccountIdFromQuery || typeof targetAccountIdFromQuery !== "string") {
                 return NextResponse.json(
                     { error: "SUPERADMIN must send account_id in searchParams" },
@@ -236,7 +236,7 @@ export async function POST(req: Request) {
                     description: cleanDescription,
                     formsId: uniqueId,
                     slug,
-                    userId: formOwnerUserId,
+                    userId: formOwnerUserId!,
                     accountId: formOwnerAccountId,
                     adminWhatsappCampaignName: adminCampaign ?? null,
                     userWhatsappCampaignName: userCampaign ?? null,

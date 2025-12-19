@@ -7,22 +7,39 @@ import { AuthUser } from './verifySuperAdmin'
 const JWT_SECRET = process.env.JWT_SECRET!
 
 export async function login(email: string, password: string) {
-    const user = await prisma.user.findUnique({ where: { email } })
+    const user = await prisma.user.findUnique({
+        where: { email },
+        select: {
+            id: true,
+            email: true,
+            password: true,
+            role: true,
+            accountId: true,
+        },
+    });
+
     if (!user) return "User not found";
 
-    const valid = await bcrypt.compare(password, user.password)
+    const valid = await bcrypt.compare(password, user.password);
     if (!valid) return "Invalid password";
 
-    const token = jwt.sign({ id: user.id, role: user.role, email: user.email }, JWT_SECRET, {
-        expiresIn: "1d",
-    })
-    return { token, user }
+    const token = jwt.sign(
+        {
+            sub: user.id,
+            accountId: user.accountId,
+            role: user.role,
+        },
+        JWT_SECRET,
+        { expiresIn: "1d" }
+    );
+
+    return { token };
 }
 
 export interface DecodedUser {
-    id: string;
-    role: "ADMIN" | "SUPERADMIN";
-    email: string
+    sub: string;
+    accountId: string;
+    role: "ADMIN" | "SUPERADMIN" | "MANAGER";
 }
 
 export function verifyToken(token: string): DecodedUser | null {
