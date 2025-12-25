@@ -3,7 +3,7 @@ import { verifyRole } from "@/src/lib/verifyRole";
 
 export async function getAuthUser() {
     try {
-        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        const user = await verifyRole(["SUPERADMIN", "ADMIN","MANAGER"]);
         if (!user) return null;
 
         const dbUser = await prisma.user.findFirst({

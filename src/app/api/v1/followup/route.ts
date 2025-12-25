@@ -140,7 +140,7 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        const user = await verifyRole(["ADMIN", "SUPERADMIN"]);
+        const user = await verifyRole(["ADMIN", "SUPERADMIN","MANAGER"]);
         if (!user) {
             return NextResponse.json(
                 { error: "Unauthorized" },
