@@ -6,18 +6,25 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 const PUBLIC_ROUTES = [
     "/login",
     "/forget-password",
-    "/reset-password"
+    "/reset-password",
 ];
 
-const ROLE_ROUTES = {
-    ADMIN: ["/admin"],
-    SUPERADMIN: ["/system_admin", "/superadmin"],
+const ALLOWED_ORIGINS = [
+    "https://forms.wizards.co.in",
+    "http://localhost:3000",
+];
+
+type Role = "ADMIN" | "MANAGER" | "SUPERADMIN";
+const ROUTE_PERMISSIONS: Record<string, Role[]> = {
+    "/admin/dashboard": ["ADMIN", "MANAGER"],
+    "/system_admin": ["SUPERADMIN"],
 };
-const ROLE_DASHBOARD: Record<"ADMIN" | "MANAGER" | "SUPERADMIN", string> = {
+const ROLE_DASHBOARD: Record<Role, string> = {
     ADMIN: "/admin/dashboard",
     MANAGER: "/admin/dashboard",
     SUPERADMIN: "/system_admin/dashboard",
 };
+
 
 function safeVerifyToken(token: string | null) {
     if (!token) return null;
@@ -25,18 +32,45 @@ function safeVerifyToken(token: string | null) {
         return jwt.verify(token, JWT_SECRET) as {
             sub: string;
             accountId: string;
-            role: "ADMIN" | "SUPERADMIN" | "MANAGER";
+            role: Role;
         };
     } catch {
         return null;
     }
 }
 
+
 export function proxy(req: NextRequest) {
     const pathname = req.nextUrl.pathname;
+    const origin = req.headers.get("origin");
+
+    if (pathname.startsWith("/api")) {
+        if (origin && ALLOWED_ORIGINS.includes(origin)) {
+            if (req.method === "OPTIONS") {
+                return new NextResponse(null, {
+                    status: 200,
+                    headers: {
+                        "Access-Control-Allow-Origin": origin,
+                        "Access-Control-Allow-Methods":
+                            "GET,POST,PUT,DELETE,OPTIONS",
+                        "Access-Control-Allow-Headers":
+                            "Content-Type, Authorization",
+                        "Access-Control-Allow-Credentials": "true",
+                    },
+                });
+            }
+
+            const res = NextResponse.next();
+            res.headers.set("Access-Control-Allow-Origin", origin);
+            res.headers.set("Access-Control-Allow-Credentials", "true");
+            return res;
+        }
+        return NextResponse.next();
+    }
+
+
     const token = req.cookies.get("token")?.value || null;
     const decoded = safeVerifyToken(token);
-
     const isPublic = PUBLIC_ROUTES.includes(pathname);
 
     if (!decoded) {
@@ -46,29 +80,30 @@ export function proxy(req: NextRequest) {
         return NextResponse.next();
     }
 
-    if (isPublic) {
-        if (decoded.role === "ADMIN" || decoded.role === "MANAGER") {
-            return NextResponse.redirect(new URL("/admin/dashboard", req.url));
-        }
+    if (pathname === "/login") {
         if (decoded.role === "SUPERADMIN") {
-            return NextResponse.redirect(new URL("/system_admin/dashboard", req.url));
+            return NextResponse.redirect(
+                new URL("/system_admin/dashboard", req.url)
+            );
         }
-    }
-
-    for (const role in ROLE_ROUTES) {
-        const allowedPaths = ROLE_ROUTES[role as keyof typeof ROLE_ROUTES];
-
-        const isRestrictedPage = allowedPaths.some((route) =>
-            pathname.startsWith(route)
+        return NextResponse.redirect(
+            new URL("/admin/dashboard", req.url)
         );
+    }
 
-        if (isRestrictedPage && decoded.role !== role) {
-            const userDashboard = ROLE_DASHBOARD[decoded.role];
-            return NextResponse.redirect(new URL(userDashboard, req.url));
+    for (const route in ROUTE_PERMISSIONS) {
+        if (pathname.startsWith(route)) {
+            const allowedRoles = ROUTE_PERMISSIONS[route];
+
+            if (!allowedRoles.includes(decoded.role)) {
+                return NextResponse.redirect(
+                    new URL(ROLE_DASHBOARD[decoded.role], req.url)
+                );
+            }
         }
     }
 
-    if (pathname === '/') {
+    if (pathname === "/") {
         return NextResponse.redirect(new URL("/login", req.url));
     }
 
@@ -78,9 +113,9 @@ export function proxy(req: NextRequest) {
 export const config = {
     matcher: [
         "/",
+        "/api/:path*",
         "/admin/:path*",
         "/system_admin/:path*",
-        "/superadmin/:path*",
         "/profile/:path*",
         "/login",
         "/forget-password",
