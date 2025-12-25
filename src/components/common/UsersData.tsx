@@ -136,7 +136,7 @@ export default function UsersData({ formId }: { formId: string }) {
     const [followBusinessStatus, setFollowBusinessStatus] = useState<string>("");
     const [columnVisibilityModel, setColumnVisibilityModel] = useState<any>({});
     const [openResponse, setOpenResponse] = useState<FormResponseItem | null>(null);
-    const [paginationModel, setPaginationModel] = useState({ pageSize: 20, page: 0 });
+    const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -309,7 +309,7 @@ export default function UsersData({ formId }: { formId: string }) {
 
 
     return (
-        <div className="w-full">
+        <div className="w-full overflow-hidden">
             <div className="flex justify-between items-center mb-5">
                 <h1 className="font-bold text-zinc-800 text-xl">{data?.title ? `Responses of ${data.title}` : "Responses"}</h1>
             </div>

@@ -2,7 +2,7 @@ import Tabs from './Tabs'
 
 export default function SideBar() {
     return (
-        <nav className='fixed inset-y-0 w-1/6 bg-blue-800 '>
+        <nav className='fixed inset-y-0 w-1/6 bg-blue-800 min-w-60 '>
             <aside className='relative w-full h-full flex flex-col'>
                 <div className='relative w-full p-5 shrink-0 '>
                     <span className='text-white font-bold text-lg'>

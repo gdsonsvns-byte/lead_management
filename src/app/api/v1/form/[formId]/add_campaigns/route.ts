@@ -15,6 +15,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
         }
 
         const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        if (!user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
         const { formId } = await params
 
         if (!formId || formId.trim() === "") {
@@ -38,7 +44,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
             );
         }
 
-        if (user.role === "ADMIN" && form.userId !== user.id) {
+        if (user.role === "ADMIN" && form.userId !== user.sub) {
             return NextResponse.json(
                 { error: "You are not allowed to modify this form." },
                 { status: 403 }

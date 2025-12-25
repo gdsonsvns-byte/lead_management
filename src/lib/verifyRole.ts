@@ -1,16 +1,20 @@
 "use server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import prisma from "./prisma";
-
 const JWT_SECRET = process.env.JWT_SECRET!;
 
-export interface DecodedUser {
-    id: string;
-    role: "ADMIN" | "SUPERADMIN";
-    email: string
+export interface AuthContext {
+    sub: string;
+    accountId: string;
+    role: string;
 }
-export async function verifyRole(allowedRoles: string[] | string) {
+interface DecodedUser {
+    sub: string;
+    accountId: string;
+    role: "ADMIN" | "SUPERADMIN" | "MANAGER";
+}
+
+export async function verifyRole(allowedRoles: string[] | string): Promise<AuthContext | null> {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
 
@@ -20,21 +24,13 @@ export async function verifyRole(allowedRoles: string[] | string) {
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET) as DecodedUser;
-
-        const rolesArray = Array.isArray(allowedRoles)
+        
+        const roles = Array.isArray(allowedRoles)
             ? allowedRoles
             : [allowedRoles];
 
-        if (!rolesArray.includes(decoded.role)) {
-            throw new Error(`Unauthorized: Allowed roles are ${rolesArray.join(", ")}`);
-        }
-
-        const user = await prisma.user.findUnique({
-            where: { email: decoded.email },
-        });
-
-        if (!user) {
-            throw new Error("User not found");
+        if (!roles.includes(decoded.role)) {
+            return null;
         }
 
         return decoded;

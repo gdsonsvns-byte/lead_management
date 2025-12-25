@@ -13,6 +13,12 @@ export async function GET(req: NextRequest) {
             );
         }
         const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        if (!user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
         const { searchParams } = new URL(req.url);
         const queryAccountId = searchParams.get("account_id")?.trim() || "";
 
@@ -29,19 +35,14 @@ export async function GET(req: NextRequest) {
             }
         }
 
-        const account = await prisma.user.findUnique({
-            where: { id: user.id },
-            select: { accountId: true }
-        });
-
-        if (!account?.accountId && queryAccountId === "") {
+        if (!user.accountId && queryAccountId === "") {
             return NextResponse.json(
                 { error: "Account not found." },
                 { status: 404 }
             );
         }
 
-        const finalAccountId = queryAccountId !== "" ? queryAccountId : account?.accountId;
+        const finalAccountId = queryAccountId !== "" ? queryAccountId : user.accountId;
 
         const user_account = await prisma.account.findUnique({
             where: { id: finalAccountId },
@@ -83,13 +84,13 @@ export async function GET(req: NextRequest) {
             (sum, f) => sum + f._count.responses, 0
         );
 
-        const initials = generateNameInitials(user_account.businessName) 
+        const initials = generateNameInitials(user_account.businessName)
 
         return NextResponse.json(
             {
                 data: user_account,
                 initials,
-                total_response:totalResponses,
+                total_response: totalResponses,
             },
             { status: 200 }
         );

@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
         const followup = await prisma.followUp.create({
             data: {
                 responseId: body.responseId,
-                addedByUserId: user.id,
+                addedByUserId: user.sub,
                 type: body.type as FollowUpType,
                 note: body.note ?? null,
                 nextFollowUpDate: nextDate,
@@ -142,18 +142,9 @@ export async function GET(req: NextRequest) {
 
         const user = await verifyRole(["ADMIN", "SUPERADMIN"]);
         if (!user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
-        const userAccount = await prisma.user.findUnique({
-            where: { id: user.id },
-            select: { accountId: true },
-        });
-
-        if (!userAccount?.accountId) {
             return NextResponse.json(
-                { error: "User account not found" },
-                { status: 404 }
+                { error: "Unauthorized" },
+                { status: 401 }
             );
         }
 
@@ -178,7 +169,7 @@ export async function GET(req: NextRequest) {
             where: {
                 response: {
                     form: {
-                        accountId: userAccount.accountId,
+                        accountId: user.accountId,
                     },
                 },
             },
@@ -218,11 +209,11 @@ export async function GET(req: NextRequest) {
             if (!responseMap.has(fu.responseId)) {
                 responseMap.set(fu.responseId, {
                     responseId: fu.responseId,
-                    response: fu.response, 
+                    response: fu.response,
                     lastFollowUp: {
                         id: fu.id,
                         status: fu.status,
-                        type:fu.type,
+                        type: fu.type,
                         businessStatus: fu.businessStatus,
                         note: fu.note,
                         nextFollowUpDate: fu.nextFollowUpDate,
@@ -236,7 +227,7 @@ export async function GET(req: NextRequest) {
             responseMap.get(fu.responseId)!.followUpHistory.push({
                 id: fu.id,
                 status: fu.status,
-                type:fu.type,
+                type: fu.type,
                 businessStatus: fu.businessStatus,
                 note: fu.note,
                 nextFollowUpDate: fu.nextFollowUpDate,
@@ -245,9 +236,6 @@ export async function GET(req: NextRequest) {
             });
         }
 
-        /**
-         * 3️⃣ Apply state filter on LAST follow-up only
-         */
         const filtered = Array.from(responseMap.values()).filter((item) => {
             const last = item.lastFollowUp;
             const nextDate = last.nextFollowUpDate
@@ -276,9 +264,6 @@ export async function GET(req: NextRequest) {
             }
         });
 
-        /**
-         * 4️⃣ Pagination
-         */
         const total = filtered.length;
         const paginated = filtered.slice(skip, skip + limit);
         const pageCount = Math.ceil(total / limit);

@@ -32,11 +32,11 @@ export async function POST(req: NextRequest) {
 
         const email = parsed.data.email.toLowerCase().trim()
 
-        const result = await login(email, body.password)
+        const result = await login(email, parsed.data.password!)
         if (typeof result === "string") {
             return NextResponse.json({ error: result }, { status: 401 })
         }
-        const { token, user } = result
+        const { token } = result
 
         const cookieStore = await cookies()
         const ONE_DAY = 60 * 60 * 24

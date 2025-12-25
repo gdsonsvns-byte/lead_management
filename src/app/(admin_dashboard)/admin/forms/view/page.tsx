@@ -14,7 +14,7 @@ export default async function ViewDataPage({ searchParams }: { searchParams: Pro
     }
 
     return (
-        <section className='relative p-5'>
+        <section className='relative p-5 overflow-hidden'>
             <UsersData formId={id} />
         </section>
     )

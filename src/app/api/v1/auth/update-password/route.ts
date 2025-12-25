@@ -16,7 +16,12 @@ export async function PATCH(req: NextRequest) {
         }
 
         const user = await verifyRole(["ADMIN", "SUPERADMIN"])
-
+        if (!user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
         const { currentPassword, newPassword, confirmPassword } = await req.json()
         const pass = resetPasswordSchema.safeParse({ password: newPassword });
 
@@ -44,7 +49,7 @@ export async function PATCH(req: NextRequest) {
         }
 
         const dbUser = await prisma.user.findUnique({
-            where: { id: user.id },
+            where: { id: user.sub },
             select: { password: true }
         });
         if (!dbUser?.password) {
@@ -69,7 +74,7 @@ export async function PATCH(req: NextRequest) {
         }
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         await prisma.user.update({
-            where: { id: user.id },
+            where: { id: user.sub },
             data: { password: hashedPassword }
         });
 
