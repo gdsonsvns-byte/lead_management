@@ -361,9 +361,25 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
             )}
 
             <Dialog open={!!openResponse} onClose={() => setOpenResponse(null)} maxWidth="lg" fullWidth>
-                <DialogTitle>Add Follow-Up</DialogTitle>
+                <DialogTitle>View Lead</DialogTitle>
 
                 <DialogContent dividers>
+                    {openResponse && Object.entries(openResponse?.response.answers).map(([key, val]) => {
+                        // const value = typeof val === "string" ? val : JSON.stringify(val);
+                        // console.log(JSON.parse(value));
+                        
+                        return (
+                            <Box key={key} mb={0}>
+                                <Typography variant="subtitle2" color="text.secondary">
+                                    {val.field.label}
+                                </Typography>
+                                <Typography>{val.value}</Typography>
+                            </Box>
+                        );
+                    })}
+
+                    <DialogTitle>Add Follow-Up</DialogTitle>
+
 
                     <Box mt={1} display="flex" flexDirection="column" gap={2}>
                         {openResponse?.followUpHistory.length === 0 && (
