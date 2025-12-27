@@ -140,7 +140,7 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        const user = await verifyRole(["ADMIN", "SUPERADMIN","MANAGER"]);
+        const user = await verifyRole(["ADMIN", "SUPERADMIN", "MANAGER"]);
         if (!user) {
             return NextResponse.json(
                 { error: "Unauthorized" },
@@ -149,7 +149,7 @@ export async function GET(req: NextRequest) {
         }
 
         const { searchParams } = new URL(req.url);
-        const state = (searchParams.get("state") || "pending").toLowerCase();
+        const state = (searchParams.get("state") || "pending_today").toLowerCase();
 
         const page = Math.max(Number(searchParams.get("page")) || 1, 1);
         const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 20, 1), 50);
@@ -243,11 +243,15 @@ export async function GET(req: NextRequest) {
                 : null;
 
             switch (state) {
-                case "pending":
+                case "pending_today":
                     return (
                         last.status === "PENDING" &&
                         nextDate &&
                         nextDate <= endOfToday
+                    );
+                case "pending":
+                    return (
+                        last.status === "PENDING"
                     );
 
                 case "completed":

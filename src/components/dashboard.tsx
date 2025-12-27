@@ -28,10 +28,20 @@ const TYPE_ICONS: Record<string, JSX.Element> = {
     MEETING: <EventIcon fontSize="small" color="secondary" />,
     NOTE: <NoteIcon fontSize="small" color="action" />,
 };
+interface State {
+    key: string,
+    status: string
+}
+const allState: State[] = [
+    { key: "All", status: "all" },
+    { key: "Pending Till Today", status: "pending_today" },
+    { key: "Pending", status: "pending" },
+    { key: "Completed", status: "completed" },
+    { key: "Cancelled", status: "cancelled" },
+]
 
 export default function DashboardComponent() {
-    const allState: string[] = ["all", "pending", "completed", "cancelled",]
-    const [currentState, setCurrentState] = useState<string>(allState[1])
+    const [currentState, setCurrentState] = useState<string>(allState[1]?.status)
     const [paginationModel, setPaginationModel] = useState({ pageSize: 12, page: 0 });
 
     const { data, isLoading, isError, isFetching } = useQuery<TodayFollowUpsResponse>({
@@ -47,6 +57,10 @@ export default function DashboardComponent() {
         placeholderData: (old) => old,
     });
 
+    useEffect(() => {
+        setPaginationModel({ pageSize: 12, page: 0 })
+    }, [currentState])
+
     return (
         <div className="w-full">
             <div className="relative mb-5 w-full flex items-center justify-end p-3">
@@ -61,8 +75,8 @@ export default function DashboardComponent() {
                         <SelectGroup>
                             <SelectLabel>States</SelectLabel>
                             {allState.map((state, idx) => (
-                                <SelectItem key={idx} value={state}>
-                                    {state}
+                                <SelectItem key={idx} value={state.status}>
+                                    {state.key}
                                 </SelectItem>
                             ))}
                         </SelectGroup>
@@ -367,7 +381,7 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
                     {openResponse && Object.entries(openResponse?.response.answers).map(([key, val]) => {
                         // const value = typeof val === "string" ? val : JSON.stringify(val);
                         // console.log(JSON.parse(value));
-                        
+
                         return (
                             <Box key={key} mb={0}>
                                 <Typography variant="subtitle2" color="text.secondary">
