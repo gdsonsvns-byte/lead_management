@@ -2,7 +2,10 @@
   "crons": [
     {
       "path": "/api/v1/cron/daily-followups",
-      "schedule": "10 12 * * *"
+      "schedule": "12 24 * * *",
+       "headers": {
+        "x-cron-secret": "super-secret-key-123"
+      }
     }
   ]
 }
