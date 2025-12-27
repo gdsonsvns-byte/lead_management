@@ -193,6 +193,8 @@ function buildPendingFollowupEmail({
           ">
             <strong>Summary:</strong><br/>
             ${f.note || "-"}
+            <br>
+            <strong>Date:</strong>${new Date(f.createdAt).toLocaleString()}
           </div>
 
            <div style="
