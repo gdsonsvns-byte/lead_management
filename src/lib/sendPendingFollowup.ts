@@ -15,7 +15,7 @@ export async function sendPendingFollowupEmail({ to, subject, html }: Props) {
         }
 
         const { error } = await resend.emails.send({
-            from: 'New Lead <leads@wizards.co.in>',
+            from: 'Pending Follow Up <leads@wizards.co.in>',
             to: [to],
             subject: subject,
             html: html,
