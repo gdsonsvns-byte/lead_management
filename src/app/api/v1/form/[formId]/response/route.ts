@@ -292,7 +292,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
         const skip = (page - 1) * limit;
         const { formId } = await params;
 
-        let state = (searchParams.get("state") || "Pending").toLowerCase();
+        let state = (searchParams.get("state") || "pending_today").toLowerCase();
         const now = new Date();
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
         const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
@@ -345,11 +345,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                     : null;
 
                 switch (state) {
-                    case "pending":
+                    case "pending_today":
                         return (
                             lastFollowUp.status === "PENDING" &&
                             nextDate &&
                             nextDate <= endOfToday
+                        );
+                    case "pending":
+                        return (
+                            lastFollowUp.status === "PENDING"
                         );
                     case "completed":
                         return lastFollowUp.status === "COMPLETED";

@@ -3,14 +3,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { useMemo, useState, useEffect, JSX } from "react";
-import {
-    Timeline,
-    TimelineItem,
-    TimelineSeparator,
-    TimelineConnector,
-    TimelineContent,
-    TimelineDot,
-} from "@mui/lab";
 
 import {
     DataGrid,
@@ -118,18 +110,23 @@ export interface FormResponsesData {
     nextPage: number | null;
     prevPage: number | null;
 }
+interface State {
+    key: string,
+    status: string
+}
 
+const allState: State[] = [
+    { key: "All", status: "all" },
+    { key: "Pending Till Today", status: "pending_today" },
+    { key: "Pending", status: "pending" },
+    { key: "Completed", status: "completed" },
+    { key: "Cancelled", status: "cancelled" },
+]
 export default function UsersData({ formId }: { formId: string }) {
     const STORAGE_KEY = `form_${formId}_column_visibility`;
     const queryClient = useQueryClient();
     const hasFormId = !!formId;
-    const allState: string[] = [
-        "All",
-        "Pending",
-        "Completed",
-        "Cancelled",
-    ]
-    const [currentState, setCurrentState] = useState<string>(allState[1])
+    const [currentState, setCurrentState] = useState<string>(allState[1].status)
     const [followType, setFollowType] = useState<string>("NOTE");
     const [followNote, setFollowNote] = useState<string>("");
     const [followNextDate, setFollowNextDate] = useState<string>("");
@@ -143,7 +140,9 @@ export default function UsersData({ formId }: { formId: string }) {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) setColumnVisibilityModel(JSON.parse(saved));
     }, [STORAGE_KEY]);
-
+    useEffect(() => {
+        setPaginationModel({ pageSize: 10, page: 0 })
+    }, [currentState])
     useEffect(() => {
         if (Object.keys(columnVisibilityModel).length) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(columnVisibilityModel));
@@ -326,8 +325,8 @@ export default function UsersData({ formId }: { formId: string }) {
                         <SelectGroup>
                             <SelectLabel>States</SelectLabel>
                             {allState.map((state, idx) => (
-                                <SelectItem key={idx} value={state}>
-                                    {state}
+                                <SelectItem key={idx} value={state.status}>
+                                    {state.key}
                                 </SelectItem>
                             ))}
                         </SelectGroup>
