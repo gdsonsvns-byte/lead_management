@@ -211,11 +211,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             },
         });
 
-        const emailPromises: Promise<any>[] = [];
-        const whatsappPromises: Promise<any>[] = [];
+        const sendNotificationMessage: Promise<any>[] = [];
 
         if (form.account?.email) {
-            emailPromises.push(sendResponseAlertEmail({
+            sendNotificationMessage.push(sendResponseAlertEmail({
                 userEmail: form.account.email,
                 allFields: fieldValuesForAdmin,
                 accountName: form.account.businessName ?? "Admin",
@@ -223,14 +222,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             }))
         }
         if (userEmail) {
-            emailPromises.push(sendResponseAlertEmailToUser({
+            sendNotificationMessage.push(sendResponseAlertEmailToUser({
                 userEmail, allFields: fieldValuesForAdmin, accountName: form.account?.businessName ?? "User"
             })
             );
-        }
-
-        if (emailPromises.length > 0) {
-            await Promise.allSettled(emailPromises);
         }
 
         if (form.userWhatsappCampaignName && form.account?.whatsappApiKey && userPhone) {
@@ -239,7 +234,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                 ? phoneStr
                 : `+91${phoneStr}`;
 
-            whatsappPromises.push(sendWhatsappToUser({
+            sendNotificationMessage.push(sendWhatsappToUser({
                 apiKey: form.account.whatsappApiKey,
                 campaignName: form.userWhatsappCampaignName,
                 destination,
@@ -249,7 +244,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
         }
 
         if (form.adminWhatsappCampaignName && form.account?.whatsappApiKey && form.account.phone) {
-            whatsappPromises.push(sendWhatsappToAdmin({
+            sendNotificationMessage.push(sendWhatsappToAdmin({
                 apiKey: form.account.whatsappApiKey,
                 campaignName: form.adminWhatsappCampaignName,
                 destination: form.account.phone.startsWith("+")
@@ -260,8 +255,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             }));
         }
 
-        if (whatsappPromises.length > 0) {
-            await Promise.allSettled(whatsappPromises);
+        if (sendNotificationMessage.length > 0) {
+            await Promise.allSettled(sendNotificationMessage);
         }
 
         return NextResponse.json(
