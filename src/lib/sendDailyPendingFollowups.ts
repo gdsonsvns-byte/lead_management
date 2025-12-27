@@ -114,7 +114,6 @@ export async function sendDailyPendingFollowups() {
         //       });
         //     }
         //   }
-
         console.log("✅ Daily follow-up WhatsApp notifications sent");
     } catch (error) {
         console.log(error);
