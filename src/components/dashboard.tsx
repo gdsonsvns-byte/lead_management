@@ -96,7 +96,7 @@ export default function DashboardComponent() {
                 )
             }
 
-            <div className='relative w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+            <div className='relative w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4'>
                 {isFetching && !isLoading && (
                     <div className="absolute inset-0 bg-white/60 flex justify-center items-center z-10">
                         <Spinner />
