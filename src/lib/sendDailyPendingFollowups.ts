@@ -15,7 +15,6 @@ export async function sendDailyPendingFollowups() {
             where: {
                 status: "PENDING",
                 nextFollowUpDate: {
-                    gte: start,
                     lte: end,
                 },
                 response: {
@@ -24,7 +23,9 @@ export async function sendDailyPendingFollowups() {
                     },
                 },
             },
-            orderBy: { createdAt: "desc" },
+            orderBy: {
+                nextFollowUpDate: "desc",
+            },
             include: {
                 response: {
                     include: {
@@ -36,6 +37,14 @@ export async function sendDailyPendingFollowups() {
                                         businessName: true,
                                         email: true,
                                     },
+                                },
+                            },
+                        },
+                        answers: {
+                            select: {
+                                value: true,
+                                field: {
+                                    select: { label: true },
                                 },
                             },
                         },
@@ -121,39 +130,94 @@ export async function sendDailyPendingFollowups() {
     }
 }
 
-function buildPendingFollowupEmail({ businessName, followups }: { businessName: string; followups: any[] }) {
-    const rows = followups
-        .map(
-            (f, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${f.businessStatus}</td>
-          <td>${f.nextFollowUpDate?.toDateString()}</td>
-        </tr>
-      `
-        )
+function buildPendingFollowupEmail({
+    businessName,
+    followups,
+}: {
+    businessName: string;
+    followups: any[];
+}) {
+    const today = new Date().setHours(0, 0, 0, 0);
+
+    const cards = followups
+        .map((f, i) => {
+            const answers = f.response.answers
+                .map(
+                    (a: any) => `
+            <tr>
+              <td style="padding:6px 0; font-weight:bold; color:#555;">
+                ${a.field.label}
+              </td>
+              <td style="padding:6px 0; color:#111;">
+                ${a.value || "-"}
+              </td>
+            </tr>
+          `
+                )
+                .join("");
+
+            const isOverdue =
+                new Date(f.nextFollowUpDate).setHours(0, 0, 0, 0) < today;
+
+            return `
+        <div style="
+          border:1px solid #e5e7eb;
+          border-radius:8px;
+          padding:16px;
+          margin-bottom:16px;
+        ">
+          <div style="font-size:14px; color:#666; margin-bottom:6px;">
+            Follow-up #${i + 1}
+          </div>
+
+          <div style="font-size:16px; font-weight:bold; margin-bottom:4px;">
+            Last Status:-${f.businessStatus}
+          </div>
+
+          <div style="
+            font-size:13px;
+            color:${isOverdue ? "#dc2626" : "#16a34a"};
+            margin-bottom:12px;
+          ">
+            ${new Date(f.nextFollowUpDate).toDateString()}
+            ${isOverdue ? " (Overdue)" : ""}
+          </div>
+
+          <table width="100%" cellpadding="0" cellspacing="0">
+            ${answers}
+          </table>
+        </div>
+      `;
+        })
         .join("");
 
     return `
-    <h2>Good Morning 👋</h2>
-    <p>
-      You have <strong>${followups.length}</strong> pending follow-ups today
-      for <b>${businessName}</b>.
-    </p>
+  <div style="background:#f6f7f9; padding:16px;">
+    <div style="
+      max-width:600px;
+      margin:auto;
+      background:#ffffff;
+      border-radius:10px;
+      padding:20px;
+      font-family:Arial, sans-serif;
+    ">
+      <h2 style="margin-top:0;">Good Morning 👋</h2>
 
-    <table border="1" cellpadding="8" cellspacing="0">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Status</th>
-          <th>Follow-up Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows}
-      </tbody>
-    </table>
+      <p style="font-size:15px; color:#333;">
+        You have <strong>${followups.length}</strong> pending follow-ups
+        (including overdue) for <strong>${businessName}</strong>.
+      </p>
 
-    <p>Please log in to your dashboard to take action.</p>
+      ${cards}
+
+      <p style="font-size:14px; color:#555; margin-top:24px;">
+        Please log in to your dashboard to take action.
+      </p>
+       <a href="https://leads.wizards.co.in" target="_blank">https://leads.wizards.co.in</a>
+      <p style="font-size:12px; color:#999;">
+        This is an automated reminder.
+      </p>
+    </div>
+  </div>
   `;
 }

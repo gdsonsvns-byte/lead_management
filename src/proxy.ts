@@ -43,6 +43,10 @@ function safeVerifyToken(token: string | null) {
 export function proxy(req: NextRequest) {
     const pathname = req.nextUrl.pathname;
     const origin = req.headers.get("origin");
+    const userAgent = req.headers.get("user-agent");
+    if (userAgent?.includes("vercel-cron")) {
+        return NextResponse.next();
+    }
 
     if (pathname.startsWith("/api")) {
         if (origin && ALLOWED_ORIGINS.includes(origin)) {
