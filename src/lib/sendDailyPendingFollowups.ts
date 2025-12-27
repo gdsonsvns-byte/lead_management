@@ -13,10 +13,6 @@ export async function sendDailyPendingFollowups() {
 
         const followUps = await prisma.followUp.findMany({
             where: {
-                status: "PENDING",
-                nextFollowUpDate: {
-                    lte: end,
-                },
                 response: {
                     form: {
                         accountId: { not: null },
@@ -24,7 +20,7 @@ export async function sendDailyPendingFollowups() {
                 },
             },
             orderBy: {
-                nextFollowUpDate: "desc",
+                createdAt: "desc",
             },
             include: {
                 response: {
@@ -64,12 +60,25 @@ export async function sendDailyPendingFollowups() {
                 latestMap.set(fu.responseId, fu);
             }
         }
+        const latestFollowups = Array.from(latestMap.values());
 
+        const validPendingFollowUps = latestFollowups.filter((fu) => {
+            if (fu.status !== "PENDING") return false;
+            if (!fu.nextFollowUpDate) return false;
+            if (new Date(fu.nextFollowUpDate) > end) return false;
+            return true;
+        });
+
+        if (validPendingFollowUps.length === 0) {
+            console.log("No pending follow-ups for today or overdue.");
+            return;
+        }
         // group by account
-        const grouped: Record<string, typeof followUps> = {};
-        for (const fu of latestMap.values()) {
-            const accountId = fu.response.form.account?.id
+        const grouped: Record<string, typeof validPendingFollowUps> = {};
+        for (const fu of validPendingFollowUps) {
+            const accountId = fu.response.form.account?.id;
             if (!accountId) continue;
+
             grouped[accountId] ??= [];
             grouped[accountId].push(fu);
         }
@@ -145,10 +154,10 @@ function buildPendingFollowupEmail({
                 .map(
                     (a: any) => `
             <tr>
-              <td style="padding:6px 0; font-weight:bold; color:#555;">
+              <td style="padding:6px 0; color:#6b7280; font-size:13px; width:40%;">
                 ${a.field.label}
               </td>
-              <td style="padding:6px 0; color:#111;">
+              <td style="padding:6px 0; color:#111827; font-size:13px;">
                 ${a.value || "-"}
               </td>
             </tr>
@@ -162,62 +171,101 @@ function buildPendingFollowupEmail({
             return `
         <div style="
           border:1px solid #e5e7eb;
-          border-radius:8px;
+          border-radius:10px;
           padding:16px;
           margin-bottom:16px;
+          background:#ffffff;
         ">
-          <div style="font-size:14px; color:#666; margin-bottom:6px;">
+
+          <!-- Header -->
+          <div style="font-size:12px; color:#6b7280; margin-bottom:4px;">
             Follow-up #${i + 1}
           </div>
 
-          <div style="font-size:16px; font-weight:bold; margin-bottom:4px;">
-            Last Status:-${f.businessStatus}
+          <div style="font-size:16px; font-weight:bold; color:#111827; margin-bottom:8px;">
+            Last Follow Up: <br> <span style="font-size:12px; font-weight:normal;"> ${f.type}</span> 
           </div>
 
           <div style="
             font-size:13px;
-            color:${isOverdue ? "#dc2626" : "#16a34a"};
+            color:#374151;
             margin-bottom:12px;
           ">
-            ${new Date(f.nextFollowUpDate).toDateString()}
-            ${isOverdue ? " (Overdue)" : ""}
+            <strong>Summary:</strong><br/>
+            ${f.note || "-"}
           </div>
 
+           <div style="
+            font-size:13px;
+            color:${isOverdue ? "#dc2626" : "#16a34a"};
+            margin-bottom:10px;
+          ">
+          <strong style="color:#374151;"font-size:16px;>Next Follow up:</strong>
+          <br>
+            ${new Date(f.nextFollowUpDate).toDateString()}
+            ${isOverdue ? " • Overdue" : ""}
+            <br>
+            <strong>Status:</strong> ${f.businessStatus}
+          </div>
+
+          <!-- Lead Details -->
           <table width="100%" cellpadding="0" cellspacing="0">
             ${answers}
           </table>
+
         </div>
       `;
         })
         .join("");
 
     return `
-  <div style="background:#f6f7f9; padding:16px;">
-    <div style="
-      max-width:600px;
-      margin:auto;
-      background:#ffffff;
-      border-radius:10px;
-      padding:20px;
-      font-family:Arial, sans-serif;
-    ">
-      <h2 style="margin-top:0;">Good Morning 👋</h2>
+    <div style="background:#f3f4f6; padding:16px;">
+      <div style="
+        max-width:600px;
+        margin:auto;
+        background:#ffffff;
+        border-radius:12px;
+        padding:20px;
+        font-family:Arial, sans-serif;
+        color:#111827;
+      ">
 
-      <p style="font-size:15px; color:#333;">
-        You have <strong>${followups.length}</strong> pending follow-ups
-        (including overdue) for <strong>${businessName}</strong>.
-      </p>
+        <h2 style="margin-top:0; margin-bottom:8px;">
+          Good Morning 👋
+        </h2>
 
-      ${cards}
+        <p style="font-size:14px; color:#374151; margin-bottom:16px;">
+          You have <strong>${followups.length}</strong> pending follow-ups
+          (including overdue) for <strong>${businessName}</strong>.
+        </p>
 
-      <p style="font-size:14px; color:#555; margin-top:24px;">
-        Please log in to your dashboard to take action.
-      </p>
-       <a href="https://leads.wizards.co.in" target="_blank">https://leads.wizards.co.in</a>
-      <p style="font-size:12px; color:#999;">
-        This is an automated reminder.
-      </p>
+        ${cards}
+
+        <!-- CTA -->
+        <div style="text-align:center; margin-top:24px;">
+          <a
+            href="https://leads.wizards.co.in"
+            target="_blank"
+            style="
+              display:inline-block;
+              background:#2563eb;
+              color:#ffffff;
+              text-decoration:none;
+              padding:10px 16px;
+              border-radius:6px;
+              font-size:14px;
+            "
+          >
+            Open Dashboard
+          </a>
+        </div>
+
+        <p style="font-size:12px; color:#9ca3af; margin-top:20px;">
+          This is an automated reminder. Please do not reply.
+        </p>
+
+      </div>
     </div>
-  </div>
   `;
 }
+
