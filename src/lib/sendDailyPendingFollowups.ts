@@ -44,6 +44,10 @@ export async function sendDailyPendingFollowups() {
             },
         });
 
+        if (followUps.length === 0) {
+            console.log("No pending follow-ups for today. No emails sent.");
+            return;
+        }
         // latest followup per response
         const latestMap = new Map<string, typeof followUps[0]>();
         for (const fu of followUps) {
@@ -62,8 +66,8 @@ export async function sendDailyPendingFollowups() {
         }
 
         for (const followups of Object.values(grouped)) {
+            if (followups.length === 0) continue;
             const account = followups[0].response.form.account;
-
             if (!account?.email) continue;
 
             const html = buildPendingFollowupEmail({
