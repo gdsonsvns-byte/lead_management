@@ -132,7 +132,7 @@ export async function sendDailyPendingFollowups() {
         //       });
         //     }
         //   }
-        console.log("✅ Daily follow-up WhatsApp notifications sent");
+        console.log("✅ All Pending follow-up Email notifications sent Successfully");
     } catch (error) {
         console.log(error);
         throw new Error("Something went wrong...")

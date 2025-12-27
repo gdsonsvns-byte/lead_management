@@ -40,6 +40,8 @@ model Account {
   forms          Form[]
 
   createdAt DateTime @default(now())
+
+  @@index([createdAt])
 }
 
 model User {
@@ -59,6 +61,11 @@ model User {
   resetTokenExpiresAt DateTime?
   createdAt           DateTime      @default(now())
   followUps           FollowUp[]
+
+  @@index([accountId])
+  @@index([role])
+  @@index([createdById])
+  @@index([createdAt])
 }
 
 model ManagedUser {
@@ -71,6 +78,9 @@ model ManagedUser {
   createdAt DateTime @default(now())
 
   admin User @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId])
+  @@index([createdAt])
 }
 
 model Form {
@@ -89,6 +99,10 @@ model Form {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   account   Account? @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId String?
+
+  @@index([userId])
+  @@index([accountId])
+  @@index([createdAt])
 }
 
 model FormField {
@@ -101,6 +115,8 @@ model FormField {
   order           Int?
   form            Form             @relation(fields: [formId], references: [id], onDelete: Cascade)
   responseAnswers ResponseAnswer[]
+
+  @@index([formId])
 }
 
 model Response {
@@ -110,6 +126,9 @@ model Response {
   form        Form             @relation(fields: [formId], references: [id], onDelete: Cascade)
   answers     ResponseAnswer[]
   followUps   FollowUp[]
+
+  @@index([formId])
+  @@index([submittedAt])
 }
 
 model ResponseAnswer {
@@ -120,6 +139,9 @@ model ResponseAnswer {
 
   response Response  @relation(fields: [responseId], references: [id], onDelete: Cascade)
   field    FormField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@index([responseId])
+  @@index([fieldId])
 }
 
 model FollowUp {
@@ -134,4 +156,12 @@ model FollowUp {
   createdAt        DateTime       @default(now())
   response         Response       @relation(fields: [responseId], references: [id], onDelete: Cascade)
   addedBy          User           @relation(fields: [addedByUserId], references: [id], onDelete: Cascade)
+
+  @@index([responseId])
+  @@index([addedByUserId])
+  @@index([status])
+  @@index([type])
+  @@index([nextFollowUpDate])
+  @@index([createdAt])
+  @@index([status, nextFollowUpDate])
 }
