@@ -73,23 +73,32 @@ export async function sendDailyPendingFollowups() {
       console.log("No pending follow-ups for today or overdue.");
       return;
     }
+    // group by account
+    const grouped: Record<string, typeof validPendingFollowUps> = {};
+    for (const fu of validPendingFollowUps) {
+      const accountId = fu.response.form.account?.id;
+      if (!accountId) continue;
 
-    const account = followUps[0]?.response?.form?.account;
-    if (!account?.email) {
-      console.log("No email found for account.");
-      return;
+      grouped[accountId] ??= [];
+      grouped[accountId].push(fu);
     }
 
-    const html = buildPendingFollowupEmail({
-      businessName: account.businessName ?? "Your Business",
-      followups: validPendingFollowUps,
-    });
+    for (const followups of Object.values(grouped)) {
+      if (followups.length === 0) continue;
+      const account = followups[0].response.form.account;
+      if (!account?.email) continue;
 
-    await sendPendingFollowupEmail({
-      to: account.email,
-      subject: `All Pending Follow-ups for ${today.toDateString()} of ${account.businessName}`,
-      html,
-    });
+      const html = buildPendingFollowupEmail({
+        businessName: account.businessName ?? "Your Business",
+        followups,
+      });
+
+      await sendPendingFollowupEmail({
+        to: account.email,
+        subject: `All Pending Follow-ups for ${today.toDateString()} of ${account.businessName}`,
+        html,
+      });
+    }
 
     // send WhatsApp per account
     //   for (const followups of Object.values(grouped)) {
