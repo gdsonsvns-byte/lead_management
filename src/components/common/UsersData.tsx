@@ -22,6 +22,7 @@ import {
     TextField,
     Alert,
     Chip,
+    Input,
 } from "@mui/material";
 import {
     Select,
@@ -40,6 +41,7 @@ import EventIcon from "@mui/icons-material/Event";
 import NoteIcon from "@mui/icons-material/Note";
 import toast from "react-hot-toast";
 import Spinner from "../ui/spinner";
+import Link from "next/link";
 
 const TYPE_ICONS: Record<string, JSX.Element> = {
     CALL: <LocalPhoneIcon fontSize="small" color="primary" />,
@@ -134,6 +136,7 @@ export default function UsersData({ formId }: { formId: string }) {
     const [columnVisibilityModel, setColumnVisibilityModel] = useState<any>({});
     const [openResponse, setOpenResponse] = useState<FormResponseItem | null>(null);
     const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
+    const [reportData, setReportData] = useState<string>("");
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -313,7 +316,26 @@ export default function UsersData({ formId }: { formId: string }) {
                 <h1 className="font-bold text-zinc-800 text-xl">{data?.title ? `Responses of ${data.title}` : "Responses"}</h1>
             </div>
 
-            <div className="relative my-5 w-full flex items-center justify-end p-3">
+            <div className="relative my-5 w-full flex items-center justify-between p-3">
+                <div className="flex flex-col items-start gap-5">
+                    <span className="text-zinc-800 font-semibold">
+                        Follow Up Report
+                    </span>
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="date"
+                            value={reportData}
+                            onChange={(e) => setReportData(e.target.value)}
+                            className="border border-gray-300 rounded-md p-1.5" />
+                        <Button
+                            variant="contained"
+                            onClick={() => window.location.href = `report?id=${formId}&date=${reportData}`}
+                            disabled={reportData === ""}
+                        >
+                            View Report
+                        </Button>
+                    </div>
+                </div>
                 <Select
                     onValueChange={(val) => setCurrentState(val)}
                     defaultValue={currentState}
