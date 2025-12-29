@@ -2,157 +2,157 @@ import prisma from "@/src/lib/prisma";
 import { sendPendingFollowupEmail } from "./sendPendingFollowup";
 
 export async function sendDailyPendingFollowups() {
-    try {
-        const today = new Date();
-        const start = new Date(today);
-        start.setHours(0, 0, 0, 0);
+  try {
+    const today = new Date();
+    const start = new Date(today);
+    start.setHours(0, 0, 0, 0);
 
-        const end = new Date(today);
-        end.setHours(23, 59, 59, 999);
+    const end = new Date(today);
+    end.setHours(23, 59, 59, 999);
 
 
-        const followUps = await prisma.followUp.findMany({
-            where: {
-                response: {
-                    form: {
-                        accountId: { not: null },
-                    },
+    const followUps = await prisma.followUp.findMany({
+      where: {
+        response: {
+          form: {
+            accountId: { not: null },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        response: {
+          include: {
+            form: {
+              include: {
+                account: {
+                  select: {
+                    id: true,
+                    businessName: true,
+                    email: true,
+                  },
                 },
+              },
             },
-            orderBy: {
-                createdAt: "desc",
-            },
-            include: {
-                response: {
-                    include: {
-                        form: {
-                            include: {
-                                account: {
-                                    select: {
-                                        id: true,
-                                        businessName: true,
-                                        email: true,
-                                    },
-                                },
-                            },
-                        },
-                        answers: {
-                            select: {
-                                value: true,
-                                field: {
-                                    select: { label: true },
-                                },
-                            },
-                        },
-                    },
+            answers: {
+              select: {
+                value: true,
+                field: {
+                  select: { label: true },
                 },
+              },
             },
-        });
+          },
+        },
+      },
+    });
 
-        if (followUps.length === 0) {
-            console.log("No pending follow-ups for today. No emails sent.");
-            return;
-        }
-        // latest followup per response
-        const latestMap = new Map<string, typeof followUps[0]>();
-        for (const fu of followUps) {
-            if (!latestMap.has(fu.responseId)) {
-                latestMap.set(fu.responseId, fu);
-            }
-        }
-        const latestFollowups = Array.from(latestMap.values());
-
-        const validPendingFollowUps = latestFollowups.filter((fu) => {
-            if (fu.status !== "PENDING") return false;
-            if (!fu.nextFollowUpDate) return false;
-            if (new Date(fu.nextFollowUpDate) > end) return false;
-            return true;
-        });
-
-        if (validPendingFollowUps.length === 0) {
-            console.log("No pending follow-ups for today or overdue.");
-            return;
-        }
-        // group by account
-        const grouped: Record<string, typeof validPendingFollowUps> = {};
-        for (const fu of validPendingFollowUps) {
-            const accountId = fu.response.form.account?.id;
-            if (!accountId) continue;
-
-            grouped[accountId] ??= [];
-            grouped[accountId].push(fu);
-        }
-
-        for (const followups of Object.values(grouped)) {
-            if (followups.length === 0) continue;
-            const account = followups[0].response.form.account;
-            if (!account?.email) continue;
-
-            const html = buildPendingFollowupEmail({
-                businessName: account.businessName ?? "Your Business",
-                followups,
-            });
-
-            await sendPendingFollowupEmail({
-                to: account.email,
-                subject: `All Pending Follow-ups for ${today.toDateString()} of ${account.businessName}`,
-                html,
-            });
-        }
-
-        // send WhatsApp per account
-        //   for (const followups of Object.values(grouped)) {
-        //     const account = followups[0].response.form.account;
-        //     const admins = account.users.filter(
-        //       u => u.role === "ADMIN" || u.role === "SUPERADMIN"
-        //     );
-
-        //     const phones = admins
-        //       .map(a => a.phone)
-        //       .filter(Boolean)
-        //       .map(p => p!.startsWith("91") ? p! : "91" + p);
-
-        //     const messageLines = followups.map(
-        //       (f, i) =>
-        //         `${i + 1}. ${f.businessStatus} | ${f.nextFollowUpDate?.toDateString()}`
-        //     );
-
-        //     const params = [
-        //       account.businessName || "Your Account",
-        //       String(followups.length),
-        //       messageLines.join("\n"),
-        //     ];
-
-        //     for (const phone of phones) {
-        //       await sendAiSensyMessage({
-        //         destination: phone,
-        //         userName: "Admin",
-        //         templateParams: params,
-        //         tags: ["daily_followup"],
-        //       });
-        //     }
-        //   }
-        console.log("✅ All Pending follow-up Email notifications sent Successfully");
-    } catch (error) {
-        console.log(error);
-        throw new Error("Something went wrong...")
+    if (followUps.length === 0) {
+      console.log("No pending follow-ups for today. No emails sent.");
+      return;
     }
+    // latest followup per response
+    const latestMap = new Map<string, typeof followUps[0]>();
+    for (const fu of followUps) {
+      if (!latestMap.has(fu.responseId)) {
+        latestMap.set(fu.responseId, fu);
+      }
+    }
+    const latestFollowups = Array.from(latestMap.values());
+
+    const validPendingFollowUps = latestFollowups.filter((fu) => {
+      if (fu.status !== "PENDING") return false;
+      if (!fu.nextFollowUpDate) return false;
+      if (new Date(fu.nextFollowUpDate) > end) return false;
+      return true;
+    });
+
+    if (validPendingFollowUps.length === 0) {
+      console.log("No pending follow-ups for today or overdue.");
+      return;
+    }
+    // group by account
+    const grouped: Record<string, typeof validPendingFollowUps> = {};
+    for (const fu of validPendingFollowUps) {
+      const accountId = fu.response.form.account?.id;
+      if (!accountId) continue;
+
+      grouped[accountId] ??= [];
+      grouped[accountId].push(fu);
+    }
+
+    for (const followups of Object.values(grouped)) {
+      if (followups.length === 0) continue;
+      const account = followups[0].response.form.account;
+      if (!account?.email) continue;
+
+      const html = buildPendingFollowupEmail({
+        businessName: account.businessName ?? "Your Business",
+        followups,
+      });
+
+      await sendPendingFollowupEmail({
+        to: account.email,
+        subject: `All Pending Follow-ups for ${today.toDateString()} of ${account.businessName}`,
+        html,
+      });
+    }
+
+    // send WhatsApp per account
+    //   for (const followups of Object.values(grouped)) {
+    //     const account = followups[0].response.form.account;
+    //     const admins = account.users.filter(
+    //       u => u.role === "ADMIN" || u.role === "SUPERADMIN"
+    //     );
+
+    //     const phones = admins
+    //       .map(a => a.phone)
+    //       .filter(Boolean)
+    //       .map(p => p!.startsWith("91") ? p! : "91" + p);
+
+    //     const messageLines = followups.map(
+    //       (f, i) =>
+    //         `${i + 1}. ${f.businessStatus} | ${f.nextFollowUpDate?.toDateString()}`
+    //     );
+
+    //     const params = [
+    //       account.businessName || "Your Account",
+    //       String(followups.length),
+    //       messageLines.join("\n"),
+    //     ];
+
+    //     for (const phone of phones) {
+    //       await sendAiSensyMessage({
+    //         destination: phone,
+    //         userName: "Admin",
+    //         templateParams: params,
+    //         tags: ["daily_followup"],
+    //       });
+    //     }
+    //   }
+    console.log("✅ All Pending follow-up Email notifications sent Successfully");
+  } catch (error) {
+    console.log(error);
+    throw new Error("Something went wrong...")
+  }
 }
 
 function buildPendingFollowupEmail({
-    businessName,
-    followups,
+  businessName,
+  followups,
 }: {
-    businessName: string;
-    followups: any[];
+  businessName: string;
+  followups: any[];
 }) {
-    const today = new Date().setHours(0, 0, 0, 0);
+  const today = new Date().setHours(0, 0, 0, 0);
 
-    const cards = followups
-        .map((f, i) => {
-            const answers = f.response.answers
-                .map(
-                    (a: any) => `
+  const cards = followups
+    .map((f, i) => {
+      const answers = f.response.answers
+        .map(
+          (a: any) => `
             <tr>
               <td style="padding:6px 0; color:#6b7280; font-size:13px; width:40%;">
                 ${a.field.label}
@@ -162,13 +162,13 @@ function buildPendingFollowupEmail({
               </td>
             </tr>
           `
-                )
-                .join("");
+        )
+        .join("");
 
-            const isOverdue =
-                new Date(f.nextFollowUpDate).setHours(0, 0, 0, 0) < today;
+      const isOverdue =
+        new Date(f.nextFollowUpDate).setHours(0, 0, 0, 0) < today;
 
-            return `
+      return `
         <div style="
           border:1px solid #e5e7eb;
           border-radius:10px;
@@ -217,10 +217,10 @@ function buildPendingFollowupEmail({
 
         </div>
       `;
-        })
-        .join("");
+    })
+    .join("");
 
-    return `
+  return `
     <div style="background:#f3f4f6; padding:16px;">
       <div style="
         max-width:600px;
