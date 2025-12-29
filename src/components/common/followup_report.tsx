@@ -157,7 +157,7 @@ function FollowUpCard({ followUp }: { followUp: FollowUp }) {
                 {followUp.response.answers.map((ans, idx) => (
                     <div key={idx}>
                         <p className="text-gray-500 text-xs">{ans.field.label}</p>
-                        <p className="text-gray-800 font-medium truncate">
+                        <p className="text-gray-800 font-medium">
                             {ans.value || "-"}
                         </p>
                     </div>
