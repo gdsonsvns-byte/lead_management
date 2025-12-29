@@ -1,4 +1,6 @@
-import React from 'react'
+import FollowupReport from '@/src/components/common/followup_report';
+import Spinner from '@/src/components/ui/spinner';
+import { Suspense } from 'react'
 
 export default async function ReportPage({ searchParams }: { searchParams: Promise<{ id?: string, date?: string }> }) {
     const { id, date } = await searchParams;
@@ -14,6 +16,10 @@ export default async function ReportPage({ searchParams }: { searchParams: Promi
     }
 
     return (
-        <div>{id}{date}</div>
+        <section className='relative p-5'>
+            <Suspense fallback={<Spinner />}>
+                <FollowupReport id={id} date={date} />
+            </Suspense>
+        </section>
     )
 }
