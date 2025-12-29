@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { useMemo, useState, useEffect, JSX } from "react";
+import { useRouter } from "next/navigation";
 
 import {
     DataGrid,
@@ -128,6 +129,7 @@ export default function UsersData({ formId }: { formId: string }) {
     const STORAGE_KEY = `form_${formId}_column_visibility`;
     const queryClient = useQueryClient();
     const hasFormId = !!formId;
+     const router = useRouter();
     const [currentState, setCurrentState] = useState<string>(allState[1].status)
     const [followType, setFollowType] = useState<string>("NOTE");
     const [followNote, setFollowNote] = useState<string>("");
@@ -136,7 +138,7 @@ export default function UsersData({ formId }: { formId: string }) {
     const [columnVisibilityModel, setColumnVisibilityModel] = useState<any>({});
     const [openResponse, setOpenResponse] = useState<FormResponseItem | null>(null);
     const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
-    const [reportData, setReportData] = useState<string>("");
+    const [reportData, setReportData] = useState<string>(new Date().toISOString().split("T")[0]);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -329,7 +331,7 @@ export default function UsersData({ formId }: { formId: string }) {
                             className="border border-gray-300 rounded-md p-1.5" />
                         <Button
                             variant="contained"
-                            onClick={() => window.location.href = `report?id=${formId}&date=${reportData}`}
+                            onClick={() => router.push(`report?id=${formId}&date=${reportData}`)}
                             disabled={reportData === ""}
                         >
                             View Report
