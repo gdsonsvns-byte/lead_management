@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
             );
         }
         const { start, end } = getDayRange(date);
-
+        console.log(start, end);
         const followUps = await prisma.followUp.findMany({
             where: {
                 createdAt: {
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
                 type: true,
                 status: true,
                 note: true,
-                nextFollowUpDate:true,
+                nextFollowUpDate: true,
                 createdAt: true,
                 addedBy: {
                     select: {
