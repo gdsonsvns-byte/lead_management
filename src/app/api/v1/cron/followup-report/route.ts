@@ -9,8 +9,8 @@ export async function GET(req: NextRequest) {
     if (secret !== process.env.CRON_SECRET) {
       return new Response("Unauthorized", { status: 401 });
     }
-    // const today = new Date().toISOString().split("T")[0];
-    const today = "2025-12-27";
+    const today = new Date().toISOString().split("T")[0];
+    // const today = "2025-12-27";
     const { start, end } = getDayRange(today);
     const followUps = await prisma.followUp.findMany({
       where: {
@@ -64,23 +64,38 @@ export async function GET(req: NextRequest) {
     });
 
     if (followUps.length === 0) {
+      console.log("No activity found for today.");
       return NextResponse.json({ message: "No activity found for today." }, { status: 200 });
     }
-    const account = followUps[0]?.response?.form?.account;
-    if (!account?.email) {
-      return NextResponse.json({ message: "No email found for account." }, { status: 200 });
+
+    const grouped: Record<string, typeof followUps> = {};
+    for (const fu of followUps) {
+      const account = fu.response?.form?.account;
+      const accountId = account?.id;
+
+      if (!accountId) continue;
+
+      grouped[accountId] ??= [];
+      grouped[accountId].push(fu);
     }
 
-    const html = buildActivityReportEmail({
-      businessName: account.businessName ?? "Your Business",
-      followUps,
-    });
+    for (const followups of Object.values(grouped)) {
+      if (followups.length === 0) continue;
 
-    await sendActivityReportEmail({
-      to: account.email,
-      subject: `Activity report for ${today} – ${account.businessName}`,
-      html,
-    });
+      const account = followups[0].response.form.account;
+      if (!account?.email) continue;
+
+      const html = buildActivityReportEmail({
+        businessName: account.businessName ?? "Your Business",
+        followups,
+      });
+
+      await sendActivityReportEmail({
+        to: account.email,
+        subject: `Activity report for ${today} – ${account.businessName}`,
+        html,
+      });
+    }
 
     console.log("✅ All activity report Email notifications sent Successfully");
     return NextResponse.json({ message: "All activity report Email notifications sent Successfully" },
@@ -101,10 +116,10 @@ function getDayRange(dateStr: string) {
 
 function buildActivityReportEmail({
   businessName,
-  followUps,
+  followups,
 }: {
   businessName: string;
-  followUps: any[];
+  followups: any[];
 }) {
   return `
   <div style="max-width:600px;margin:0 auto;padding:16px;">
@@ -112,7 +127,7 @@ function buildActivityReportEmail({
       Daily Activity Report – ${businessName}
     </h2>
 
-    ${followUps.map(renderFollowUpCard).join("")}
+    ${followups.map(renderFollowUpCard).join("")}
   </div>
   `;
 }
