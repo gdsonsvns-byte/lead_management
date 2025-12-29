@@ -4,16 +4,21 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
 import Spinner from "../ui/spinner";
-import { Calendar, Clock, Mail, NotebookPen } from "lucide-react";
+import { Calendar, Clock, Mail, MoveLeft, NotebookPen } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 
 export default function FollowupReport({ id, date }: { id: string, date: string }) {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams()
+    const [currentDate, setCurrentDate] = useState<string>(date);
     const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
     const { data, isLoading, isError, isFetching, error } = useQuery<FollowUpListResponse>({
-        queryKey: ["follow_up_report", id, date],
+        queryKey: ["follow_up_report", id, currentDate],
         queryFn: async () => {
             const res = await axios.get(`/api/v1/followup/report`, {
-                params: { id, date, page: paginationModel.page + 1, limit: paginationModel.pageSize },
+                params: { id, date: currentDate, page: paginationModel.page + 1, limit: paginationModel.pageSize },
                 withCredentials: true,
             });
             return res.data;
@@ -21,20 +26,50 @@ export default function FollowupReport({ id, date }: { id: string, date: string 
         retry: 1,
         placeholderData: (old) => old,
     });
-    if (data?.followUps?.length === 0) {
-        return (
-            <div className="text-center text-gray-500 py-10">
-                No follow-ups found
-            </div>
-        );
-    }
+
+    const handleBack = () => {
+        if (window.history.length > 1) {
+            router.back();
+        } else {
+            router.push("/dashboard");
+        }
+    };
     return (
         <div className="w-full overflow-hidden">
             <div className="flex justify-between items-center mb-5">
-                <h1 className="font-bold text-zinc-800 text-xl">
-                    {data?.followUps?.[0]?.response?.form?.title}
-                </h1>
+                <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-gray-400 cursor-pointer hover:bg-gray-100 transition duration-300 ease-in-out"
+                        onClick={handleBack}
+                    >
+                        <MoveLeft size={16} />
+                    </div>
+                    <h1 className="font-bold text-zinc-800 text-xl">
+                        {data?.followUps?.[0]?.response?.form?.title}
+                    </h1>
+                </div>
+                <div className="flex items-center gap-2">
+                    <input
+                        type="date"
+                        value={currentDate}
+                        onChange={(e) => {
+                            const newDate = e.target.value;
+                            setCurrentDate(newDate);
+                            const params = new URLSearchParams(searchParams.toString());
+                            params.set("date", newDate);
+                            router.replace(`${pathname}?${params.toString()}`);
+                        }}
+                        className="border border-gray-300 rounded-md p-1.5"
+                        disabled={isFetching}
+                    />
+                </div>
             </div>
+            {
+                data?.followUps?.length === 0 && (
+                    <div className="text-center text-gray-500 py-10">
+                        No follow-ups found
+                    </div>
+                )
+            }
             {isLoading && (
                 <div className="flex justify-center py-20">
                     <Spinner />
@@ -57,6 +92,30 @@ export default function FollowupReport({ id, date }: { id: string, date: string 
                     <FollowUpCard key={followUp.id} followUp={followUp} />
                 ))}
             </div>
+            {data && data.totalResponse > paginationModel.pageSize && (
+                <div className="flex items-center gap-4 mt-6 justify-center">
+                    <button
+                        disabled={!data.prevPage || isFetching}
+                        onClick={() => setPaginationModel((p) => ({ ...p, page: p.page - 1 }))}
+                        className={`px-4 py-2 rounded-lg bg-gray-200 text-sm font-medium transition-all ${!data.prevPage ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
+                    >
+                        Previous
+                    </button>
+
+                    <span className="font-medium text-zinc-700">
+                        Page {data.page} / {data.pageCount}
+                    </span>
+
+                    <button
+                        disabled={!data.nextPage || isFetching}
+                        onClick={() => setPaginationModel((p) => ({ ...p, page: p.page + 1 }))}
+                        className={`px-4 py-2 rounded-lg bg-gray-200 text-sm font-medium transition-all ${!data.nextPage ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
+                    >
+                        Next
+                    </button>
+
+                </div>
+            )}
         </div>
     )
 }
@@ -66,11 +125,11 @@ function FollowUpCard({ followUp }: { followUp: FollowUp }) {
         <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition">
             <div className="flex items-start justify-between">
                 <div>
-                    <p className="text-sm font-semibold text-gray-800">
+                    {/* <p className="text-sm font-semibold text-gray-800">
                         {followUp.response.form.title}
-                    </p>
-                    <p className="text-sm mt-3 text-gray-700 flex items-center gap-2">
-                        <Calendar size={14}/> {new Date(followUp.createdAt).toLocaleString()}
+                    </p> */}
+                    <p className="text-sm text-gray-700 flex items-center gap-2">
+                        <Calendar size={14} /> {new Date(followUp.createdAt).toLocaleString()}
                     </p>
                 </div>
 
@@ -90,11 +149,11 @@ function FollowUpCard({ followUp }: { followUp: FollowUp }) {
             </div>
             {followUp.note && (
                 <p className="mt-1 text-sm text-gray-700 flex items-center gap-2">
-                    <NotebookPen size={14}/> {followUp.note}
+                    <NotebookPen size={14} /> {followUp.note}
                 </p>
             )}
 
-            <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+            <div className="mt-4 flex flex-col gap-x-4 gap-y-2 text-sm">
                 {followUp.response.answers.map((ans, idx) => (
                     <div key={idx}>
                         <p className="text-gray-500 text-xs">{ans.field.label}</p>

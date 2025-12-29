@@ -96,7 +96,7 @@ export async function GET(req: NextRequest) {
 
         if (followUps.length === 0) {
             return NextResponse.json(
-                { message: "No followups found." },
+                { followUps: [] },
                 { status: 200 }
             );
         }
