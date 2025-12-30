@@ -7,7 +7,7 @@ interface Props {
     subject: string
     html: string;
 }
-export async function sendPendingFollowupEmail({ to, subject, html }: Props) {
+export async function sendPendingFollowupEmail({ to, subject, html }: Props, retries = 3) {
     try {
         if (!to) {
             console.warn("⚠️ User email missing. Skipping user email.");
@@ -22,8 +22,15 @@ export async function sendPendingFollowupEmail({ to, subject, html }: Props) {
         });
 
         if (error) {
-            console.error("❌ Failed to send alert email:", error);
-            return { success: false, error };
+            if (error.statusCode === 429 && retries > 0) {
+                const wait = (4 - retries) * 1000;
+                console.warn(`⏳ Rate limited. Retrying in ${wait}ms`);
+                await delay(wait);
+                return sendPendingFollowupEmail({ to, subject, html }, retries - 1);
+            }
+
+            console.error("❌ Email failed:", error);
+            return { success: false };
         }
 
         return { success: true, message: "Alert email sent successfully" };
@@ -32,4 +39,8 @@ export async function sendPendingFollowupEmail({ to, subject, html }: Props) {
         console.error("❌ Unexpected email error:", err);
         return { success: false, error: err.message };
     }
+}
+
+function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }

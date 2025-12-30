@@ -98,6 +98,7 @@ export async function sendDailyPendingFollowups() {
         subject: `All Pending Follow-ups for ${today.toDateString()} of ${account.businessName}`,
         html,
       });
+      await delay(1000);
     }
 
     // send WhatsApp per account
@@ -137,6 +138,10 @@ export async function sendDailyPendingFollowups() {
     console.log(error);
     throw new Error("Something went wrong...")
   }
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function buildPendingFollowupEmail({

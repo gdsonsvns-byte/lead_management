@@ -10,7 +10,6 @@ export async function GET(req: NextRequest) {
       return new Response("Unauthorized", { status: 401 });
     }
     const today = new Date().toISOString().split("T")[0];
-    // const today = "2025-12-27";
     const { start, end } = getDayRange(today);
     const followUps = await prisma.followUp.findMany({
       where: {
@@ -85,16 +84,15 @@ export async function GET(req: NextRequest) {
       const account = followups[0].response.form.account;
       if (!account?.email) continue;
 
-      const html = buildActivityReportEmail({
-        businessName: account.businessName ?? "Your Business",
-        followups,
-      });
-
       await sendActivityReportEmail({
         to: account.email,
         subject: `Activity report for ${today} – ${account.businessName}`,
-        html,
+        html: buildActivityReportEmail({
+          businessName: account.businessName ?? "Your Business",
+          followups,
+        }),
       });
+      await delay(1000);
     }
 
     console.log("✅ All activity report Email notifications sent Successfully");
@@ -105,6 +103,10 @@ export async function GET(req: NextRequest) {
     console.log(error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function getDayRange(dateStr: string) {
@@ -137,10 +139,8 @@ function renderFollowUpCard(followUp: any) {
     ? new Date(followUp.nextFollowUpDate).toDateString()
     : "-";
 
-  const statusBg =
-    followUp.status === "PENDING" ? "#FEF3C7" : "#DCFCE7";
-  const statusColor =
-    followUp.status === "PENDING" ? "#92400E" : "#166534";
+  const statusBg = followUp.status === "PENDING" ? "#FEF3C7" : "#DCFCE7";
+  const statusColor = followUp.status === "PENDING" ? "#92400E" : "#166534";
 
   return `
   <table width="100%" cellpadding="0" cellspacing="0" style="
@@ -206,7 +206,7 @@ function renderFollowUpCard(followUp: any) {
             <tr>
               <td style="padding-bottom:8px;">
                 <div style="font-size:11px;color:#6b7280;">
-                  ${ans.field.label}
+                  ${ans.field.label ?? "-"}
                 </div>
                 <div style="font-size:14px;color:#111827;font-weight:600;">
                   ${ans.value || "-"}

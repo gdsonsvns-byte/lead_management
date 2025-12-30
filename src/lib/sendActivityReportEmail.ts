@@ -7,29 +7,37 @@ interface Props {
     subject: string
     html: string;
 }
-export async function sendActivityReportEmail({ to, subject, html }: Props) {
+export async function sendActivityReportEmail(
+    { to, subject, html }: Props,
+    retries = 3
+) {
     try {
-        if (!to) {
-            console.warn("⚠️ User email missing. Skipping user email.");
-            return { success: false, skipped: true };
-        }
-
         const { error } = await resend.emails.send({
-            from: 'Activity Report <leads@wizards.co.in>',
+            from: "Activity Report <leads@wizards.co.in>",
             to: [to],
-            subject: subject,
-            html: html,
+            subject,
+            html,
         });
 
         if (error) {
-            console.error("❌ Failed to send activity report email:", error);
-            return { success: false, error };
+            if (error.statusCode === 429 && retries > 0) {
+                const wait = (4 - retries) * 1000;
+                console.warn(`⏳ Rate limited. Retrying in ${wait}ms`);
+                await delay(wait);
+                return sendActivityReportEmail({ to, subject, html }, retries - 1);
+            }
+
+            console.error("❌ Email failed:", error);
+            return { success: false };
         }
 
-        return { success: true, message: "Activity report email sent successfully" };
+        return { success: true };
 
     } catch (err: any) {
-        console.error("❌ Unexpected email error:", err);
+        console.error("❌ Unexpected error:", err);
         return { success: false, error: err.message };
     }
+}
+function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
