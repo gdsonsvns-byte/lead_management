@@ -39,28 +39,30 @@ model Account {
   users          User[]
   forms          Form[]
 
-  createdAt DateTime @default(now())
+  createdAt       DateTime         @default(now())
+  apiAccessTokens ApiAccessToken[]
 
   @@index([createdAt])
 }
 
 model User {
-  id                  String        @id @default(uuid())
+  id                  String           @id @default(uuid())
   name                String
-  email               String        @unique
+  email               String           @unique
   password            String
-  role                Role          @default(ADMIN)
+  role                Role             @default(ADMIN)
   createdById         String?
-  createdBy           User?         @relation("CreatedAdmins", fields: [createdById], references: [id], onDelete: SetNull)
-  createdAdmins       User[]        @relation("CreatedAdmins")
+  createdBy           User?            @relation("CreatedAdmins", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAdmins       User[]           @relation("CreatedAdmins")
   accountId           String
-  account             Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  account             Account          @relation(fields: [accountId], references: [id], onDelete: Cascade)
   managedUsers        ManagedUser[]
   forms               Form[]
   resetToken          String?
   resetTokenExpiresAt DateTime?
-  createdAt           DateTime      @default(now())
+  createdAt           DateTime         @default(now())
   followUps           FollowUp[]
+  apiAccessTokens     ApiAccessToken[]
 
   @@index([accountId])
   @@index([role])
@@ -164,4 +166,23 @@ model FollowUp {
   @@index([nextFollowUpDate])
   @@index([createdAt])
   @@index([status, nextFollowUpDate])
+}
+
+model ApiAccessToken {
+  id          String    @id @default(uuid())
+  name        String
+  tokenHash   String    @unique
+  accountId   String
+  createdById String
+  expiresAt   DateTime?
+  lastUsedAt  DateTime?
+  isRevoked   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdBy User    @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@index([createdById])
+  @@index([expiresAt])
 }
