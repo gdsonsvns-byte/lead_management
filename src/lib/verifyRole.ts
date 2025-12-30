@@ -19,12 +19,12 @@ export async function verifyRole(allowedRoles: string[] | string): Promise<AuthC
     const token = cookieStore.get("token")?.value;
 
     if (!token) {
-        throw new Error("No authentication token found");
+        return null;
     }
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET) as DecodedUser;
-        
+
         const roles = Array.isArray(allowedRoles)
             ? allowedRoles
             : [allowedRoles];
@@ -42,7 +42,6 @@ export async function verifyRole(allowedRoles: string[] | string): Promise<AuthC
         if (err.name === "JsonWebTokenError") {
             throw new Error("Invalid token. Authentication failed.");
         }
-
-        throw new Error("Authentication error");
+        return null;
     }
 }

@@ -193,40 +193,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
 
             return response;
         });
-
-        const followup = await prisma.followUp.create({
-            data: {
-                responseId: result.id,
-                addedByUserId: form.userId,
-                type: FollowUpType.STATUS_CHANGE,
-                note: "Auto Follow up add by the System.",
-                nextFollowUpDate: new Date(),
-                businessStatus: "Call Client",
-                status: FollowUpStatus.PENDING,
-            },
-            include: {
-                addedBy: {
-                    select: { id: true, name: true, email: true },
-                },
-            },
-        });
+        
 
         const sendNotificationMessage: Promise<any>[] = [];
 
-        if (form.account?.email) {
-            sendNotificationMessage.push(sendResponseAlertEmail({
-                userEmail: form.account.email,
-                allFields: fieldValuesForAdmin,
-                accountName: form.account.businessName ?? "Admin",
-                formName: form.title
-            }))
-        }
-        if (userEmail) {
-            sendNotificationMessage.push(sendResponseAlertEmailToUser({
-                userEmail, allFields: fieldValuesForAdmin, accountName: form.account?.businessName ?? "User"
-            })
-            );
-        }
+        // if (form.account?.email) {
+        //     sendNotificationMessage.push(sendResponseAlertEmail({
+        //         userEmail: form.account.email,
+        //         allFields: fieldValuesForAdmin,
+        //         accountName: form.account.businessName ?? "Admin",
+        //         formName: form.title
+        //     }))
+        // }
+        // if (userEmail) {
+        //     sendNotificationMessage.push(sendResponseAlertEmailToUser({
+        //         userEmail, allFields: fieldValuesForAdmin, accountName: form.account?.businessName ?? "User"
+        //     })
+        //     );
+        // }
 
         if (form.userWhatsappCampaignName && form.account?.whatsappApiKey && userPhone) {
             const phoneStr = String(userPhone).trim();

@@ -1,12 +1,13 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { createFormSchema } from "@/src/types/form"
 import slugify from "slugify"
 import { isRateLimited } from "@/src/lib/limiter"
 import { verifyRole } from "@/src/lib/verifyRole"
 import prisma from "@/src/lib/prisma"
+import { verifyApiAccessToken } from "@/src/lib/verifyApiAccessToken"
 
 // get all form associted with Account
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";
         if (isRateLimited(ip)) {
@@ -17,12 +18,12 @@ export async function GET(req: Request) {
         }
 
         const user = await verifyRole(["ADMIN", "SUPERADMIN"])
-        if (!user) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
+        const apiClient = await verifyApiAccessToken(req);
+
+        if (!user && !apiClient) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
+        const accountId = user?.accountId || apiClient?.accountId;
         const { searchParams } = new URL(req.url);
         const page = Math.max(Number(searchParams.get("page")) || 1, 1);
         const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 10, 1), 50);
@@ -41,16 +42,15 @@ export async function GET(req: Request) {
                 );
             }
         }
-        console.log(user.accountId, user.role, user.sub);
 
-        if (!user.accountId && queryAccountId === "") {
+        if (!accountId && queryAccountId === "") {
             return NextResponse.json(
                 { error: "Account not found." },
                 { status: 404 }
             );
         }
 
-        const finalAccountId = queryAccountId !== "" ? queryAccountId : user.accountId;
+        const finalAccountId = queryAccountId !== "" ? queryAccountId : accountId;
 
         const forms = await prisma.form.findMany({
             where: { accountId: finalAccountId },
@@ -104,18 +104,20 @@ export async function GET(req: Request) {
     }
 }
 // create form 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";
         if (isRateLimited(ip)) {
             return NextResponse.json(
-                { error: "Too many requests. Try again later." },
+                { error: "Too many requests" },
                 { status: 429 }
             );
         }
 
         const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
-        if (!user) {
+        const apiClient = await verifyApiAccessToken(req);
+
+        if (!user && !apiClient) {
             return NextResponse.json(
                 { error: "Unauthorized" },
                 { status: 401 }
@@ -123,64 +125,14 @@ export async function POST(req: Request) {
         }
         const contentLength = Number(req.headers.get("content-length") || 0);
         if (contentLength > 50_000) {
-            return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+            return NextResponse.json(
+                { error: "Payload too large" },
+                { status: 413 }
+            );
         }
-
-        const { searchParams } = new URL(req.url);
-        const targetAccountIdFromQuery = searchParams.get("account_id");
-
         const body = await req.json();
-
-        const userAccount = await prisma.user.findUnique({
-            where: { id: user.sub },
-            select: { role: true, name: true }
-        });
-
-        if (!userAccount) {
-            return NextResponse.json({ error: "User account not found" }, { status: 404 });
-        }
-
-        let formOwnerUserId = user?.sub;
-        let formOwnerAccountId = user.accountId;
-        let formOwnerName = userAccount.name;
-
-        if (user?.role === "SUPERADMIN") {
-            if (!targetAccountIdFromQuery || typeof targetAccountIdFromQuery !== "string") {
-                return NextResponse.json(
-                    { error: "SUPERADMIN must send account_id in searchParams" },
-                    { status: 400 }
-                );
-            }
-
-            const targetAccount = await prisma.account.findUnique({
-                where: { id: targetAccountIdFromQuery }
-            });
-
-            if (!targetAccount) {
-                return NextResponse.json(
-                    { error: "Target account does not exist" },
-                    { status: 404 }
-                );
-            }
-
-            const firstUser = await prisma.user.findFirst({
-                where: { accountId: targetAccountIdFromQuery },
-                select: { id: true, name: true, accountId: true }
-            });
-
-            if (!firstUser) {
-                return NextResponse.json(
-                    { error: "No users found inside this account" },
-                    { status: 404 }
-                );
-            }
-
-            formOwnerUserId = firstUser.id;
-            formOwnerAccountId = targetAccountIdFromQuery;
-            formOwnerName = firstUser.name;
-        }
-
         const parsed = createFormSchema.safeParse(body);
+
         if (!parsed.success) {
             return NextResponse.json(
                 { errors: parsed.error.flatten().fieldErrors },
@@ -189,87 +141,114 @@ export async function POST(req: Request) {
         }
 
         const { title, description, fields } = parsed.data;
-        const rawAdmin = body.adminCampaign;
-        const rawUser = body.userCampaign;
+        let accountId: string;
 
-        const adminCampaign = typeof rawAdmin === "string" ? rawAdmin.trim() : null;
-        const userCampaign = typeof rawUser === "string" ? rawUser.trim() : null;
+        if (user) {
+            if (user.role === "SUPERADMIN") {
+                const targetAccountId =
+                    new URL(req.url).searchParams.get("account_id");
 
-        if (adminCampaign && adminCampaign.length > 100) {
+                if (!targetAccountId) {
+                    return NextResponse.json(
+                        { error: "SUPERADMIN must provide account_id" },
+                        { status: 400 }
+                    );
+                }
+
+                const accountExists = await prisma.account.findUnique({
+                    where: { id: targetAccountId },
+                    select: { id: true },
+                });
+
+                if (!accountExists) {
+                    return NextResponse.json(
+                        { error: "Account not found" },
+                        { status: 404 }
+                    );
+                }
+
+                accountId = targetAccountId;
+            } else {
+                accountId = user.accountId;
+            }
+        } else {
+            accountId = apiClient?.accountId!;
+        }
+        const adminUser = await prisma.user.findFirst({
+            where: {
+                accountId,
+                role: "ADMIN",
+            },
+            select: { id: true, name: true },
+        });
+
+        if (!adminUser) {
             return NextResponse.json(
-                { error: "Admin campaign name too long. Max 100 chars." },
-                { status: 400 }
+                { error: "No ADMIN user found for this account" },
+                { status: 404 }
             );
         }
 
-        if (userCampaign && userCampaign.length > 100) {
-            return NextResponse.json(
-                { error: "User campaign name too long. Max 100 chars." },
-                { status: 400 }
-            );
-        }
+        const formOwnerUserId = adminUser.id;
         const cleanTitle = title.trim();
         const cleanDescription = description?.trim() || "";
 
-        const slugBase = slugify(cleanTitle, { lower: true, strict: true });
-        const slug = `${slugBase}-${Date.now()}`;
+        const slug =
+            `${slugify(cleanTitle, { lower: true, strict: true })}-${Date.now()}`;
 
         const existing = await prisma.form.findFirst({
-            where: {
-                title: cleanTitle,
-                accountId: formOwnerAccountId
-            }
+            where: { title: cleanTitle, accountId },
         });
 
         if (existing) {
             return NextResponse.json(
-                { error: "A form with this title already exists for this account" },
+                { error: "Form with this title already exists" },
                 { status: 400 }
             );
         }
 
-        const prefix = (formOwnerName || "FORM").slice(0, 4).toUpperCase();
-        const formCount = await prisma.form.count({
-            where: { accountId: formOwnerAccountId }
-        });
-        const formattedCount = String(formCount + 1).padStart(4, "0");
-        const datePart = new Date().toISOString();
-        const uniqueId = `${prefix}-${formattedCount}-${datePart}`;
+        const count = await prisma.form.count({ where: { accountId } });
+        const prefix = (adminUser.name || "FORM").slice(0, 4).toUpperCase();
+        const formsId = `${prefix}-${String(count + 1).padStart(4, "0")}-${Date.now()}`;
 
-        const result = await prisma.$transaction(async (tx) => {
-            return tx.form.create({
-                data: {
-                    title: cleanTitle,
-                    description: cleanDescription,
-                    formsId: uniqueId,
-                    slug,
-                    userId: formOwnerUserId!,
-                    accountId: formOwnerAccountId,
-                    adminWhatsappCampaignName: adminCampaign ?? null,
-                    userWhatsappCampaignName: userCampaign ?? null,
-                    fields: {
-                        create: fields?.map((f, idx) => ({
-                            label: f.label.trim(),
-                            type: f.type,
-                            required: f.required ?? false,
-                            options: f.options ? JSON.stringify(f.options) : undefined,
-                            order: f.order ?? idx + 1,
-                        })) || [],
-                    },
+        const form = await prisma.form.create({
+            data: {
+                title: cleanTitle,
+                description: cleanDescription,
+                slug,
+                formsId,
+                userId: formOwnerUserId,
+                accountId,
+                fields: {
+                    create: fields?.map((f, idx) => ({
+                        label: f.label.trim(),
+                        type: f.type,
+                        required: f.required ?? false,
+                        options: f.options ? JSON.stringify(f.options) : undefined,
+                        order: f.order ?? idx + 1,
+                    })),
                 },
-                include: { fields: true },
-            });
+            },
+            include: { fields: true },
         });
 
         return NextResponse.json(
-            { success: true, form: result },
+            {
+                success: true,
+                createdVia: user
+                    ? user.role === "SUPERADMIN"
+                        ? "SUPERADMIN"
+                        : "ADMIN"
+                    : "API",
+                form,
+            },
             { status: 201 }
         );
 
     } catch (err: any) {
         console.error("POST /form error:", err);
         return NextResponse.json(
-            { error: err.message || "Failed to create form" },
+            { error: "Failed to create form" },
             { status: 500 }
         );
     }
