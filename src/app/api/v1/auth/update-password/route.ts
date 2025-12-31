@@ -1,5 +1,6 @@
 import { isRateLimited } from "@/src/lib/limiter";
 import prisma from "@/src/lib/prisma";
+import { verifyApiAccessToken } from "@/src/lib/verifyApiAccessToken";
 import { verifyRole } from "@/src/lib/verifyRole";
 import { resetPasswordSchema } from "@/src/types/auth";
 import bcrypt from "bcryptjs";
@@ -16,7 +17,21 @@ export async function PATCH(req: NextRequest) {
         }
 
         const user = await verifyRole(["ADMIN", "SUPERADMIN"])
-        if (!user) {
+        const apiClient = await verifyApiAccessToken(req);
+
+        if (!user && !apiClient) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+        let userId: string | null = null;
+        if (user && (user.role === "ADMIN" || user.role === "SUPERADMIN")) {
+            userId = user.sub;
+        } else if (!user && apiClient) {
+            userId = apiClient.adminId;
+        }
+        if (!userId) {
             return NextResponse.json(
                 { error: "Unauthorized" },
                 { status: 401 }
@@ -49,7 +64,7 @@ export async function PATCH(req: NextRequest) {
         }
 
         const dbUser = await prisma.user.findUnique({
-            where: { id: user.sub },
+            where: { id: userId },
             select: { password: true }
         });
         if (!dbUser?.password) {
@@ -74,7 +89,7 @@ export async function PATCH(req: NextRequest) {
         }
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         await prisma.user.update({
-            where: { id: user.sub },
+            where: { id: userId },
             data: { password: hashedPassword }
         });
 
