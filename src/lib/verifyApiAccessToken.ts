@@ -45,6 +45,7 @@ export async function verifyApiAccessToken(req: NextRequest) {
         accountId: token.account.id,
         tokenId: token.id,
         adminId: token.account.users[0].id,
+        adminRole: token.account.users[0].role,
         adminName: token.account.users[0].name,
     };
 }
