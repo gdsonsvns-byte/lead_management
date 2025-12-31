@@ -77,13 +77,18 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ f
             return NextResponse.json({ error: "Form not found" }, { status: 404 });
         }
 
-        if (user?.role === "ADMIN" && form.accountId !== user.accountId) {
+        if (user && user.role === "ADMIN" && form.accountId !== user.accountId) {
             return NextResponse.json(
                 { error: "You do not have permission to delete this form." },
                 { status: 403 }
             );
         }
-
+        if (apiClient && form.accountId !== apiClient.accountId) {
+            return NextResponse.json(
+                { error: "You do not have permission to delete this form." },
+                { status: 403 }
+            );
+        }
         const answers = await prisma.responseAnswer.findMany({
             where: {
                 field: {
@@ -189,6 +194,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
         }
 
         if (user && user.role === "ADMIN" && form.accountId !== user.accountId) {
+            return NextResponse.json(
+                { error: "You do not have permission to update this form." },
+                { status: 403 }
+            );
+        }
+
+        if (apiClient && form.accountId !== apiClient.accountId) {
             return NextResponse.json(
                 { error: "You do not have permission to update this form." },
                 { status: 403 }
