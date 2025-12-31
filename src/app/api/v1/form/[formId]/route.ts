@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import slugify from "slugify";
 import { v2 as cloudinary } from "cloudinary";
 import { extractCloudinaryInfo } from "@/src/lib/extractCloudinaryInfo";
+import { verifyApiAccessToken } from "@/src/lib/verifyApiAccessToken";
 
 
 cloudinary.config({
@@ -52,8 +53,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ f
                 { status: 429 }
             );
         }
-        const user = await verifyRole(["ADMIN", "SUPERADMIN"])
-        if (!user) {
+        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        const apiClient = await verifyApiAccessToken(req);
+
+        if (!user && !apiClient) {
             return NextResponse.json(
                 { error: "Unauthorized" },
                 { status: 401 }
@@ -74,7 +77,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ f
             return NextResponse.json({ error: "Form not found" }, { status: 404 });
         }
 
-        if (user.role === "ADMIN" && form.accountId !== user.accountId) {
+        if (user?.role === "ADMIN" && form.accountId !== user.accountId) {
             return NextResponse.json(
                 { error: "You do not have permission to delete this form." },
                 { status: 403 }
@@ -157,8 +160,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
             );
         }
 
-        const user = await verifyRole(["ADMIN", "SUPERADMIN"])
-        if (!user) {
+        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        const apiClient = await verifyApiAccessToken(req);
+
+        if (!user && !apiClient) {
             return NextResponse.json(
                 { error: "Unauthorized" },
                 { status: 401 }
@@ -183,7 +188,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
             return NextResponse.json({ error: "Form not found" }, { status: 404 });
         }
 
-        if (user.role === "ADMIN" && form.accountId !== user.accountId) {
+        if (user && user.role === "ADMIN" && form.accountId !== user.accountId) {
             return NextResponse.json(
                 { error: "You do not have permission to update this form." },
                 { status: 403 }
