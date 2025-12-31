@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { SettingsIcon, Trash2Icon, ViewIcon } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import toast from "react-hot-toast";
 import Spinner from "./ui/spinner";
 
@@ -20,9 +20,10 @@ interface Props {
     details: Account;
     page: number;
     limit: number;
+    setOpenFormModal: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function AccountDropDown({ details, page, limit }: Props) {
+export default function AccountDropDown({ details, page, limit, setOpenFormModal }: Props) {
     const queryClient = useQueryClient();
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
@@ -71,6 +72,11 @@ export default function AccountDropDown({ details, page, limit }: Props) {
                     <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
                         <Link href={`/system_admin/accounts/add_new_user?account_id=${details.id}`}>
                             Add New User
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
+                        <Link href={`?account_id=${details.id}`} onClick={() => setOpenFormModal(true)}>
+                            Generate API Key
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-gray-300" />

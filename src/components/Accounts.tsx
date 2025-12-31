@@ -10,6 +10,8 @@ import { ArrowRight, CheckCircle, MessageCircle, XCircle } from "lucide-react";
 import AccountDropDown from "./AccountDropDown";
 import { Toaster } from "react-hot-toast";
 import AddWhatsappAPIKey from "./add_whatsapp_api_key";
+import GenerateApiKey from "./common/generate_api_key";
+import ShowApiToken from "./common/show_api_toke";
 
 
 interface Account {
@@ -44,7 +46,12 @@ async function fetchAccounts(page: number, limit: number = 10): Promise<Accounts
 export default function Accounts() {
     const [page, setPage] = useState(1);
     const limit = 10;
-
+    const [openFormModal, setOpenFormModal] = useState(false);
+    const [openTokenModal, setOpenTokenModal] = useState(false);
+    const [apiKey, setapiKey] = useState({
+        message: "",
+        token: "",
+    });
     const { data, isLoading, isError } = useQuery({
         queryKey: ["accounts", page, limit],
         queryFn: () => fetchAccounts(page, limit),
@@ -138,7 +145,7 @@ export default function Accounts() {
                             </p>
 
                             <div className="relative w-full flex items-center justify-between mt-4">
-                                <AccountDropDown details={acc} page={page} limit={limit} />
+                                <AccountDropDown details={acc} page={page} limit={limit} setOpenFormModal={setOpenFormModal} />
                                 <Link
                                     href={`/system_admin/accounts/${acc.id}`}
                                     className="inline-flex items-center gap-2 text-blue-600 font-medium text-sm hover:underline group w-max"
@@ -193,6 +200,8 @@ export default function Accounts() {
             <Suspense fallback={<Spinner />} >
                 <AddWhatsappAPIKey page={page} limit={limit} />
             </Suspense>
+            {openFormModal && <GenerateApiKey setOpenFormModal={setOpenFormModal} apiKey={apiKey} setapiKey={setapiKey} setOpenTokenModal={setOpenTokenModal} />}
+            {openTokenModal && <ShowApiToken setOpenTokenModal={setOpenTokenModal} apiKey={apiKey} />}
         </div>
     );
 }

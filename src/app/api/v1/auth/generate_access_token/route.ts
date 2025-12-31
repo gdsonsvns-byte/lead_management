@@ -21,9 +21,9 @@ export async function POST(req: NextRequest) {
                 { status: 401 }
             );
         }
-
+        const accountId = req.nextUrl.searchParams.get("account_id")?.toString().toLocaleLowerCase();
         const body = await req.json();
-        const { name, accountId } = body;
+        const { name } = body;
         if (!name) {
             return NextResponse.json(
                 { error: "Token name is required" },

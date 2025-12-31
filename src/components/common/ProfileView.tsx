@@ -1,13 +1,23 @@
 "use client";
 import { AccountSummaryResponse } from "@/src/types/auth";
+import { Button } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Loader2 } from "lucide-react";
+import { Loader2, Settings } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Toaster } from "react-hot-toast";
+import GenerateApiKey from "./generate_api_key";
+import { useState } from "react";
+import ShowApiToken from "./show_api_toke";
 
 export default function ProfileView({ accountId }: { accountId?: string }) {
     const currentPath = usePathname()
+    const [openFormModal, setOpenFormModal] = useState(false);
+    const [openTokenModal, setOpenTokenModal] = useState(false);
+    const [apiKey, setapiKey] = useState({
+        message: "",
+        token: "",
+    });
     const { data, isLoading, error } = useQuery<AccountSummaryResponse>({
         queryKey: ["view-profile", accountId],
         queryFn: async () => {
@@ -40,7 +50,7 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
     return (
         <div className="w-full space-y-5">
             <div className="flex items-center justify-between bg-white p-6 rounded-xl shadow">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 w-full">
                     <div className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl font-semibold">
                         {data.initials}
                     </div>
@@ -50,6 +60,16 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
                         </h1>
                         <p className="text-gray-500">{account.email}</p>
                     </div>
+                    {
+                        currentPath !== '/system_admin/setting' && (
+                            <div className="ml-auto">
+                                <Button variant="contained" onClick={() => setOpenFormModal(true)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300 ease-in-out">
+                                    <Settings className="w-4 h-4" />
+                                    Generate API Key
+                                </Button>
+                            </div>
+                        )
+                    }
                 </div>
             </div>
 
@@ -107,6 +127,8 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
                     ))}
                 </div>
             </div>
+            {openFormModal && <GenerateApiKey setOpenFormModal={setOpenFormModal} apiKey={apiKey} setapiKey={setapiKey} setOpenTokenModal={setOpenTokenModal} />}
+            {openTokenModal && <ShowApiToken setOpenTokenModal={setOpenTokenModal} apiKey={apiKey} />}
             <Toaster />
         </div>
     );
