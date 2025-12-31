@@ -14,6 +14,23 @@ export async function verifyApiAccessToken(req: NextRequest) {
 
     const token = await prisma.apiAccessToken.findUnique({
         where: { tokenHash },
+        include: {
+            account: {
+                select: {
+                    id: true,
+                    users: {
+                        where: {
+                            role: "ADMIN"
+                        },
+                        select: {
+                            name: true,
+                            id: true,
+                            role: true,
+                        }
+                    }
+                }
+            }
+        },
     });
 
     if (!token) return null;
@@ -25,7 +42,9 @@ export async function verifyApiAccessToken(req: NextRequest) {
     });
 
     return {
-        accountId: token.accountId,
+        accountId: token.account.id,
         tokenId: token.id,
+        adminId: token.account.users[0].id,
+        adminName: token.account.users[0].name,
     };
 }

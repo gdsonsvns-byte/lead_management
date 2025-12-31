@@ -142,6 +142,8 @@ export async function POST(req: NextRequest) {
 
         const { title, description, fields } = parsed.data;
         let accountId: string;
+        let adminId: string;
+        let adminName: string;
 
         if (user) {
             if (user.role === "SUPERADMIN") {
@@ -157,7 +159,7 @@ export async function POST(req: NextRequest) {
 
                 const accountExists = await prisma.account.findUnique({
                     where: { id: targetAccountId },
-                    select: { id: true },
+                    select: { id: true, users: { where: { role: "ADMIN" }, select: { id: true, name: true } } },
                 });
 
                 if (!accountExists) {
@@ -168,28 +170,46 @@ export async function POST(req: NextRequest) {
                 }
 
                 accountId = targetAccountId;
+                adminId = accountExists.users[0].id;
+                adminName = accountExists.users[0].name;
             } else {
+                const accountExists = await prisma.account.findUnique({
+                    where: { id: user.accountId },
+                    select: { id: true, users: { where: { role: "ADMIN" }, select: { id: true, name: true } } },
+                });
+
+                if (!accountExists) {
+                    return NextResponse.json(
+                        { error: "Account not found" },
+                        { status: 404 }
+                    );
+                }
                 accountId = user.accountId;
+                adminId = accountExists.users[0].id;
+                adminName = accountExists.users[0].name;
             }
         } else {
             accountId = apiClient?.accountId!;
+            adminId = apiClient?.adminId!;
+            adminName = apiClient?.adminName!;
         }
-        const adminUser = await prisma.user.findFirst({
-            where: {
-                accountId,
-                role: "ADMIN",
-            },
-            select: { id: true, name: true },
-        });
+        const rawAdmin = body.adminCampaign;
+        const rawUser = body.userCampaign;
+        const adminCampaign = typeof rawAdmin === "string" ? rawAdmin.trim() : null;
+        const userCampaign = typeof rawUser === "string" ? rawUser.trim() : null;
 
-        if (!adminUser) {
+        if (adminCampaign && adminCampaign.length > 100) {
             return NextResponse.json(
-                { error: "No ADMIN user found for this account" },
-                { status: 404 }
+                { error: "Admin campaign name too long. Max 100 chars." }, { status: 400 }
             );
         }
 
-        const formOwnerUserId = adminUser.id;
+        if (userCampaign && userCampaign.length > 100) {
+            return NextResponse.json(
+                { error: "User campaign name too long. Max 100 chars." }, { status: 400 }
+            )
+        }
+
         const cleanTitle = title.trim();
         const cleanDescription = description?.trim() || "";
 
@@ -208,8 +228,8 @@ export async function POST(req: NextRequest) {
         }
 
         const count = await prisma.form.count({ where: { accountId } });
-        const prefix = (adminUser.name || "FORM").slice(0, 4).toUpperCase();
-        const formsId = `${prefix}-${String(count + 1).padStart(4, "0")}-${Date.now()}`;
+        const prefix = (adminName || "FORM").slice(0, 4).toUpperCase();
+        const formsId = `${prefix}-${String(count + 1).padStart(4, "0")}-${new Date().toDateString().split(" ").join("-")}`;
 
         const form = await prisma.form.create({
             data: {
@@ -217,8 +237,10 @@ export async function POST(req: NextRequest) {
                 description: cleanDescription,
                 slug,
                 formsId,
-                userId: formOwnerUserId,
+                userId: adminId,
                 accountId,
+                adminWhatsappCampaignName: adminCampaign ?? null,
+                userWhatsappCampaignName: userCampaign ?? null,
                 fields: {
                     create: fields?.map((f, idx) => ({
                         label: f.label.trim(),
