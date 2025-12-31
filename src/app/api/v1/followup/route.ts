@@ -1,6 +1,7 @@
 import { FollowUpStatus, FollowUpType } from "@/src/app/generated/prisma/enums";
 import { isRateLimited } from "@/src/lib/limiter";
 import prisma from "@/src/lib/prisma";
+import { verifyApiAccessToken } from "@/src/lib/verifyApiAccessToken";
 import { verifyRole } from "@/src/lib/verifyRole";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -23,9 +24,22 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const user = await verifyRole(["ADMIN", "SUPERADMIN"]);
-        if (!user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        const apiClient = await verifyApiAccessToken(req);
+
+        if (!user && !apiClient) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+        let userId: string | null = null;
+        if (user?.role === "ADMIN") {
+            userId = user.sub;
+        } else if (!user && apiClient) {
+            userId = apiClient.adminId;
+        } else {
+            userId = user?.sub!;
         }
 
         const body = (await req.json()) as FollowUpPayload;
@@ -102,7 +116,7 @@ export async function POST(req: NextRequest) {
         const followup = await prisma.followUp.create({
             data: {
                 responseId: body.responseId,
-                addedByUserId: user.sub,
+                addedByUserId: userId,
                 type: body.type as FollowUpType,
                 note: body.note ?? null,
                 nextFollowUpDate: nextDate,
@@ -140,8 +154,10 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        const user = await verifyRole(["ADMIN", "SUPERADMIN", "MANAGER"]);
-        if (!user) {
+        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        const apiClient = await verifyApiAccessToken(req);
+
+        if (!user && !apiClient) {
             return NextResponse.json(
                 { error: "Unauthorized" },
                 { status: 401 }
@@ -156,20 +172,21 @@ export async function GET(req: NextRequest) {
         const skip = (page - 1) * limit;
 
         const now = new Date();
-        const endOfToday = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate(),
-            23,
-            59,
-            59
-        );
+        const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+
+        let accountId: string | null = null;
+
+        if (user?.role === "ADMIN") {
+            accountId = user.accountId;
+        } else if (!user && apiClient) {
+            accountId = apiClient.accountId;
+        }
 
         const followUps = await prisma.followUp.findMany({
             where: {
                 response: {
                     form: {
-                        accountId: user.accountId,
+                        accountId: accountId,
                     },
                 },
             },

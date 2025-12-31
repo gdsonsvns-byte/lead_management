@@ -57,3 +57,8 @@ export type ResponseAnswer = Prisma.ResponseAnswerModel
  * 
  */
 export type FollowUp = Prisma.FollowUpModel
+/**
+ * Model ApiAccessToken
+ * 
+ */
+export type ApiAccessToken = Prisma.ApiAccessTokenModel

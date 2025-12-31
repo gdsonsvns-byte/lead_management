@@ -1,5 +1,6 @@
 import { isRateLimited } from "@/src/lib/limiter";
 import prisma from "@/src/lib/prisma";
+import { verifyApiAccessToken } from "@/src/lib/verifyApiAccessToken";
 import { verifyRole } from "@/src/lib/verifyRole";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -12,13 +13,27 @@ export async function GET(req: NextRequest) {
                 { status: 429 }
             );
         }
-        const user = await verifyRole(["ADMIN", "SUPERADMIN"]);
-        if (!user) {
+        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        const apiClient = await verifyApiAccessToken(req);
+
+        if (!user && !apiClient) {
             return NextResponse.json(
                 { error: "Unauthorized" },
                 { status: 401 }
             );
         }
+        let accountId: string | null = null;
+        if (user?.role === "ADMIN") {
+            accountId = user.accountId;
+        } else if (!user && apiClient) {
+            accountId = apiClient.accountId;
+        }  
+        let adminRole: string | null = null;
+        if (user?.role === "ADMIN") {
+            adminRole = user.role;
+        } else if (!user && apiClient) {
+            adminRole = apiClient.adminRole;
+        }  
         const { searchParams } = new URL(req.url);
         const id = searchParams.get("id");
         const date = searchParams.get("date");
@@ -38,7 +53,6 @@ export async function GET(req: NextRequest) {
             );
         }
         const { start, end } = getDayRange(date);
-        console.log(start, end);
         const followUps = await prisma.followUp.findMany({
             where: {
                 createdAt: {
@@ -48,8 +62,8 @@ export async function GET(req: NextRequest) {
                 response: {
                     form: {
                         id: id,
-                        ...(user.role === "ADMIN" && {
-                            accountId: user.accountId,
+                        ...(adminRole === "ADMIN" && {
+                            accountId: accountId,
                         }),
                     },
                 },

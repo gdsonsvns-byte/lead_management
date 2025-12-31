@@ -58,7 +58,8 @@ export const ModelName = {
   FormField: 'FormField',
   Response: 'Response',
   ResponseAnswer: 'ResponseAnswer',
-  FollowUp: 'FollowUp'
+  FollowUp: 'FollowUp',
+  ApiAccessToken: 'ApiAccessToken'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -180,6 +181,21 @@ export const FollowUpScalarFieldEnum = {
 } as const
 
 export type FollowUpScalarFieldEnum = (typeof FollowUpScalarFieldEnum)[keyof typeof FollowUpScalarFieldEnum]
+
+
+export const ApiAccessTokenScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  tokenHash: 'tokenHash',
+  accountId: 'accountId',
+  createdById: 'createdById',
+  expiresAt: 'expiresAt',
+  lastUsedAt: 'lastUsedAt',
+  isRevoked: 'isRevoked',
+  createdAt: 'createdAt'
+} as const
+
+export type ApiAccessTokenScalarFieldEnum = (typeof ApiAccessTokenScalarFieldEnum)[keyof typeof ApiAccessTokenScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -391,7 +391,8 @@ export const ModelName = {
   FormField: 'FormField',
   Response: 'Response',
   ResponseAnswer: 'ResponseAnswer',
-  FollowUp: 'FollowUp'
+  FollowUp: 'FollowUp',
+  ApiAccessToken: 'ApiAccessToken'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -407,7 +408,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "user" | "managedUser" | "form" | "formField" | "response" | "responseAnswer" | "followUp"
+    modelProps: "account" | "user" | "managedUser" | "form" | "formField" | "response" | "responseAnswer" | "followUp" | "apiAccessToken"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1003,6 +1004,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ApiAccessToken: {
+      payload: Prisma.$ApiAccessTokenPayload<ExtArgs>
+      fields: Prisma.ApiAccessTokenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ApiAccessTokenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiAccessTokenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ApiAccessTokenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiAccessTokenPayload>
+        }
+        findFirst: {
+          args: Prisma.ApiAccessTokenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiAccessTokenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ApiAccessTokenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiAccessTokenPayload>
+        }
+        findMany: {
+          args: Prisma.ApiAccessTokenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiAccessTokenPayload>[]
+        }
+        create: {
+          args: Prisma.ApiAccessTokenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiAccessTokenPayload>
+        }
+        createMany: {
+          args: Prisma.ApiAccessTokenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ApiAccessTokenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiAccessTokenPayload>[]
+        }
+        delete: {
+          args: Prisma.ApiAccessTokenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiAccessTokenPayload>
+        }
+        update: {
+          args: Prisma.ApiAccessTokenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiAccessTokenPayload>
+        }
+        deleteMany: {
+          args: Prisma.ApiAccessTokenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ApiAccessTokenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ApiAccessTokenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiAccessTokenPayload>[]
+        }
+        upsert: {
+          args: Prisma.ApiAccessTokenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ApiAccessTokenPayload>
+        }
+        aggregate: {
+          args: Prisma.ApiAccessTokenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateApiAccessToken>
+        }
+        groupBy: {
+          args: Prisma.ApiAccessTokenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ApiAccessTokenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ApiAccessTokenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ApiAccessTokenCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1145,6 +1220,21 @@ export const FollowUpScalarFieldEnum = {
 } as const
 
 export type FollowUpScalarFieldEnum = (typeof FollowUpScalarFieldEnum)[keyof typeof FollowUpScalarFieldEnum]
+
+
+export const ApiAccessTokenScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  tokenHash: 'tokenHash',
+  accountId: 'accountId',
+  createdById: 'createdById',
+  expiresAt: 'expiresAt',
+  lastUsedAt: 'lastUsedAt',
+  isRevoked: 'isRevoked',
+  createdAt: 'createdAt'
+} as const
+
+export type ApiAccessTokenScalarFieldEnum = (typeof ApiAccessTokenScalarFieldEnum)[keyof typeof ApiAccessTokenScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1399,6 +1489,7 @@ export type GlobalOmitConfig = {
   response?: Prisma.ResponseOmit
   responseAnswer?: Prisma.ResponseAnswerOmit
   followUp?: Prisma.FollowUpOmit
+  apiAccessToken?: Prisma.ApiAccessTokenOmit
 }
 
 /* Types for Logging */

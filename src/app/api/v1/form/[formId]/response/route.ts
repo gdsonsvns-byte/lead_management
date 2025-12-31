@@ -6,6 +6,7 @@ import prisma from "@/src/lib/prisma";
 import { verifyRole } from "@/src/lib/verifyRole";
 import { sendResponseAlertEmail, sendResponseAlertEmailToUser } from "@/src/lib/sendResponseAlertEmail";
 import { sendWhatsappToAdmin, sendWhatsappToUser } from "@/src/lib/whatsapp";
+import { verifyApiAccessToken } from "@/src/lib/verifyApiAccessToken";
 
 export const runtime = "nodejs";
 
@@ -194,39 +195,23 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             return response;
         });
 
-        const followup = await prisma.followUp.create({
-            data: {
-                responseId: result.id,
-                addedByUserId: form.userId,
-                type: FollowUpType.STATUS_CHANGE,
-                note: "Auto Follow up add by the System.",
-                nextFollowUpDate: new Date(),
-                businessStatus: "Call Client",
-                status: FollowUpStatus.PENDING,
-            },
-            include: {
-                addedBy: {
-                    select: { id: true, name: true, email: true },
-                },
-            },
-        });
 
         const sendNotificationMessage: Promise<any>[] = [];
 
-        if (form.account?.email) {
-            sendNotificationMessage.push(sendResponseAlertEmail({
-                userEmail: form.account.email,
-                allFields: fieldValuesForAdmin,
-                accountName: form.account.businessName ?? "Admin",
-                formName: form.title
-            }))
-        }
-        if (userEmail) {
-            sendNotificationMessage.push(sendResponseAlertEmailToUser({
-                userEmail, allFields: fieldValuesForAdmin, accountName: form.account?.businessName ?? "User"
-            })
-            );
-        }
+        // if (form.account?.email) {
+        //     sendNotificationMessage.push(sendResponseAlertEmail({
+        //         userEmail: form.account.email,
+        //         allFields: fieldValuesForAdmin,
+        //         accountName: form.account.businessName ?? "Admin",
+        //         formName: form.title
+        //     }))
+        // }
+        // if (userEmail) {
+        //     sendNotificationMessage.push(sendResponseAlertEmailToUser({
+        //         userEmail, allFields: fieldValuesForAdmin, accountName: form.account?.businessName ?? "User"
+        //     })
+        //     );
+        // }
 
         if (form.userWhatsappCampaignName && form.account?.whatsappApiKey && userPhone) {
             const phoneStr = String(userPhone).trim();
@@ -285,7 +270,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             );
         }
 
-        await verifyRole(["ADMIN", "SUPERADMIN"]);
+        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        const apiClient = await verifyApiAccessToken(req);
+
+        if (!user && !apiClient) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
         const { searchParams } = new URL(req.url);
         const page = Math.max(Number(searchParams.get("page")) || 1, 1);
         const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 20, 1), 50);
@@ -294,12 +287,21 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
 
         let state = (searchParams.get("state") || "pending_today").toLowerCase();
         const now = new Date();
-        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        // const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
         const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
 
+        const whereCondition: any = {
+            id: formId,
+        };
+
+        if (user?.role === "ADMIN") {
+            whereCondition.userId = user.sub;
+        } else if (!user && apiClient) {
+            whereCondition.userId = apiClient.adminId;
+        }
 
         const form = await prisma.form.findUnique({
-            where: { id: formId },
+            where: whereCondition,
             include: {
                 fields: true,
                 responses: {
@@ -326,7 +328,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
         }
 
         const allResponses = await prisma.response.findMany({
-            where: { formId },
+            where: { formId: formId },
             include: {
                 followUps: {
                     orderBy: { createdAt: "desc" }
