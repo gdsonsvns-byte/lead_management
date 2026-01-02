@@ -74,8 +74,8 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
     return (
         <div className="w-full space-y-5">
             <div className="flex items-center justify-between bg-white p-6 rounded-xl shadow">
-                <div className="flex items-center gap-4 w-full">
-                    <div className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl font-semibold">
+                <div className="flex sm:items-center sm:flex-row items-start flex-col gap-4 w-full">
+                    <div className="w-14 h-14 shrink-0 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl font-semibold">
                         {data.initials}
                     </div>
                     <div>

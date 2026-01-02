@@ -46,7 +46,7 @@ export default function UpdatePassword() {
                 Update Password
             </h2>
 
-            <div className="grid grid-cols-3 gap-2 gap-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 gap-y-5">
 
                 <div className="">
                     <Input
@@ -91,7 +91,7 @@ export default function UpdatePassword() {
                 <button
                     disabled={disableButton || passwordMutation.isPending}
                     onClick={() => passwordMutation.mutate()}
-                    className={`mt-5 py-2.5 col-span-2 w-full rounded-lg text-white font-semibold transition 
+                    className={`mt-5 py-2.5 col-span-1 md:col-span-2 w-full rounded-lg text-white font-semibold transition 
                         ${disableButton || passwordMutation.isPending
                             ? "bg-gray-400 cursor-not-allowed"
                             : "bg-blue-600 hover:bg-blue-700"}`}

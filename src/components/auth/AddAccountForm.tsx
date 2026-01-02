@@ -87,7 +87,7 @@ export default function AddAccountForm() {
     }
 
     return (
-        <form className="grid grid-cols-3 gap-5" onSubmit={handleSubmit}>
+        <form className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-5" onSubmit={handleSubmit}>
 
             <Input
                 value={formValue.name}
@@ -160,7 +160,7 @@ export default function AddAccountForm() {
             />
 
             <button
-                className="col-span-2 bg-blue-600 py-2.5 text-white mt-3 rounded font-medium text-lg flex items-center justify-center cursor-pointer transition-colors duration-200 ease-in hover:bg-blue-700"
+                className="md:col-span-2 col-span-1 bg-blue-600 py-2.5 text-white mt-3 rounded font-medium text-lg flex items-center justify-center cursor-pointer transition-colors duration-200 ease-in hover:bg-blue-700"
             >
                 {isPending ? <Spinner color="white" /> : "Create Account"}
             </button>
