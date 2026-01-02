@@ -23,6 +23,7 @@ interface FormField {
     required?: boolean;
     options?: string[];
     optionsText?: string;
+    order?: number;
 }
 
 export interface FormData {
@@ -61,22 +62,28 @@ export default function EditForm() {
             const res = await axios.get<FormResponse>(`/api/v1/form/${formId}`, {
                 withCredentials: true,
             });
-            setTitle(res.data.form.title ?? '');
+
+            setTitle(res.data.form.title ?? "");
             setDescription(res.data.form.description ?? "");
-            const mappedFields = res.data.form.fields.map((f: any) => ({
-                id: f.id,
-                label: f.label,
-                type: f.type,
-                required: f.required,
-                options: f.options ? JSON.parse(f.options) : [],
-                optionsText: f.options ? JSON.parse(f.options).join(", ") : "",
-            }));
-            setFields(mappedFields)
+
+            const mappedFields = res.data.form.fields
+                .sort((a: any, b: any) => a.order - b.order)
+                .map((f: any) => ({
+                    id: f.id,
+                    label: f.label,
+                    type: f.type,
+                    required: f.required,
+                    order: f.order,
+                    options: f.options ? JSON.parse(f.options) : [],
+                    optionsText: f.options ? JSON.parse(f.options).join(", ") : "",
+                }));
+
+            setFields(mappedFields);
             return res.data;
         },
-        enabled: hasFormId,
-        staleTime: 1000 * 60 * 60,
+        enabled: !!formId,
     });
+
 
     const closeModal = () => {
         const params = new URLSearchParams(searchParams.toString());
@@ -87,12 +94,21 @@ export default function EditForm() {
     const addField = () => {
         setFields((prev) => [
             ...prev,
-            { label: "", type: "text", required: false, options: [], optionsText: "" },
+            {
+                label: "",
+                type: "text",
+                required: false,
+                options: [],
+                optionsText: "",
+                order: prev.length + 1,
+            },
         ]);
     };
 
     const removeField = (indexToRemove: number) => {
-        setFields((prev) => prev.filter((_, i) => i !== indexToRemove));
+        setFields((prev) =>
+            prev.filter((_, i) => i !== indexToRemove)
+        );
     };
 
     const updateField = (index: number, updates: Partial<FormField>) => {
@@ -137,7 +153,10 @@ export default function EditForm() {
         mutation.mutate({
             title,
             description,
-            fields,
+            fields: fields.map((f, i) => ({
+                ...f,
+                order: f.order ?? i + 1,
+            })),
         });
     };
 
