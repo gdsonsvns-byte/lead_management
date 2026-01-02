@@ -1,19 +1,23 @@
 "use client";
 import { AccountSummaryResponse } from "@/src/types/auth";
 import { Button } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { Loader2, Settings } from "lucide-react";
+import { Loader2, Settings, Trash2 } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import GenerateApiKey from "./generate_api_key";
 import { useState } from "react";
 import ShowApiToken from "./show_api_toke";
+import Spinner from "../ui/spinner";
+import UpdatePassword from "../UpdatePassword";
 
 export default function ProfileView({ accountId }: { accountId?: string }) {
     const currentPath = usePathname()
+    const queryClient = useQueryClient();
     const [openFormModal, setOpenFormModal] = useState(false);
     const [openTokenModal, setOpenTokenModal] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
     const [apiKey, setapiKey] = useState({
         message: "",
         token: "",
@@ -28,30 +32,50 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
         },
         staleTime: 1000 * 60 * 60,
     });
+    const deleteMutation = useMutation({
+        mutationFn: async (user_id: string) => {
+            setDeletingId(user_id);
+            return await axios.delete(`/api/v1/auth/users/${user_id}`, {
+                withCredentials: true,
+            });
+        },
+        onSuccess: () => {
+            toast.success('User deleted successfully', {
+                duration: 4000
+            });
+            queryClient.invalidateQueries({ queryKey: ["view-profile", accountId] });
+        },
+        onSettled: () => {
+            setDeletingId(null);
+        },
+        onError: () => {
+            toast.error('Something went wrong, can\'t delete the User.', {
+                duration: 4000
+            });
+        }
+    });
 
-    if (isLoading)
+    if (isLoading) {
         return (
             <div className="flex items-center justify-center p-10">
                 <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
             </div>
         );
-
-    if (error)
+    }
+    if (error || !data) {
         return (
             <p className="text-red-500 p-6 text-center">
                 Failed to load account information.
             </p>
         );
-
-    if (!data) return null;
-
+    }
     const account = data.data;
 
     return (
         <div className="w-full space-y-5">
             <div className="flex items-center justify-between bg-white p-6 rounded-xl shadow">
-                <div className="flex items-center gap-4 w-full">
-                    <div className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl font-semibold">
+                <div className="flex sm:items-center sm:flex-row items-start flex-col gap-4 w-full">
+                    <div className="w-14 h-14 shrink-0 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl font-semibold">
                         {data.initials}
                     </div>
                     <div>
@@ -116,17 +140,35 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
                     {account.users.map((u) => (
                         <div
                             key={u.id}
-                            className="p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition"
+                            className="relative p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition"
                         >
                             <p className="text-gray-800 font-medium">{u.name}</p>
                             <p className="text-gray-500 text-sm">{u.email}</p>
                             <span className="mt-1 inline-block text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700">
                                 {u.role}
                             </span>
+                            {
+                                u.role !== "ADMIN" && u.role !== "SUPERADMIN" && (
+                                    <button
+                                        onClick={() => deleteMutation.mutate(u.id)}
+                                        disabled={deletingId === u.id}
+                                        className=" absolute right-2 top-2 ml-auto bg-red-100 text-red-500 px-2 py-2 rounded hover:text-white hover:bg-red-600 transition duration-300 ease-in-out cursor-pointer  ">
+                                        {
+                                            deletingId === u.id ? (
+                                                <Spinner color="white" />
+                                            ) : (
+                                                <Trash2 className="w-4 h-4" />
+                                            )
+                                        }
+                                    </button>
+                                )
+                            }
                         </div>
                     ))}
                 </div>
             </div>
+            
+            <UpdatePassword/>
             {openFormModal && <GenerateApiKey setOpenFormModal={setOpenFormModal} apiKey={apiKey} setapiKey={setapiKey} setOpenTokenModal={setOpenTokenModal} />}
             {openTokenModal && <ShowApiToken setOpenTokenModal={setOpenTokenModal} apiKey={apiKey} />}
             <Toaster />

@@ -156,7 +156,7 @@ function OpenForm({ onClose, accountId }: Props) {
           />
         </div>
 
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4 flex flex-col md:flex-row gap-2">
           <Input
             type="text"
             label="Admin Campaign Name"
@@ -190,7 +190,7 @@ function OpenForm({ onClose, accountId }: Props) {
             <h2 className="font-medium text-zinc-800">Fields</h2>
 
             <button
-              className="bg-blue-600 text-white px-4 py-2 rounded-full flex items-center gap-2"
+              className="bg-blue-600 text-white px-4 py-2 rounded-full flex  items-center gap-2"
               onClick={addField}
             >
               Add Field <PlusIcon size={16} />

@@ -144,7 +144,7 @@ export default function EditForm() {
     if (!hasFormId) return null;
 
     return (
-        <section className="fixed inset-0 bg-black/30 z-50 flex justify-center items-start p-10 overflow-auto">
+        <section className="fixed inset-0 bg-black/30 z-50 flex justify-center items-start md:p-10 p-4 overflow-auto">
             <div className="bg-white w-full max-w-2xl rounded-xl shadow-xl p-6 relative">
 
                 <button

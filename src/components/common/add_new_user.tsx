@@ -86,7 +86,7 @@ export default function AddNewUser() {
         });
     }
     return (
-        <form className="grid grid-cols-3 gap-5" onSubmit={handleSubmit}>
+        <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" onSubmit={handleSubmit}>
             <Input
                 value={formValue.name}
                 type="text"
@@ -133,14 +133,14 @@ export default function AddNewUser() {
 
 
             <button
-                className="col-span-2 bg-blue-600 py-2.5 text-white mt-3 rounded font-medium text-lg flex items-center justify-center cursor-pointer transition-colors duration-200 ease-in hover:bg-blue-700"
+                className="col-span-1 md:col-span-2 bg-blue-600 py-2.5 text-white mt-3 rounded font-medium text-lg flex items-center justify-center cursor-pointer transition-colors duration-200 ease-in hover:bg-blue-700"
                 disabled={isPending}
             >
                 {isPending ? <Spinner color="white" /> : "Create Account"}
             </button>
 
             {isSuccess && (
-                <p className="col-span-3 text-green-500">
+                <p className="col-span-1 md:col-span-2 text-green-500">
                     Account created successfully!
                 </p>
             )}

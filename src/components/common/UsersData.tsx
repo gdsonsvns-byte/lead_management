@@ -318,18 +318,19 @@ export default function UsersData({ formId }: { formId: string }) {
                 <h1 className="font-bold text-zinc-800 text-xl">{data?.title ? `Responses of ${data.title}` : "Responses"}</h1>
             </div>
 
-            <div className="relative my-5 w-full flex items-center justify-between p-3">
+            <div className="relative my-5 w-full flex flex-col md:flex-row items-center justify-between gap-3">
                 <div className="flex flex-col items-start gap-5">
                     <span className="text-zinc-800 font-semibold">
                         Follow Up Report
                     </span>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between gap-2">
                         <input
                             type="date"
                             value={reportData}
                             onChange={(e) => setReportData(e.target.value)}
                             className="border border-gray-300 rounded-md p-1.5" />
                         <Button
+                            className="text-sm md:text-base"
                             variant="contained"
                             onClick={() => router.push(`report?id=${formId}&date=${reportData}`)}
                             disabled={reportData === ""}

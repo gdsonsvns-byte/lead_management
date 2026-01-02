@@ -29,7 +29,7 @@ export default function FieldItem({ field, index, updateField, removeField }: Pr
             </div>
 
             <div className="relative mt-4">
-                <div className="flex gap-4">
+                <div className="flex gap-4 flex-col md:flex-row">
                     <Input
                         placeholder="Label"
                         value={field.label}
