@@ -64,8 +64,8 @@ export default function GenerateApiKey({ setOpenFormModal, apiKey, setapiKey, se
             });
             showMessage("success", "API Key generated successfully!");
             setapiKey(data);
-            setOpenTokenModal(true);
-            setTimeout(() => closeModal(), 800);
+            setTimeout(() => closeModal(), 700);
+            setTimeout(() => setOpenTokenModal(true), 1000);
         },
     });
     const { mutate, isPending } = CreateAPIKey;
