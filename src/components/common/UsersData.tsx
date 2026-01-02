@@ -40,9 +40,8 @@ import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import EventIcon from "@mui/icons-material/Event";
 import NoteIcon from "@mui/icons-material/Note";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import Spinner from "../ui/spinner";
-import Link from "next/link";
 
 const TYPE_ICONS: Record<string, JSX.Element> = {
     CALL: <LocalPhoneIcon fontSize="small" color="primary" />,
@@ -600,6 +599,7 @@ export default function UsersData({ formId }: { formId: string }) {
                     <Button onClick={() => setOpenResponse(null)}>Close</Button>
                 </DialogActions>
             </Dialog>
+            <Toaster/>
         </div>
     );
 }
