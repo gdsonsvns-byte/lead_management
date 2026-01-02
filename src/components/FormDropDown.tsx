@@ -1,7 +1,7 @@
 'use client';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { CopyIcon, EyeIcon, Pencil, SettingsIcon, Trash2Icon, ViewIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -57,8 +57,9 @@ export default function FormDropDown({ formData }: Props) {
         onSettled: () => {
             setDeletingId(null);
         },
-        onError: () => {
-            toast.error('Something went wrong, can\'t delete the form.', {
+        onError: (err: AxiosError<any>) => {
+            const msg = err?.response?.data?.error || "Something went wrong, can\'t delete the form."
+            toast.error(msg, {
                 duration: 5000
             });
         }

@@ -24,17 +24,17 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        const user = await verifyRole(["SUPERADMIN", "ADMIN","MANAGER"]);
         const apiClient = await verifyApiAccessToken(req);
 
         if (!user && !apiClient) {
             return NextResponse.json(
-                { error: "Unauthorized" },
+                { error: "Unauthorized User" },
                 { status: 401 }
             );
         }
         let userId: string | null = null;
-        if (user?.role === "ADMIN") {
+        if (user?.role === "ADMIN" || user?.role === "MANAGER") {
             userId = user.sub;
         } else if (!user && apiClient) {
             userId = apiClient.adminId;
@@ -154,12 +154,12 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        const user = await verifyRole(["SUPERADMIN", "ADMIN","MANAGER"]);
         const apiClient = await verifyApiAccessToken(req);
 
         if (!user && !apiClient) {
             return NextResponse.json(
-                { error: "Unauthorized" },
+                { error: "Unauthorized User" },
                 { status: 401 }
             );
         }
@@ -176,7 +176,7 @@ export async function GET(req: NextRequest) {
 
         let accountId: string | null = null;
 
-        if (user?.role === "ADMIN") {
+        if (user?.role === "ADMIN" || user?.role === "MANAGER") {
             accountId = user.accountId;
         } else if (!user && apiClient) {
             accountId = apiClient.accountId;

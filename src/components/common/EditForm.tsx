@@ -122,7 +122,7 @@ export default function EditForm() {
         onError: (err: any) => {
             const msg = err?.response?.data?.error || "Update failed";
             setMessage({ type: "error", text: msg });
-            toast.error('Update failed. Try again.', {
+            toast.error(msg, {
                 duration: 5000
             });
         },

@@ -17,11 +17,11 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        const user = await verifyRole(["ADMIN", "SUPERADMIN"])
+        const user = await verifyRole(["ADMIN", "SUPERADMIN","MANAGER"])
         const apiClient = await verifyApiAccessToken(req);
 
         if (!user && !apiClient) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+            return NextResponse.json({ error: "Unauthorized User" }, { status: 401 });
         }
         const accountId = user?.accountId || apiClient?.accountId;
         const { searchParams } = new URL(req.url);
