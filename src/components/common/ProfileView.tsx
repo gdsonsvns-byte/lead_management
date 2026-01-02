@@ -148,7 +148,7 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
                                 {u.role}
                             </span>
                             {
-                                u.role !== "ADMIN" && (
+                                u.role !== "ADMIN" && u.role !== "SUPERADMIN" && (
                                     <button
                                         onClick={() => deleteMutation.mutate(u.id)}
                                         disabled={deletingId === u.id}
@@ -167,7 +167,7 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
                     ))}
                 </div>
             </div>
-
+            
             <UpdatePassword/>
             {openFormModal && <GenerateApiKey setOpenFormModal={setOpenFormModal} apiKey={apiKey} setapiKey={setapiKey} setOpenTokenModal={setOpenTokenModal} />}
             {openTokenModal && <ShowApiToken setOpenTokenModal={setOpenTokenModal} apiKey={apiKey} />}
