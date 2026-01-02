@@ -224,7 +224,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
         const slug = `${slugBase}-${Date.now()}`
 
         const updatedForm = await prisma.$transaction(async (tx) => {
-
             const newForm = await tx.form.update({
                 where: { id: form.id },
                 data: {
@@ -233,6 +232,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
                     slug,
                 },
             })
+
+            const existingOrderMap = new Map(
+                form.fields.map((f) => [f.id, f.order])
+            );
 
             const existingIds = form.fields.map((f) => f.id)
             const incomingIds = fields?.map((f: any) => f.id).filter(Boolean) || []
@@ -290,8 +293,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
                 });
             }
 
-            for (const [index, f] of (fields || []).entries()) {
-                const cleanLabel = f.label.trim()
+            for (const f of fields || []) {
+                const cleanLabel = f.label.trim();
 
                 if (f.id) {
                     await tx.formField.update({
@@ -301,9 +304,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
                             type: f.type,
                             required: f.required ?? false,
                             options: f.options ? JSON.stringify(f.options) : undefined,
-                            order: f.order ?? index + 1,
+                            order:
+                                typeof f.order === "number"
+                                    ? f.order
+                                    : existingOrderMap.get(f.id),
                         },
-                    })
+                    });
                 } else {
                     await tx.formField.create({
                         data: {
@@ -312,11 +318,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
                             type: f.type,
                             required: f.required ?? false,
                             options: f.options ? JSON.stringify(f.options) : undefined,
-                            order: f.order ?? index + 1,
+                            order: f.order ?? form.fields.length + 1,
                         },
-                    })
+                    });
                 }
             }
+
 
             const result = await tx.form.findUnique({
                 where: { id: form.id },
