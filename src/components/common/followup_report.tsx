@@ -36,9 +36,9 @@ export default function FollowupReport({ id, date }: { id: string, date: string 
     };
     return (
         <div className="w-full overflow-hidden">
-            <div className="flex justify-between items-center mb-5">
+            <div className="flex flex-col sm:flex-row gap-5 justify-between md:items-center items-start mb-5">
                 <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-gray-400 cursor-pointer hover:bg-gray-100 transition duration-300 ease-in-out"
+                    <div className="w-10 h-10 shrink-0 bg-white rounded-full flex items-center justify-center border border-gray-400 cursor-pointer hover:bg-gray-100 transition duration-300 ease-in-out"
                         onClick={handleBack}
                     >
                         <MoveLeft size={16} />
@@ -47,7 +47,7 @@ export default function FollowupReport({ id, date }: { id: string, date: string 
                         {data?.followUps?.[0]?.response?.form?.title}
                     </h1>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 ml-auto">
                     <input
                         type="date"
                         value={currentDate}
