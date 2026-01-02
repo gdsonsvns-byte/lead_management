@@ -44,7 +44,7 @@ export default function DashboardComponent() {
     const [currentState, setCurrentState] = useState<string>(allState[1]?.status)
     const [paginationModel, setPaginationModel] = useState({ pageSize: 12, page: 0 });
 
-    const { data, isLoading, isError, isFetching } = useQuery<TodayFollowUpsResponse>({
+    const { data, isLoading, isError, isFetching, error } = useQuery<TodayFollowUpsResponse>({
         queryKey: ["dashboard", paginationModel.page, paginationModel.pageSize, currentState],
         queryFn: async () => {
             const res = await axios.get(`/api/v1/followup`, {
@@ -92,6 +92,15 @@ export default function DashboardComponent() {
                 data && data.total === 0 && (
                     <div className="w-full flex justify-center py-20">
                         No Data Available for today
+                    </div>
+                )
+            }
+            {
+                error && (
+                    <div className="w-full flex justify-center py-20">
+                        {
+                            (error as AxiosError<any>)?.response?.data?.error
+                        }
                     </div>
                 )
             }

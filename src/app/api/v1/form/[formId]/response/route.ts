@@ -286,12 +286,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             );
         }
 
-        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        const user = await verifyRole(["SUPERADMIN", "ADMIN","MANAGER"]);
         const apiClient = await verifyApiAccessToken(req);
 
         if (!user && !apiClient) {
             return NextResponse.json(
-                { error: "Unauthorized" },
+                { error: "Unauthorized User" },
                 { status: 401 }
             );
         }
@@ -310,10 +310,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             id: formId,
         };
 
-        if (user?.role === "ADMIN") {
-            whereCondition.userId = user.sub;
+        if (user?.role === "ADMIN" || user?.role === "MANAGER") {
+            whereCondition.accountId = user.accountId;
         } else if (!user && apiClient) {
-            whereCondition.userId = apiClient.adminId;
+            whereCondition.accountId = apiClient.accountId;
         }
 
         const form = await prisma.form.findUnique({

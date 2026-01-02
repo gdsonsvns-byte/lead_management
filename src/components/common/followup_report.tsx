@@ -1,7 +1,7 @@
 'use client';
 import { FollowUp, FollowUpListResponse } from "@/src/types/report";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import Spinner from "../ui/spinner";
 import { Calendar, Clock, Mail, MoveLeft, NotebookPen } from "lucide-react";
@@ -83,7 +83,7 @@ export default function FollowupReport({ id, date }: { id: string, date: string 
             {isError && (
                 <div className="flex justify-center py-20">
                     <h1 className="text-red-600 font-bold text-xl">
-                        {error?.message}
+                        {(error as AxiosError<any>)?.response?.data?.error}
                     </h1>
                 </div>
             )}
