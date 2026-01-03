@@ -201,7 +201,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             }
         }
 
-        const nextDate = nextFollowUpDate && !isNaN(Date.parse(nextFollowUpDate)) ? new Date(nextFollowUpDate) : null;
+        const nextDate = nextFollowUpDate && !isNaN(Date.parse(nextFollowUpDate)) ? new Date(nextFollowUpDate) : new Date();
 
         const followup = await prisma.followUp.create({
             data: {
@@ -209,7 +209,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                 addedByUserId: form.userId,
                 type: FollowUpType.STATUS_CHANGE,
                 note: DEFAULT_NOTE,
-                nextFollowUpDate: nextDate,
+                nextFollowUpDate: nextDate ?? new Date(),
                 businessStatus: nextAction ?? DEFAULT_NEXT_ACTION,
                 status: internalStatus,
             },
@@ -219,7 +219,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                 },
             },
         });
-
 
         const sendNotificationMessage: Promise<any>[] = [];
 
