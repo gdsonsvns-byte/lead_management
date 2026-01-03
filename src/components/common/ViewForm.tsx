@@ -6,6 +6,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { TextField } from "@mui/material";
 
 interface Field {
     id: string;
@@ -13,15 +14,30 @@ interface Field {
     type: string;
     required?: boolean;
     options?: string | null;
+    order?: number;
 }
-
+const BUSINESS_STATUSES = [
+    "Client Converted",
+    "Client will Call",
+    "Client will Visit",
+    "Client will Message",
+    "Call Client",
+    "Message Client",
+    "Visit Client",
+    "Put on Backburner",
+    "Client not Interested",
+];
+const CLOSED_BUSINESS_STATUSES = ["Client Converted", "Client not Interested"];
 export default function ViewForm() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const formId = searchParams.get("view");
     const hasFormId = !!formId;
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
-
+    const [initialFollowUp, setInitialFollowUp] = useState({
+        nextAction: "",
+        nextFollowUpDate: "",
+    });
     const [formValues, setFormValues] = useState<Record<string, any>>({});
     const handleChange = (field: Field, value: any) => {
         setFormValues((prev) => ({
@@ -36,6 +52,10 @@ export default function ViewForm() {
             const res = await axios.get(`/api/v1/form/${formId}`, {
                 withCredentials: true,
             });
+
+            res.data.form.fields.sort(
+                (a: Field, b: Field) => (a.order ?? 0) - (b.order ?? 0)
+            );
             return res.data.form;
         },
         enabled: hasFormId,
@@ -159,9 +179,14 @@ export default function ViewForm() {
     const submitMutation = useMutation({
         mutationFn: async (formData: FormData) => {
             const res = await axios.post(
-                `/api/v1/form/${formId}/response`,
+                `/api/v1/form/${formId}/response/internal`,
                 formData,
-                { withCredentials: true }
+                {
+                    withCredentials: true,
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
             );
             return res.data;
         },
@@ -170,7 +195,7 @@ export default function ViewForm() {
             toast.success('Form updated successfully!', {
                 duration: 5000
             });
-            setTimeout(closeModal,500);
+            setTimeout(closeModal, 500);
             setFormValues({})
         },
         onError: (err: any) => {
@@ -182,10 +207,8 @@ export default function ViewForm() {
         },
     });
 
-
     const handleTestSubmit = () => {
         const formData = new FormData();
-
         Object.entries(formValues).forEach(([fieldId, value]) => {
             if (value instanceof FileList) {
                 for (let i = 0; i < value.length; i++) {
@@ -197,10 +220,15 @@ export default function ViewForm() {
                 formData.append(fieldId, value);
             }
         });
+        if (initialFollowUp?.nextAction) {
+            formData.append("nextAction", initialFollowUp.nextAction);
+        }
 
+        if (initialFollowUp?.nextFollowUpDate) {
+            formData.append("nextFollowUpDate", initialFollowUp.nextFollowUpDate);
+        }
         submitMutation.mutate(formData);
     };
-
 
     if (!hasFormId) return null;
 
@@ -239,8 +267,9 @@ export default function ViewForm() {
                         </p>
 
                         <div className="space-y-3 animate-fadeIn">
-                            {data.fields.map((field: Field, index: number) => {
+                            {[...data.fields].sort((a: Field, b: Field) => (a.order ?? 0) - (b.order ?? 0)).map((field: Field, index: number) => {
                                 let options: string[] = [];
+
                                 if (field.options) {
                                     try {
                                         options = JSON.parse(field.options);
@@ -248,36 +277,73 @@ export default function ViewForm() {
                                         options = [];
                                     }
                                 }
+
                                 return (
                                     <div
                                         key={field.id}
                                         className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp"
                                         style={{ animationDelay: `${index * 0.08}s` }}
                                     >
-                                        {options.length > 0 &&
-                                            <div className="flex justify-between mb-2">
-                                                <label 
-                                                className={`relative text-sm text-zinc-800 group-hover:text-black transition ${field.required ? "after:content-['*'] after:text-red-600 after:ml-1" : ""} `}
-                                                >
-                                                    {field.label}
-                                                </label>
-                                                {/* {field.required && (
-                                                <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
-                                                    Required
-                                                </span>
-                                            )} */}
-                                            </div>
-                                        }
-
+                                        <div className="flex justify-between mb-2">
+                                            {options.length > 0 ? <label
+                                                className={`relative text-sm text-zinc-800 group-hover:text-black transition ${field.required
+                                                    ? "after:content-['*'] after:text-red-600 after:ml-1"
+                                                    : ""
+                                                    }`}
+                                            >
+                                                {field.label}
+                                            </label> : ""}
+                                        </div>
 
                                         <div className="transform group-hover:scale-[1.01] transition-transform">
                                             {renderField(field, options)}
                                         </div>
+
                                     </div>
                                 );
                             })}
 
+                            <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp flex flex-col gap-8"
+                            >
+                                <span>Initial Follow Up Details</span>
+                                <div className="flex flex-col sm:flex-row gap-5">
+                                    <TextField
+                                        label="Next Action"
+                                        select
+                                        value={initialFollowUp.nextAction}
+                                        onChange={(e) => {
+                                            setInitialFollowUp((prev) => ({ ...prev, nextAction: e.target.value }));
+                                            if (CLOSED_BUSINESS_STATUSES.includes(e.target.value)) {
+                                                setInitialFollowUp((prev) => ({ ...prev, nextDate: "" }));
+                                            }
+                                        }}
+                                        SelectProps={{ native: true }}
+                                        InputLabelProps={{ shrink: true }}
+                                        fullWidth
+                                    >
+                                        <option value="">Select status</option>
+                                        {BUSINESS_STATUSES.map((s) => (
+                                            <option key={s} value={s}>
+                                                {s}
+                                            </option>
+                                        ))}
+                                    </TextField>
+                                    {
+                                        initialFollowUp.nextAction && !CLOSED_BUSINESS_STATUSES.includes(initialFollowUp.nextAction) && (
+                                            <TextField
+                                                label="Next Follow-Up Date"
+                                                type="date"
+                                                value={initialFollowUp.nextFollowUpDate}
+                                                onChange={(e) => setInitialFollowUp((prev) => ({ ...prev, nextFollowUpDate: e.target.value }))}
+                                                InputLabelProps={{ shrink: true }}
+                                                fullWidth
+                                            />
+                                        )
+                                    }
+                                </div>
+                            </div>
                         </div>
+
 
                         <div className="space-y-3 animate-fadeIn mt-5">
                             <button

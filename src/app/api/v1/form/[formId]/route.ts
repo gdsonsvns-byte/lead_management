@@ -33,7 +33,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
 
         const form = await prisma.form.findFirst({
             where: { id: formId },
-            include: { fields: true },
+            include: {
+                fields: {
+                    orderBy: {
+                        order: "asc",
+                    },
+                },
+            }
         })
         if (!form) return NextResponse.json({ error: "Form not found" }, { status: 404 })
 

@@ -106,10 +106,15 @@ export default function EditForm() {
     };
 
     const removeField = (indexToRemove: number) => {
-        setFields((prev) =>
-            prev.filter((_, i) => i !== indexToRemove)
-        );
+        setFields((prev) => {
+            const updated = prev.filter((_, i) => i !== indexToRemove);
+            return updated.map((field, index) => ({
+                ...field,
+                order: index + 1,
+            }));
+        });
     };
+
 
     const updateField = (index: number, updates: Partial<FormField>) => {
         setFields((prev) =>
@@ -246,10 +251,12 @@ export default function EditForm() {
 
                             <button
                                 className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg"
+                                // onClick={() => console.log(fields)}
                                 onClick={handleSave}
                                 disabled={mutation.isPending}
                             >
                                 {mutation.isPending ? <Spinner color="white" /> : "Save Changes"}
+                                {/* Save Changes */}
                             </button>
 
                             {message && (
