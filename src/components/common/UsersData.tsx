@@ -210,8 +210,26 @@ export default function UsersData({ formId }: { formId: string }) {
             {
                 field: "submittedAt",
                 headerName: "Submitted",
-                width: 200,
-                valueGetter: (value, row) => new Date(row?.submittedAt).toLocaleString(),
+                width: 220,
+                sortable: true,
+                renderCell: (params: GridRenderCellParams) => {
+                    const row = params.row;
+                    const date = row?.submittedAt
+                        ? new Date(row.submittedAt).toLocaleString()
+                        : "-";
+                    const addedByName = row?.followUps?.[0]?.addedBy?.name ?? null;
+
+                    return (
+                        <div style={{ lineHeight: 1.3 }}>
+                            <div style={{ fontWeight: 500 }}>{date}</div>
+                            {addedByName && (
+                                <div style={{ fontSize: 12, color: "#666" }}>
+                                    ({addedByName})
+                                </div>
+                            )}
+                        </div>
+                    );
+                },
             },
             {
                 field: "followUpCount",
