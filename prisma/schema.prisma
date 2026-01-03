@@ -118,7 +118,7 @@ model FormField {
   form            Form             @relation(fields: [formId], references: [id], onDelete: Cascade)
   responseAnswers ResponseAnswer[]
 
-  @@index([formId])
+  @@index([formId, order])
 }
 
 model Response {
