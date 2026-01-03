@@ -13,6 +13,7 @@ interface Field {
     type: string;
     required?: boolean;
     options?: string | null;
+    order?: number;
 }
 
 export default function ViewForm() {
@@ -36,6 +37,10 @@ export default function ViewForm() {
             const res = await axios.get(`/api/v1/form/${formId}`, {
                 withCredentials: true,
             });
+
+            res.data.form.fields.sort(
+                (a: Field, b: Field) => (a.order ?? 0) - (b.order ?? 0)
+            );
             return res.data.form;
         },
         enabled: hasFormId,
@@ -170,7 +175,7 @@ export default function ViewForm() {
             toast.success('Form updated successfully!', {
                 duration: 5000
             });
-            setTimeout(closeModal,500);
+            setTimeout(closeModal, 500);
             setFormValues({})
         },
         onError: (err: any) => {
@@ -239,45 +244,44 @@ export default function ViewForm() {
                         </p>
 
                         <div className="space-y-3 animate-fadeIn">
-                            {data.fields.map((field: Field, index: number) => {
-                                let options: string[] = [];
-                                if (field.options) {
-                                    try {
-                                        options = JSON.parse(field.options);
-                                    } catch {
-                                        options = [];
+                            {[...data.fields]
+                                .sort((a: Field, b: Field) => (a.order ?? 0) - (b.order ?? 0))
+                                .map((field: Field, index: number) => {
+                                    let options: string[] = [];
+
+                                    if (field.options) {
+                                        try {
+                                            options = JSON.parse(field.options);
+                                        } catch {
+                                            options = [];
+                                        }
                                     }
-                                }
-                                return (
-                                    <div
-                                        key={field.id}
-                                        className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp"
-                                        style={{ animationDelay: `${index * 0.08}s` }}
-                                    >
-                                        {options.length > 0 &&
+
+                                    return (
+                                        <div
+                                            key={field.id}
+                                            className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp"
+                                            style={{ animationDelay: `${index * 0.08}s` }}
+                                        >
                                             <div className="flex justify-between mb-2">
-                                                <label 
-                                                className={`relative text-sm text-zinc-800 group-hover:text-black transition ${field.required ? "after:content-['*'] after:text-red-600 after:ml-1" : ""} `}
+                                                <label
+                                                    className={`relative text-sm text-zinc-800 group-hover:text-black transition ${field.required
+                                                        ? "after:content-['*'] after:text-red-600 after:ml-1"
+                                                        : ""
+                                                        }`}
                                                 >
                                                     {field.label}
                                                 </label>
-                                                {/* {field.required && (
-                                                <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
-                                                    Required
-                                                </span>
-                                            )} */}
                                             </div>
-                                        }
 
-
-                                        <div className="transform group-hover:scale-[1.01] transition-transform">
-                                            {renderField(field, options)}
+                                            <div className="transform group-hover:scale-[1.01] transition-transform">
+                                                {renderField(field, options)}
+                                            </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-
+                                    );
+                                })}
                         </div>
+
 
                         <div className="space-y-3 animate-fadeIn mt-5">
                             <button
