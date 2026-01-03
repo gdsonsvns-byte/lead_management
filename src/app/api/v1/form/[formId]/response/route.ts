@@ -278,7 +278,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
 export async function GET(req: NextRequest, { params }: { params: Promise<{ formId: string }> }) {
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";
-
         if (isRateLimited(ip)) {
             return NextResponse.json(
                 { error: "Too many requests. Try again later." },
@@ -290,68 +289,36 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
         const apiClient = await verifyApiAccessToken(req);
 
         if (!user && !apiClient) {
-            return NextResponse.json(
-                { error: "Unauthorized User" },
-                { status: 401 }
-            );
+            return NextResponse.json({ error: "Unauthorized User" }, { status: 401 });
         }
+
         const { searchParams } = new URL(req.url);
         const page = Math.max(Number(searchParams.get("page")) || 1, 1);
         const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 20, 1), 50);
         const skip = (page - 1) * limit;
+        const state = (searchParams.get("state") || "pending_today").toLowerCase();
         const { formId } = await params;
 
-        let state = (searchParams.get("state") || "pending_today").toLowerCase();
         const now = new Date();
-        // const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-        const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+        const endOfToday = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            23, 59, 59
+        );
 
-        const whereCondition: any = {
-            id: formId,
-        };
+        const formWhere: any = { id: formId };
 
         if (user?.role === "ADMIN" || user?.role === "MANAGER") {
-            whereCondition.accountId = user.accountId;
+            formWhere.accountId = user.accountId;
         } else if (!user && apiClient) {
-            whereCondition.accountId = apiClient.accountId;
+            formWhere.accountId = apiClient.accountId;
         }
 
         const form = await prisma.form.findUnique({
-            where: whereCondition,
+            where: formWhere,
             include: {
-                fields: {
-                    orderBy: { order: "asc" },
-                },
-                responses: {
-                    skip,
-                    take: limit,
-                    orderBy: { submittedAt: "desc" },
-                    include: {
-                        answers: {
-                            include: {
-                                field: {
-                                    select: {
-                                        label: true,
-                                        order: true,
-                                    },
-                                },
-                            },
-                            orderBy: {
-                                field: {
-                                    order: "asc",
-                                },
-                            },
-                        },
-                        followUps: {
-                            orderBy: { createdAt: "desc" },
-                            include: {
-                                addedBy: {
-                                    select: { id: true, name: true, email: true },
-                                },
-                            },
-                        },
-                    },
-                },
+                fields: { orderBy: { order: "asc" } },
             },
         });
 
@@ -359,112 +326,73 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             return NextResponse.json({ error: "Form not found" }, { status: 404 });
         }
 
-        const allResponses = await prisma.response.findMany({
-            where: { formId: formId },
+        const responses = await prisma.response.findMany({
+            where: {
+                formId,
+            },
+            orderBy: { submittedAt: "desc" },
             include: {
+                answers: {
+                    include: {
+                        field: {
+                            select: { label: true, order: true },
+                        },
+                    },
+                    orderBy: {
+                        field: { order: "asc" },
+                    },
+                },
                 followUps: {
-                    orderBy: { createdAt: "desc" }
-                }
-            }
+                    orderBy: { createdAt: "desc" },
+                    include: {
+                        addedBy: { select: { id: true, name: true, email: true } },
+                    },
+                },
+            },
         });
 
-        const filteredResponseIds = allResponses
-            .filter(res => {
-                const lastFollowUp = res.followUps[0] || null;
+        const filteredResponses = responses.filter((res) => {
+            const lastFollowUp = res.followUps[0];
+            if (!lastFollowUp) return false;
 
-                if (!lastFollowUp) return state === "all";
+            switch (state) {
+                case "pending_today":
+                    return (
+                        lastFollowUp.status === "PENDING" &&
+                        lastFollowUp.nextFollowUpDate &&
+                        new Date(lastFollowUp.nextFollowUpDate) <= endOfToday
+                    );
 
-                const nextDate = lastFollowUp.nextFollowUpDate
-                    ? new Date(lastFollowUp.nextFollowUpDate)
-                    : null;
+                case "pending":
+                    return lastFollowUp.status === "PENDING";
 
-                switch (state) {
-                    case "pending_today":
-                        return (
-                            lastFollowUp.status === "PENDING" &&
-                            nextDate &&
-                            nextDate <= endOfToday
-                        );
-                    case "pending":
-                        return (
-                            lastFollowUp.status === "PENDING"
-                        );
-                    case "completed":
-                        return lastFollowUp.status === "COMPLETED";
-                    case "cancelled":
-                        return lastFollowUp.status === "CANCELLED";
-                    case "all":
-                        return true;
-                    default:
-                        return true;
-                }
-            })
-            .map(r => r.id);
+                case "completed":
+                    return lastFollowUp.status === "COMPLETED";
 
-        const responseCount = filteredResponseIds.length;
+                case "cancelled":
+                    return lastFollowUp.status === "CANCELLED";
 
-        if (responseCount === 0) {
+                case "all":
+                    return true;
+
+                default:
+                    return true;
+            }
+        });
+        const totalResponse = filteredResponses.length;
+
+        if (totalResponse === 0) {
             return NextResponse.json(
                 { message: "No response found." },
                 { status: 404 }
             );
         }
+        const paginatedResponses = filteredResponses.slice(skip, skip + limit);
 
-        const paginatedResponses = await prisma.response.findMany({
-            where: { id: { in: filteredResponseIds } },
-            skip,
-            take: limit,
-            orderBy: { submittedAt: "desc" },
-            include: {
-                answers: true,
-                followUps: {
-                    orderBy: { createdAt: "desc" },
-                    include: {
-                        addedBy: {
-                            select: { id: true, name: true, email: true }
-                        }
-                    }
-                }
-            }
-        });
-
-        // const formatted = paginatedResponses.map((res, idx) => {
-        //     const answerMap: Record<string, any> = {};
-
-        //     for (const ans of res.answers) {
-        //         const field = form.fields.find((f) => f.id === ans.fieldId);
-        //         let value = ans.value;
-
-        //         if (value?.startsWith("[") && value.endsWith("]")) {
-        //             try {
-        //                 value = JSON.parse(value);
-        //             } catch { }
-        //         }
-
-        //         answerMap[field?.label || ans.fieldId] = value;
-        //     }
-
-        //     const followUps = res.followUps;
-        //     const lastFollowUp = followUps[0] ?? null;
-        //     const nextFollowUpDate = followUps.find(f => f.nextFollowUpDate)?.nextFollowUpDate ?? null;
-
-        //     return {
-        //         idx: idx + 1,
-        //         responseId: res.id,
-        //         submittedAt: res.submittedAt,
-        //         answers: answerMap,
-        //         followUps,
-        //         followUpCount: followUps.length,
-        //         lastFollowUp,
-        //         nextFollowUpDate,
-        //         leadStatus: lastFollowUp?.status ?? "PENDING"
-        //     };
-        // });
         const formatted = paginatedResponses.map((res, idx) => {
             const answerMap: Record<string, any> = {};
 
             for (const ans of res.answers) {
-                const field = form.fields.find((f) => f.id === ans.fieldId);
                 let value = ans.value;
 
                 if (value?.startsWith("[") && value.endsWith("]")) {
@@ -473,15 +401,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                     } catch { }
                 }
 
-                answerMap[field?.label || ans.fieldId] = value;
+                answerMap[ans.field.label] = value;
             }
 
             const followUps = res.followUps;
             const lastFollowUp = followUps[0] ?? null;
-            const nextFollowUpDate = followUps.find(f => f.nextFollowUpDate)?.nextFollowUpDate ?? null;
+            const nextFollowUpDate =
+                followUps.find((f) => f.nextFollowUpDate)?.nextFollowUpDate ?? null;
 
             return {
-                idx: idx + 1,
+                idx: skip + idx + 1,
                 responseId: res.id,
                 submittedAt: res.submittedAt,
                 answers: answerMap,
@@ -489,27 +418,29 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                 followUpCount: followUps.length,
                 lastFollowUp,
                 nextFollowUpDate,
-                leadStatus: lastFollowUp?.status ?? "PENDING"
+                leadStatus: lastFollowUp?.status ?? "PENDING",
             };
         });
 
-        const pageCount = Math.ceil(responseCount / limit);
+        const pageCount = Math.ceil(totalResponse / limit);
 
-        return NextResponse.json({
-            id: form.id,
-            formId: form.formsId,
-            title: form.title,
-            description: form.description,
-            responses: formatted,
-            page,
-            limit,
-            totalResponse: responseCount,
-            pageCount,
-            hasMore: page < pageCount,
-            nextPage: page < pageCount ? page + 1 : null,
-            prevPage: page > 1 ? page - 1 : null,
-        }, { status: 200 });
-
+        return NextResponse.json(
+            {
+                id: form.id,
+                formId: form.formsId,
+                title: form.title,
+                description: form.description,
+                responses: formatted,
+                page,
+                limit,
+                totalResponse,
+                pageCount,
+                hasMore: page < pageCount,
+                nextPage: page < pageCount ? page + 1 : null,
+                prevPage: page > 1 ? page - 1 : null,
+            },
+            { status: 200 }
+        );
     } catch (error: any) {
         console.error("Retrieve error:", error);
         return NextResponse.json(
@@ -518,3 +449,4 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
         );
     }
 }
+
