@@ -286,7 +286,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             );
         }
 
-        const user = await verifyRole(["SUPERADMIN", "ADMIN","MANAGER"]);
+        const user = await verifyRole(["SUPERADMIN", "ADMIN", "MANAGER"]);
         const apiClient = await verifyApiAccessToken(req);
 
         if (!user && !apiClient) {
@@ -319,24 +319,40 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
         const form = await prisma.form.findUnique({
             where: whereCondition,
             include: {
-                fields: true,
+                fields: {
+                    orderBy: { order: "asc" },
+                },
                 responses: {
                     skip,
                     take: limit,
                     orderBy: { submittedAt: "desc" },
                     include: {
-                        answers: true,
+                        answers: {
+                            include: {
+                                field: {
+                                    select: {
+                                        label: true,
+                                        order: true,
+                                    },
+                                },
+                            },
+                            orderBy: {
+                                field: {
+                                    order: "asc",
+                                },
+                            },
+                        },
                         followUps: {
                             orderBy: { createdAt: "desc" },
                             include: {
                                 addedBy: {
-                                    select: { id: true, name: true, email: true }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                    select: { id: true, name: true, email: true },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         });
 
         if (!form) {
@@ -412,6 +428,38 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             }
         });
 
+        // const formatted = paginatedResponses.map((res, idx) => {
+        //     const answerMap: Record<string, any> = {};
+
+        //     for (const ans of res.answers) {
+        //         const field = form.fields.find((f) => f.id === ans.fieldId);
+        //         let value = ans.value;
+
+        //         if (value?.startsWith("[") && value.endsWith("]")) {
+        //             try {
+        //                 value = JSON.parse(value);
+        //             } catch { }
+        //         }
+
+        //         answerMap[field?.label || ans.fieldId] = value;
+        //     }
+
+        //     const followUps = res.followUps;
+        //     const lastFollowUp = followUps[0] ?? null;
+        //     const nextFollowUpDate = followUps.find(f => f.nextFollowUpDate)?.nextFollowUpDate ?? null;
+
+        //     return {
+        //         idx: idx + 1,
+        //         responseId: res.id,
+        //         submittedAt: res.submittedAt,
+        //         answers: answerMap,
+        //         followUps,
+        //         followUpCount: followUps.length,
+        //         lastFollowUp,
+        //         nextFollowUpDate,
+        //         leadStatus: lastFollowUp?.status ?? "PENDING"
+        //     };
+        // });
         const formatted = paginatedResponses.map((res, idx) => {
             const answerMap: Record<string, any> = {};
 
