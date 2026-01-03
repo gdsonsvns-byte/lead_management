@@ -351,43 +351,81 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             },
         });
 
-        const filteredResponses = responses.filter((res) => {
-            const lastFollowUp = res.followUps[0];
-            if (!lastFollowUp) return false;
+        // const filteredResponses = responses.filter((res) => {
+        //     const lastFollowUp = res.followUps[0];
+        //     if (!lastFollowUp) return false;
 
-            switch (state) {
-                case "pending_today":
-                    return (
-                        lastFollowUp.status === "PENDING" &&
-                        lastFollowUp.nextFollowUpDate &&
-                        new Date(lastFollowUp.nextFollowUpDate) <= endOfToday
-                    );
+        //     switch (state) {
+        //         case "pending_today":
+        //             return (
+        //                 lastFollowUp.status === "PENDING" &&
+        //                 lastFollowUp.nextFollowUpDate &&
+        //                 new Date(lastFollowUp.nextFollowUpDate) <= endOfToday
+        //             );
 
-                case "pending":
-                    return lastFollowUp.status === "PENDING";
+        //         case "pending":
+        //             return lastFollowUp.status === "PENDING";
 
-                case "completed":
-                    return lastFollowUp.status === "COMPLETED";
+        //         case "completed":
+        //             return lastFollowUp.status === "COMPLETED";
 
-                case "cancelled":
-                    return lastFollowUp.status === "CANCELLED";
+        //         case "cancelled":
+        //             return lastFollowUp.status === "CANCELLED";
 
-                case "all":
-                    return true;
+        //         case "all":
+        //             return true;
 
-                default:
-                    return true;
-            }
-        });
-        const totalResponse = filteredResponses.length;
+        //         default:
+        //             return true;
+        //     }
+        // });
+        let finalResponses = responses;
 
+        if (state !== "all") {
+            finalResponses = responses.filter((res) => {
+                const lastFollowUp = res.followUps[0];
+                if (!lastFollowUp) return false;
+
+                switch (state) {
+                    case "pending_today":
+                        return (
+                            lastFollowUp.status === "PENDING" &&
+                            lastFollowUp.nextFollowUpDate &&
+                            new Date(lastFollowUp.nextFollowUpDate) <= endOfToday
+                        );
+
+                    case "pending":
+                        return lastFollowUp.status === "PENDING";
+
+                    case "completed":
+                        return lastFollowUp.status === "COMPLETED";
+
+                    case "cancelled":
+                        return lastFollowUp.status === "CANCELLED";
+
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        // const totalResponse = filteredResponses.length;
+
+        // if (totalResponse === 0) {
+        //     return NextResponse.json(
+        //         { message: "No response found." },
+        //         { status: 404 }
+        //     );
+        // }
+        // const paginatedResponses = filteredResponses.slice(skip, skip + limit);
+        const totalResponse = finalResponses.length;
         if (totalResponse === 0) {
             return NextResponse.json(
                 { message: "No response found." },
                 { status: 404 }
             );
         }
-        const paginatedResponses = filteredResponses.slice(skip, skip + limit);
+        const paginatedResponses = finalResponses.slice(skip, skip + limit);
 
         const formatted = paginatedResponses.map((res, idx) => {
             const answerMap: Record<string, any> = {};
