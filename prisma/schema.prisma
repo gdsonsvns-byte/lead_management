@@ -98,9 +98,10 @@ model Form {
   adminWhatsappCampaignName String?
   userWhatsappCampaignName  String?
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  account   Account? @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  accountId String?
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account     Account?     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId   String?
+  nextActions NextAction[]
 
   @@index([userId])
   @@index([accountId])
@@ -185,4 +186,19 @@ model ApiAccessToken {
   @@index([accountId])
   @@index([createdById])
   @@index([expiresAt])
+}
+
+model NextAction {
+  id        String         @id @default(uuid())
+  label     String
+  status    FollowUpStatus @default(PENDING)
+  formId    String
+  form      Form           @relation(fields: [formId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
+
+  @@index([id])
+  @@index([label])
+  @@index([formId])
+  @@index([status])
+  @@index([createdAt])
 }
