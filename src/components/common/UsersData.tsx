@@ -128,7 +128,7 @@ export default function UsersData({ formId }: { formId: string }) {
     const STORAGE_KEY = `form_${formId}_column_visibility`;
     const queryClient = useQueryClient();
     const hasFormId = !!formId;
-     const router = useRouter();
+    const router = useRouter();
     const [currentState, setCurrentState] = useState<string>(allState[1].status)
     const [followType, setFollowType] = useState<string>("NOTE");
     const [followNote, setFollowNote] = useState<string>("");
@@ -524,6 +524,7 @@ export default function UsersData({ formId }: { formId: string }) {
                                                         value={followType}
                                                         onChange={(e) => setFollowType(e.target.value)}
                                                         SelectProps={{ native: true }}
+                                                        InputLabelProps={{ shrink: true }}
                                                         fullWidth
                                                     >
                                                         {FOLLOWUP_TYPES.map((t) => (
@@ -540,6 +541,7 @@ export default function UsersData({ formId }: { formId: string }) {
                                                         value={followNote}
                                                         onChange={(e) => setFollowNote(e.target.value)}
                                                         placeholder="Write note..."
+                                                        InputLabelProps={{ shrink: true }}
                                                         fullWidth
                                                     />
 
@@ -548,6 +550,7 @@ export default function UsersData({ formId }: { formId: string }) {
                                                         label="Next Action"
                                                         select
                                                         value={followBusinessStatus}
+                                                        InputLabelProps={{ shrink: true }}
                                                         onChange={(e) => {
                                                             setFollowBusinessStatus(e.target.value);
                                                             if (CLOSED_BUSINESS_STATUSES.includes(e.target.value)) {
@@ -599,7 +602,7 @@ export default function UsersData({ formId }: { formId: string }) {
                     <Button onClick={() => setOpenResponse(null)}>Close</Button>
                 </DialogActions>
             </Dialog>
-            <Toaster/>
+            <Toaster />
         </div>
     );
 }
