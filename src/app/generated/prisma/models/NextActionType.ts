@@ -28,6 +28,7 @@ export type NextActionTypeMinAggregateOutputType = {
   id: string | null
   label: string | null
   status: $Enums.FollowUpStatus | null
+  formId: string | null
   isDefault: boolean | null
   createdAt: Date | null
 }
@@ -36,6 +37,7 @@ export type NextActionTypeMaxAggregateOutputType = {
   id: string | null
   label: string | null
   status: $Enums.FollowUpStatus | null
+  formId: string | null
   isDefault: boolean | null
   createdAt: Date | null
 }
@@ -44,6 +46,7 @@ export type NextActionTypeCountAggregateOutputType = {
   id: number
   label: number
   status: number
+  formId: number
   isDefault: number
   createdAt: number
   _all: number
@@ -54,6 +57,7 @@ export type NextActionTypeMinAggregateInputType = {
   id?: true
   label?: true
   status?: true
+  formId?: true
   isDefault?: true
   createdAt?: true
 }
@@ -62,6 +66,7 @@ export type NextActionTypeMaxAggregateInputType = {
   id?: true
   label?: true
   status?: true
+  formId?: true
   isDefault?: true
   createdAt?: true
 }
@@ -70,6 +75,7 @@ export type NextActionTypeCountAggregateInputType = {
   id?: true
   label?: true
   status?: true
+  formId?: true
   isDefault?: true
   createdAt?: true
   _all?: true
@@ -151,6 +157,7 @@ export type NextActionTypeGroupByOutputType = {
   id: string
   label: string
   status: $Enums.FollowUpStatus
+  formId: string | null
   isDefault: boolean
   createdAt: Date
   _count: NextActionTypeCountAggregateOutputType | null
@@ -180,36 +187,41 @@ export type NextActionTypeWhereInput = {
   id?: Prisma.StringFilter<"NextActionType"> | string
   label?: Prisma.StringFilter<"NextActionType"> | string
   status?: Prisma.EnumFollowUpStatusFilter<"NextActionType"> | $Enums.FollowUpStatus
+  formId?: Prisma.StringNullableFilter<"NextActionType"> | string | null
   isDefault?: Prisma.BoolFilter<"NextActionType"> | boolean
   createdAt?: Prisma.DateTimeFilter<"NextActionType"> | Date | string
-  nextActions?: Prisma.NextActionListRelationFilter
+  form?: Prisma.XOR<Prisma.FormNullableScalarRelationFilter, Prisma.FormWhereInput> | null
 }
 
 export type NextActionTypeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  formId?: Prisma.SortOrderInput | Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  nextActions?: Prisma.NextActionOrderByRelationAggregateInput
+  form?: Prisma.FormOrderByWithRelationInput
 }
 
 export type NextActionTypeWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  label_formId?: Prisma.NextActionTypeLabelFormIdCompoundUniqueInput
   AND?: Prisma.NextActionTypeWhereInput | Prisma.NextActionTypeWhereInput[]
   OR?: Prisma.NextActionTypeWhereInput[]
   NOT?: Prisma.NextActionTypeWhereInput | Prisma.NextActionTypeWhereInput[]
   label?: Prisma.StringFilter<"NextActionType"> | string
   status?: Prisma.EnumFollowUpStatusFilter<"NextActionType"> | $Enums.FollowUpStatus
+  formId?: Prisma.StringNullableFilter<"NextActionType"> | string | null
   isDefault?: Prisma.BoolFilter<"NextActionType"> | boolean
   createdAt?: Prisma.DateTimeFilter<"NextActionType"> | Date | string
-  nextActions?: Prisma.NextActionListRelationFilter
-}, "id">
+  form?: Prisma.XOR<Prisma.FormNullableScalarRelationFilter, Prisma.FormWhereInput> | null
+}, "id" | "label_formId">
 
 export type NextActionTypeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  formId?: Prisma.SortOrderInput | Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.NextActionTypeCountOrderByAggregateInput
@@ -224,6 +236,7 @@ export type NextActionTypeScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"NextActionType"> | string
   label?: Prisma.StringWithAggregatesFilter<"NextActionType"> | string
   status?: Prisma.EnumFollowUpStatusWithAggregatesFilter<"NextActionType"> | $Enums.FollowUpStatus
+  formId?: Prisma.StringNullableWithAggregatesFilter<"NextActionType"> | string | null
   isDefault?: Prisma.BoolWithAggregatesFilter<"NextActionType"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"NextActionType"> | Date | string
 }
@@ -234,16 +247,16 @@ export type NextActionTypeCreateInput = {
   status?: $Enums.FollowUpStatus
   isDefault?: boolean
   createdAt?: Date | string
-  nextActions?: Prisma.NextActionCreateNestedManyWithoutNextActionTypeInput
+  form?: Prisma.FormCreateNestedOneWithoutNextActionsInput
 }
 
 export type NextActionTypeUncheckedCreateInput = {
   id?: string
   label: string
   status?: $Enums.FollowUpStatus
+  formId?: string | null
   isDefault?: boolean
   createdAt?: Date | string
-  nextActions?: Prisma.NextActionUncheckedCreateNestedManyWithoutNextActionTypeInput
 }
 
 export type NextActionTypeUpdateInput = {
@@ -252,22 +265,23 @@ export type NextActionTypeUpdateInput = {
   status?: Prisma.EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  nextActions?: Prisma.NextActionUpdateManyWithoutNextActionTypeNestedInput
+  form?: Prisma.FormUpdateOneWithoutNextActionsNestedInput
 }
 
 export type NextActionTypeUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+  formId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  nextActions?: Prisma.NextActionUncheckedUpdateManyWithoutNextActionTypeNestedInput
 }
 
 export type NextActionTypeCreateManyInput = {
   id?: string
   label: string
   status?: $Enums.FollowUpStatus
+  formId?: string | null
   isDefault?: boolean
   createdAt?: Date | string
 }
@@ -284,19 +298,31 @@ export type NextActionTypeUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+  formId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type NextActionTypeNullableScalarRelationFilter = {
-  is?: Prisma.NextActionTypeWhereInput | null
-  isNot?: Prisma.NextActionTypeWhereInput | null
+export type NextActionTypeListRelationFilter = {
+  every?: Prisma.NextActionTypeWhereInput
+  some?: Prisma.NextActionTypeWhereInput
+  none?: Prisma.NextActionTypeWhereInput
+}
+
+export type NextActionTypeOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
+export type NextActionTypeLabelFormIdCompoundUniqueInput = {
+  label: string
+  formId: string
 }
 
 export type NextActionTypeCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  formId?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -305,6 +331,7 @@ export type NextActionTypeMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  formId?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -313,27 +340,54 @@ export type NextActionTypeMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  formId?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
-export type NextActionTypeCreateNestedOneWithoutNextActionsInput = {
-  create?: Prisma.XOR<Prisma.NextActionTypeCreateWithoutNextActionsInput, Prisma.NextActionTypeUncheckedCreateWithoutNextActionsInput>
-  connectOrCreate?: Prisma.NextActionTypeCreateOrConnectWithoutNextActionsInput
-  connect?: Prisma.NextActionTypeWhereUniqueInput
+export type NextActionTypeCreateNestedManyWithoutFormInput = {
+  create?: Prisma.XOR<Prisma.NextActionTypeCreateWithoutFormInput, Prisma.NextActionTypeUncheckedCreateWithoutFormInput> | Prisma.NextActionTypeCreateWithoutFormInput[] | Prisma.NextActionTypeUncheckedCreateWithoutFormInput[]
+  connectOrCreate?: Prisma.NextActionTypeCreateOrConnectWithoutFormInput | Prisma.NextActionTypeCreateOrConnectWithoutFormInput[]
+  createMany?: Prisma.NextActionTypeCreateManyFormInputEnvelope
+  connect?: Prisma.NextActionTypeWhereUniqueInput | Prisma.NextActionTypeWhereUniqueInput[]
 }
 
-export type NextActionTypeUpdateOneWithoutNextActionsNestedInput = {
-  create?: Prisma.XOR<Prisma.NextActionTypeCreateWithoutNextActionsInput, Prisma.NextActionTypeUncheckedCreateWithoutNextActionsInput>
-  connectOrCreate?: Prisma.NextActionTypeCreateOrConnectWithoutNextActionsInput
-  upsert?: Prisma.NextActionTypeUpsertWithoutNextActionsInput
-  disconnect?: Prisma.NextActionTypeWhereInput | boolean
-  delete?: Prisma.NextActionTypeWhereInput | boolean
-  connect?: Prisma.NextActionTypeWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.NextActionTypeUpdateToOneWithWhereWithoutNextActionsInput, Prisma.NextActionTypeUpdateWithoutNextActionsInput>, Prisma.NextActionTypeUncheckedUpdateWithoutNextActionsInput>
+export type NextActionTypeUncheckedCreateNestedManyWithoutFormInput = {
+  create?: Prisma.XOR<Prisma.NextActionTypeCreateWithoutFormInput, Prisma.NextActionTypeUncheckedCreateWithoutFormInput> | Prisma.NextActionTypeCreateWithoutFormInput[] | Prisma.NextActionTypeUncheckedCreateWithoutFormInput[]
+  connectOrCreate?: Prisma.NextActionTypeCreateOrConnectWithoutFormInput | Prisma.NextActionTypeCreateOrConnectWithoutFormInput[]
+  createMany?: Prisma.NextActionTypeCreateManyFormInputEnvelope
+  connect?: Prisma.NextActionTypeWhereUniqueInput | Prisma.NextActionTypeWhereUniqueInput[]
 }
 
-export type NextActionTypeCreateWithoutNextActionsInput = {
+export type NextActionTypeUpdateManyWithoutFormNestedInput = {
+  create?: Prisma.XOR<Prisma.NextActionTypeCreateWithoutFormInput, Prisma.NextActionTypeUncheckedCreateWithoutFormInput> | Prisma.NextActionTypeCreateWithoutFormInput[] | Prisma.NextActionTypeUncheckedCreateWithoutFormInput[]
+  connectOrCreate?: Prisma.NextActionTypeCreateOrConnectWithoutFormInput | Prisma.NextActionTypeCreateOrConnectWithoutFormInput[]
+  upsert?: Prisma.NextActionTypeUpsertWithWhereUniqueWithoutFormInput | Prisma.NextActionTypeUpsertWithWhereUniqueWithoutFormInput[]
+  createMany?: Prisma.NextActionTypeCreateManyFormInputEnvelope
+  set?: Prisma.NextActionTypeWhereUniqueInput | Prisma.NextActionTypeWhereUniqueInput[]
+  disconnect?: Prisma.NextActionTypeWhereUniqueInput | Prisma.NextActionTypeWhereUniqueInput[]
+  delete?: Prisma.NextActionTypeWhereUniqueInput | Prisma.NextActionTypeWhereUniqueInput[]
+  connect?: Prisma.NextActionTypeWhereUniqueInput | Prisma.NextActionTypeWhereUniqueInput[]
+  update?: Prisma.NextActionTypeUpdateWithWhereUniqueWithoutFormInput | Prisma.NextActionTypeUpdateWithWhereUniqueWithoutFormInput[]
+  updateMany?: Prisma.NextActionTypeUpdateManyWithWhereWithoutFormInput | Prisma.NextActionTypeUpdateManyWithWhereWithoutFormInput[]
+  deleteMany?: Prisma.NextActionTypeScalarWhereInput | Prisma.NextActionTypeScalarWhereInput[]
+}
+
+export type NextActionTypeUncheckedUpdateManyWithoutFormNestedInput = {
+  create?: Prisma.XOR<Prisma.NextActionTypeCreateWithoutFormInput, Prisma.NextActionTypeUncheckedCreateWithoutFormInput> | Prisma.NextActionTypeCreateWithoutFormInput[] | Prisma.NextActionTypeUncheckedCreateWithoutFormInput[]
+  connectOrCreate?: Prisma.NextActionTypeCreateOrConnectWithoutFormInput | Prisma.NextActionTypeCreateOrConnectWithoutFormInput[]
+  upsert?: Prisma.NextActionTypeUpsertWithWhereUniqueWithoutFormInput | Prisma.NextActionTypeUpsertWithWhereUniqueWithoutFormInput[]
+  createMany?: Prisma.NextActionTypeCreateManyFormInputEnvelope
+  set?: Prisma.NextActionTypeWhereUniqueInput | Prisma.NextActionTypeWhereUniqueInput[]
+  disconnect?: Prisma.NextActionTypeWhereUniqueInput | Prisma.NextActionTypeWhereUniqueInput[]
+  delete?: Prisma.NextActionTypeWhereUniqueInput | Prisma.NextActionTypeWhereUniqueInput[]
+  connect?: Prisma.NextActionTypeWhereUniqueInput | Prisma.NextActionTypeWhereUniqueInput[]
+  update?: Prisma.NextActionTypeUpdateWithWhereUniqueWithoutFormInput | Prisma.NextActionTypeUpdateWithWhereUniqueWithoutFormInput[]
+  updateMany?: Prisma.NextActionTypeUpdateManyWithWhereWithoutFormInput | Prisma.NextActionTypeUpdateManyWithWhereWithoutFormInput[]
+  deleteMany?: Prisma.NextActionTypeScalarWhereInput | Prisma.NextActionTypeScalarWhereInput[]
+}
+
+export type NextActionTypeCreateWithoutFormInput = {
   id?: string
   label: string
   status?: $Enums.FollowUpStatus
@@ -341,7 +395,7 @@ export type NextActionTypeCreateWithoutNextActionsInput = {
   createdAt?: Date | string
 }
 
-export type NextActionTypeUncheckedCreateWithoutNextActionsInput = {
+export type NextActionTypeUncheckedCreateWithoutFormInput = {
   id?: string
   label: string
   status?: $Enums.FollowUpStatus
@@ -349,23 +403,53 @@ export type NextActionTypeUncheckedCreateWithoutNextActionsInput = {
   createdAt?: Date | string
 }
 
-export type NextActionTypeCreateOrConnectWithoutNextActionsInput = {
+export type NextActionTypeCreateOrConnectWithoutFormInput = {
   where: Prisma.NextActionTypeWhereUniqueInput
-  create: Prisma.XOR<Prisma.NextActionTypeCreateWithoutNextActionsInput, Prisma.NextActionTypeUncheckedCreateWithoutNextActionsInput>
+  create: Prisma.XOR<Prisma.NextActionTypeCreateWithoutFormInput, Prisma.NextActionTypeUncheckedCreateWithoutFormInput>
 }
 
-export type NextActionTypeUpsertWithoutNextActionsInput = {
-  update: Prisma.XOR<Prisma.NextActionTypeUpdateWithoutNextActionsInput, Prisma.NextActionTypeUncheckedUpdateWithoutNextActionsInput>
-  create: Prisma.XOR<Prisma.NextActionTypeCreateWithoutNextActionsInput, Prisma.NextActionTypeUncheckedCreateWithoutNextActionsInput>
-  where?: Prisma.NextActionTypeWhereInput
+export type NextActionTypeCreateManyFormInputEnvelope = {
+  data: Prisma.NextActionTypeCreateManyFormInput | Prisma.NextActionTypeCreateManyFormInput[]
+  skipDuplicates?: boolean
 }
 
-export type NextActionTypeUpdateToOneWithWhereWithoutNextActionsInput = {
-  where?: Prisma.NextActionTypeWhereInput
-  data: Prisma.XOR<Prisma.NextActionTypeUpdateWithoutNextActionsInput, Prisma.NextActionTypeUncheckedUpdateWithoutNextActionsInput>
+export type NextActionTypeUpsertWithWhereUniqueWithoutFormInput = {
+  where: Prisma.NextActionTypeWhereUniqueInput
+  update: Prisma.XOR<Prisma.NextActionTypeUpdateWithoutFormInput, Prisma.NextActionTypeUncheckedUpdateWithoutFormInput>
+  create: Prisma.XOR<Prisma.NextActionTypeCreateWithoutFormInput, Prisma.NextActionTypeUncheckedCreateWithoutFormInput>
 }
 
-export type NextActionTypeUpdateWithoutNextActionsInput = {
+export type NextActionTypeUpdateWithWhereUniqueWithoutFormInput = {
+  where: Prisma.NextActionTypeWhereUniqueInput
+  data: Prisma.XOR<Prisma.NextActionTypeUpdateWithoutFormInput, Prisma.NextActionTypeUncheckedUpdateWithoutFormInput>
+}
+
+export type NextActionTypeUpdateManyWithWhereWithoutFormInput = {
+  where: Prisma.NextActionTypeScalarWhereInput
+  data: Prisma.XOR<Prisma.NextActionTypeUpdateManyMutationInput, Prisma.NextActionTypeUncheckedUpdateManyWithoutFormInput>
+}
+
+export type NextActionTypeScalarWhereInput = {
+  AND?: Prisma.NextActionTypeScalarWhereInput | Prisma.NextActionTypeScalarWhereInput[]
+  OR?: Prisma.NextActionTypeScalarWhereInput[]
+  NOT?: Prisma.NextActionTypeScalarWhereInput | Prisma.NextActionTypeScalarWhereInput[]
+  id?: Prisma.StringFilter<"NextActionType"> | string
+  label?: Prisma.StringFilter<"NextActionType"> | string
+  status?: Prisma.EnumFollowUpStatusFilter<"NextActionType"> | $Enums.FollowUpStatus
+  formId?: Prisma.StringNullableFilter<"NextActionType"> | string | null
+  isDefault?: Prisma.BoolFilter<"NextActionType"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"NextActionType"> | Date | string
+}
+
+export type NextActionTypeCreateManyFormInput = {
+  id?: string
+  label: string
+  status?: $Enums.FollowUpStatus
+  isDefault?: boolean
+  createdAt?: Date | string
+}
+
+export type NextActionTypeUpdateWithoutFormInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
@@ -373,7 +457,7 @@ export type NextActionTypeUpdateWithoutNextActionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type NextActionTypeUncheckedUpdateWithoutNextActionsInput = {
+export type NextActionTypeUncheckedUpdateWithoutFormInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
@@ -381,88 +465,76 @@ export type NextActionTypeUncheckedUpdateWithoutNextActionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-
-/**
- * Count Type NextActionTypeCountOutputType
- */
-
-export type NextActionTypeCountOutputType = {
-  nextActions: number
+export type NextActionTypeUncheckedUpdateManyWithoutFormInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type NextActionTypeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  nextActions?: boolean | NextActionTypeCountOutputTypeCountNextActionsArgs
-}
-
-/**
- * NextActionTypeCountOutputType without action
- */
-export type NextActionTypeCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the NextActionTypeCountOutputType
-   */
-  select?: Prisma.NextActionTypeCountOutputTypeSelect<ExtArgs> | null
-}
-
-/**
- * NextActionTypeCountOutputType without action
- */
-export type NextActionTypeCountOutputTypeCountNextActionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.NextActionWhereInput
-}
 
 
 export type NextActionTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   label?: boolean
   status?: boolean
+  formId?: boolean
   isDefault?: boolean
   createdAt?: boolean
-  nextActions?: boolean | Prisma.NextActionType$nextActionsArgs<ExtArgs>
-  _count?: boolean | Prisma.NextActionTypeCountOutputTypeDefaultArgs<ExtArgs>
+  form?: boolean | Prisma.NextActionType$formArgs<ExtArgs>
 }, ExtArgs["result"]["nextActionType"]>
 
 export type NextActionTypeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   label?: boolean
   status?: boolean
+  formId?: boolean
   isDefault?: boolean
   createdAt?: boolean
+  form?: boolean | Prisma.NextActionType$formArgs<ExtArgs>
 }, ExtArgs["result"]["nextActionType"]>
 
 export type NextActionTypeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   label?: boolean
   status?: boolean
+  formId?: boolean
   isDefault?: boolean
   createdAt?: boolean
+  form?: boolean | Prisma.NextActionType$formArgs<ExtArgs>
 }, ExtArgs["result"]["nextActionType"]>
 
 export type NextActionTypeSelectScalar = {
   id?: boolean
   label?: boolean
   status?: boolean
+  formId?: boolean
   isDefault?: boolean
   createdAt?: boolean
 }
 
-export type NextActionTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "status" | "isDefault" | "createdAt", ExtArgs["result"]["nextActionType"]>
+export type NextActionTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "status" | "formId" | "isDefault" | "createdAt", ExtArgs["result"]["nextActionType"]>
 export type NextActionTypeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  nextActions?: boolean | Prisma.NextActionType$nextActionsArgs<ExtArgs>
-  _count?: boolean | Prisma.NextActionTypeCountOutputTypeDefaultArgs<ExtArgs>
+  form?: boolean | Prisma.NextActionType$formArgs<ExtArgs>
 }
-export type NextActionTypeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type NextActionTypeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type NextActionTypeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  form?: boolean | Prisma.NextActionType$formArgs<ExtArgs>
+}
+export type NextActionTypeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  form?: boolean | Prisma.NextActionType$formArgs<ExtArgs>
+}
 
 export type $NextActionTypePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "NextActionType"
   objects: {
-    nextActions: Prisma.$NextActionPayload<ExtArgs>[]
+    form: Prisma.$FormPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     label: string
     status: $Enums.FollowUpStatus
+    formId: string | null
     isDefault: boolean
     createdAt: Date
   }, ExtArgs["result"]["nextActionType"]>
@@ -859,7 +931,7 @@ readonly fields: NextActionTypeFieldRefs;
  */
 export interface Prisma__NextActionTypeClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  nextActions<T extends Prisma.NextActionType$nextActionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NextActionType$nextActionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NextActionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  form<T extends Prisma.NextActionType$formArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.NextActionType$formArgs<ExtArgs>>): Prisma.Prisma__FormClient<runtime.Types.Result.GetResult<Prisma.$FormPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -892,6 +964,7 @@ export interface NextActionTypeFieldRefs {
   readonly id: Prisma.FieldRef<"NextActionType", 'String'>
   readonly label: Prisma.FieldRef<"NextActionType", 'String'>
   readonly status: Prisma.FieldRef<"NextActionType", 'FollowUpStatus'>
+  readonly formId: Prisma.FieldRef<"NextActionType", 'String'>
   readonly isDefault: Prisma.FieldRef<"NextActionType", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"NextActionType", 'DateTime'>
 }
@@ -1143,6 +1216,10 @@ export type NextActionTypeCreateManyAndReturnArgs<ExtArgs extends runtime.Types.
    */
   data: Prisma.NextActionTypeCreateManyInput | Prisma.NextActionTypeCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NextActionTypeIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1213,6 +1290,10 @@ export type NextActionTypeUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.
    * Limit how many NextActionTypes to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NextActionTypeIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1282,27 +1363,22 @@ export type NextActionTypeDeleteManyArgs<ExtArgs extends runtime.Types.Extension
 }
 
 /**
- * NextActionType.nextActions
+ * NextActionType.form
  */
-export type NextActionType$nextActionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type NextActionType$formArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the NextAction
+   * Select specific fields to fetch from the Form
    */
-  select?: Prisma.NextActionSelect<ExtArgs> | null
+  select?: Prisma.FormSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the NextAction
+   * Omit specific fields from the Form
    */
-  omit?: Prisma.NextActionOmit<ExtArgs> | null
+  omit?: Prisma.FormOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.NextActionInclude<ExtArgs> | null
-  where?: Prisma.NextActionWhereInput
-  orderBy?: Prisma.NextActionOrderByWithRelationInput | Prisma.NextActionOrderByWithRelationInput[]
-  cursor?: Prisma.NextActionWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.NextActionScalarFieldEnum | Prisma.NextActionScalarFieldEnum[]
+  include?: Prisma.FormInclude<ExtArgs> | null
+  where?: Prisma.FormWhereInput
 }
 
 /**

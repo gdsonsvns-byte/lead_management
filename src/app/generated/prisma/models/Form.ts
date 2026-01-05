@@ -35,7 +35,6 @@ export type FormMinAggregateOutputType = {
   adminWhatsappCampaignName: string | null
   userWhatsappCampaignName: string | null
   accountId: string | null
-  nextActionId: string | null
 }
 
 export type FormMaxAggregateOutputType = {
@@ -49,7 +48,6 @@ export type FormMaxAggregateOutputType = {
   adminWhatsappCampaignName: string | null
   userWhatsappCampaignName: string | null
   accountId: string | null
-  nextActionId: string | null
 }
 
 export type FormCountAggregateOutputType = {
@@ -63,7 +61,6 @@ export type FormCountAggregateOutputType = {
   adminWhatsappCampaignName: number
   userWhatsappCampaignName: number
   accountId: number
-  nextActionId: number
   _all: number
 }
 
@@ -79,7 +76,6 @@ export type FormMinAggregateInputType = {
   adminWhatsappCampaignName?: true
   userWhatsappCampaignName?: true
   accountId?: true
-  nextActionId?: true
 }
 
 export type FormMaxAggregateInputType = {
@@ -93,7 +89,6 @@ export type FormMaxAggregateInputType = {
   adminWhatsappCampaignName?: true
   userWhatsappCampaignName?: true
   accountId?: true
-  nextActionId?: true
 }
 
 export type FormCountAggregateInputType = {
@@ -107,7 +102,6 @@ export type FormCountAggregateInputType = {
   adminWhatsappCampaignName?: true
   userWhatsappCampaignName?: true
   accountId?: true
-  nextActionId?: true
   _all?: true
 }
 
@@ -194,7 +188,6 @@ export type FormGroupByOutputType = {
   adminWhatsappCampaignName: string | null
   userWhatsappCampaignName: string | null
   accountId: string | null
-  nextActionId: string | null
   _count: FormCountAggregateOutputType | null
   _min: FormMinAggregateOutputType | null
   _max: FormMaxAggregateOutputType | null
@@ -229,12 +222,11 @@ export type FormWhereInput = {
   adminWhatsappCampaignName?: Prisma.StringNullableFilter<"Form"> | string | null
   userWhatsappCampaignName?: Prisma.StringNullableFilter<"Form"> | string | null
   accountId?: Prisma.StringNullableFilter<"Form"> | string | null
-  nextActionId?: Prisma.StringNullableFilter<"Form"> | string | null
   fields?: Prisma.FormFieldListRelationFilter
   responses?: Prisma.ResponseListRelationFilter
+  nextActions?: Prisma.NextActionTypeListRelationFilter
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
-  nextAction?: Prisma.XOR<Prisma.NextActionNullableScalarRelationFilter, Prisma.NextActionWhereInput> | null
 }
 
 export type FormOrderByWithRelationInput = {
@@ -248,12 +240,11 @@ export type FormOrderByWithRelationInput = {
   adminWhatsappCampaignName?: Prisma.SortOrderInput | Prisma.SortOrder
   userWhatsappCampaignName?: Prisma.SortOrderInput | Prisma.SortOrder
   accountId?: Prisma.SortOrderInput | Prisma.SortOrder
-  nextActionId?: Prisma.SortOrderInput | Prisma.SortOrder
   fields?: Prisma.FormFieldOrderByRelationAggregateInput
   responses?: Prisma.ResponseOrderByRelationAggregateInput
+  nextActions?: Prisma.NextActionTypeOrderByRelationAggregateInput
   user?: Prisma.UserOrderByWithRelationInput
   account?: Prisma.AccountOrderByWithRelationInput
-  nextAction?: Prisma.NextActionOrderByWithRelationInput
 }
 
 export type FormWhereUniqueInput = Prisma.AtLeast<{
@@ -270,12 +261,11 @@ export type FormWhereUniqueInput = Prisma.AtLeast<{
   adminWhatsappCampaignName?: Prisma.StringNullableFilter<"Form"> | string | null
   userWhatsappCampaignName?: Prisma.StringNullableFilter<"Form"> | string | null
   accountId?: Prisma.StringNullableFilter<"Form"> | string | null
-  nextActionId?: Prisma.StringNullableFilter<"Form"> | string | null
   fields?: Prisma.FormFieldListRelationFilter
   responses?: Prisma.ResponseListRelationFilter
+  nextActions?: Prisma.NextActionTypeListRelationFilter
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
-  nextAction?: Prisma.XOR<Prisma.NextActionNullableScalarRelationFilter, Prisma.NextActionWhereInput> | null
 }, "id" | "slug">
 
 export type FormOrderByWithAggregationInput = {
@@ -289,7 +279,6 @@ export type FormOrderByWithAggregationInput = {
   adminWhatsappCampaignName?: Prisma.SortOrderInput | Prisma.SortOrder
   userWhatsappCampaignName?: Prisma.SortOrderInput | Prisma.SortOrder
   accountId?: Prisma.SortOrderInput | Prisma.SortOrder
-  nextActionId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.FormCountOrderByAggregateInput
   _max?: Prisma.FormMaxOrderByAggregateInput
   _min?: Prisma.FormMinOrderByAggregateInput
@@ -309,7 +298,6 @@ export type FormScalarWhereWithAggregatesInput = {
   adminWhatsappCampaignName?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
   userWhatsappCampaignName?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
   accountId?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
-  nextActionId?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
 }
 
 export type FormCreateInput = {
@@ -323,9 +311,9 @@ export type FormCreateInput = {
   userWhatsappCampaignName?: string | null
   fields?: Prisma.FormFieldCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
+  nextActions?: Prisma.NextActionTypeCreateNestedManyWithoutFormInput
   user: Prisma.UserCreateNestedOneWithoutFormsInput
   account?: Prisma.AccountCreateNestedOneWithoutFormsInput
-  nextAction?: Prisma.NextActionCreateNestedOneWithoutFormInput
 }
 
 export type FormUncheckedCreateInput = {
@@ -339,9 +327,9 @@ export type FormUncheckedCreateInput = {
   adminWhatsappCampaignName?: string | null
   userWhatsappCampaignName?: string | null
   accountId?: string | null
-  nextActionId?: string | null
   fields?: Prisma.FormFieldUncheckedCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
+  nextActions?: Prisma.NextActionTypeUncheckedCreateNestedManyWithoutFormInput
 }
 
 export type FormUpdateInput = {
@@ -355,9 +343,9 @@ export type FormUpdateInput = {
   userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
+  nextActions?: Prisma.NextActionTypeUpdateManyWithoutFormNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutFormsNestedInput
   account?: Prisma.AccountUpdateOneWithoutFormsNestedInput
-  nextAction?: Prisma.NextActionUpdateOneWithoutFormNestedInput
 }
 
 export type FormUncheckedUpdateInput = {
@@ -371,9 +359,9 @@ export type FormUncheckedUpdateInput = {
   adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  nextActionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
+  nextActions?: Prisma.NextActionTypeUncheckedUpdateManyWithoutFormNestedInput
 }
 
 export type FormCreateManyInput = {
@@ -387,7 +375,6 @@ export type FormCreateManyInput = {
   adminWhatsappCampaignName?: string | null
   userWhatsappCampaignName?: string | null
   accountId?: string | null
-  nextActionId?: string | null
 }
 
 export type FormUpdateManyMutationInput = {
@@ -412,7 +399,6 @@ export type FormUncheckedUpdateManyInput = {
   adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  nextActionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type FormListRelationFilter = {
@@ -436,7 +422,6 @@ export type FormCountOrderByAggregateInput = {
   adminWhatsappCampaignName?: Prisma.SortOrder
   userWhatsappCampaignName?: Prisma.SortOrder
   accountId?: Prisma.SortOrder
-  nextActionId?: Prisma.SortOrder
 }
 
 export type FormMaxOrderByAggregateInput = {
@@ -450,7 +435,6 @@ export type FormMaxOrderByAggregateInput = {
   adminWhatsappCampaignName?: Prisma.SortOrder
   userWhatsappCampaignName?: Prisma.SortOrder
   accountId?: Prisma.SortOrder
-  nextActionId?: Prisma.SortOrder
 }
 
 export type FormMinOrderByAggregateInput = {
@@ -464,12 +448,16 @@ export type FormMinOrderByAggregateInput = {
   adminWhatsappCampaignName?: Prisma.SortOrder
   userWhatsappCampaignName?: Prisma.SortOrder
   accountId?: Prisma.SortOrder
-  nextActionId?: Prisma.SortOrder
 }
 
 export type FormScalarRelationFilter = {
   is?: Prisma.FormWhereInput
   isNot?: Prisma.FormWhereInput
+}
+
+export type FormNullableScalarRelationFilter = {
+  is?: Prisma.FormWhereInput | null
+  isNot?: Prisma.FormWhereInput | null
 }
 
 export type FormCreateNestedManyWithoutAccountInput = {
@@ -584,46 +572,20 @@ export type FormUpdateOneRequiredWithoutResponsesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.FormUpdateToOneWithWhereWithoutResponsesInput, Prisma.FormUpdateWithoutResponsesInput>, Prisma.FormUncheckedUpdateWithoutResponsesInput>
 }
 
-export type FormCreateNestedManyWithoutNextActionInput = {
-  create?: Prisma.XOR<Prisma.FormCreateWithoutNextActionInput, Prisma.FormUncheckedCreateWithoutNextActionInput> | Prisma.FormCreateWithoutNextActionInput[] | Prisma.FormUncheckedCreateWithoutNextActionInput[]
-  connectOrCreate?: Prisma.FormCreateOrConnectWithoutNextActionInput | Prisma.FormCreateOrConnectWithoutNextActionInput[]
-  createMany?: Prisma.FormCreateManyNextActionInputEnvelope
-  connect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+export type FormCreateNestedOneWithoutNextActionsInput = {
+  create?: Prisma.XOR<Prisma.FormCreateWithoutNextActionsInput, Prisma.FormUncheckedCreateWithoutNextActionsInput>
+  connectOrCreate?: Prisma.FormCreateOrConnectWithoutNextActionsInput
+  connect?: Prisma.FormWhereUniqueInput
 }
 
-export type FormUncheckedCreateNestedManyWithoutNextActionInput = {
-  create?: Prisma.XOR<Prisma.FormCreateWithoutNextActionInput, Prisma.FormUncheckedCreateWithoutNextActionInput> | Prisma.FormCreateWithoutNextActionInput[] | Prisma.FormUncheckedCreateWithoutNextActionInput[]
-  connectOrCreate?: Prisma.FormCreateOrConnectWithoutNextActionInput | Prisma.FormCreateOrConnectWithoutNextActionInput[]
-  createMany?: Prisma.FormCreateManyNextActionInputEnvelope
-  connect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
-}
-
-export type FormUpdateManyWithoutNextActionNestedInput = {
-  create?: Prisma.XOR<Prisma.FormCreateWithoutNextActionInput, Prisma.FormUncheckedCreateWithoutNextActionInput> | Prisma.FormCreateWithoutNextActionInput[] | Prisma.FormUncheckedCreateWithoutNextActionInput[]
-  connectOrCreate?: Prisma.FormCreateOrConnectWithoutNextActionInput | Prisma.FormCreateOrConnectWithoutNextActionInput[]
-  upsert?: Prisma.FormUpsertWithWhereUniqueWithoutNextActionInput | Prisma.FormUpsertWithWhereUniqueWithoutNextActionInput[]
-  createMany?: Prisma.FormCreateManyNextActionInputEnvelope
-  set?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
-  disconnect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
-  delete?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
-  connect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
-  update?: Prisma.FormUpdateWithWhereUniqueWithoutNextActionInput | Prisma.FormUpdateWithWhereUniqueWithoutNextActionInput[]
-  updateMany?: Prisma.FormUpdateManyWithWhereWithoutNextActionInput | Prisma.FormUpdateManyWithWhereWithoutNextActionInput[]
-  deleteMany?: Prisma.FormScalarWhereInput | Prisma.FormScalarWhereInput[]
-}
-
-export type FormUncheckedUpdateManyWithoutNextActionNestedInput = {
-  create?: Prisma.XOR<Prisma.FormCreateWithoutNextActionInput, Prisma.FormUncheckedCreateWithoutNextActionInput> | Prisma.FormCreateWithoutNextActionInput[] | Prisma.FormUncheckedCreateWithoutNextActionInput[]
-  connectOrCreate?: Prisma.FormCreateOrConnectWithoutNextActionInput | Prisma.FormCreateOrConnectWithoutNextActionInput[]
-  upsert?: Prisma.FormUpsertWithWhereUniqueWithoutNextActionInput | Prisma.FormUpsertWithWhereUniqueWithoutNextActionInput[]
-  createMany?: Prisma.FormCreateManyNextActionInputEnvelope
-  set?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
-  disconnect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
-  delete?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
-  connect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
-  update?: Prisma.FormUpdateWithWhereUniqueWithoutNextActionInput | Prisma.FormUpdateWithWhereUniqueWithoutNextActionInput[]
-  updateMany?: Prisma.FormUpdateManyWithWhereWithoutNextActionInput | Prisma.FormUpdateManyWithWhereWithoutNextActionInput[]
-  deleteMany?: Prisma.FormScalarWhereInput | Prisma.FormScalarWhereInput[]
+export type FormUpdateOneWithoutNextActionsNestedInput = {
+  create?: Prisma.XOR<Prisma.FormCreateWithoutNextActionsInput, Prisma.FormUncheckedCreateWithoutNextActionsInput>
+  connectOrCreate?: Prisma.FormCreateOrConnectWithoutNextActionsInput
+  upsert?: Prisma.FormUpsertWithoutNextActionsInput
+  disconnect?: Prisma.FormWhereInput | boolean
+  delete?: Prisma.FormWhereInput | boolean
+  connect?: Prisma.FormWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.FormUpdateToOneWithWhereWithoutNextActionsInput, Prisma.FormUpdateWithoutNextActionsInput>, Prisma.FormUncheckedUpdateWithoutNextActionsInput>
 }
 
 export type FormCreateWithoutAccountInput = {
@@ -637,8 +599,8 @@ export type FormCreateWithoutAccountInput = {
   userWhatsappCampaignName?: string | null
   fields?: Prisma.FormFieldCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
+  nextActions?: Prisma.NextActionTypeCreateNestedManyWithoutFormInput
   user: Prisma.UserCreateNestedOneWithoutFormsInput
-  nextAction?: Prisma.NextActionCreateNestedOneWithoutFormInput
 }
 
 export type FormUncheckedCreateWithoutAccountInput = {
@@ -651,9 +613,9 @@ export type FormUncheckedCreateWithoutAccountInput = {
   createdAt?: Date | string
   adminWhatsappCampaignName?: string | null
   userWhatsappCampaignName?: string | null
-  nextActionId?: string | null
   fields?: Prisma.FormFieldUncheckedCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
+  nextActions?: Prisma.NextActionTypeUncheckedCreateNestedManyWithoutFormInput
 }
 
 export type FormCreateOrConnectWithoutAccountInput = {
@@ -696,7 +658,6 @@ export type FormScalarWhereInput = {
   adminWhatsappCampaignName?: Prisma.StringNullableFilter<"Form"> | string | null
   userWhatsappCampaignName?: Prisma.StringNullableFilter<"Form"> | string | null
   accountId?: Prisma.StringNullableFilter<"Form"> | string | null
-  nextActionId?: Prisma.StringNullableFilter<"Form"> | string | null
 }
 
 export type FormCreateWithoutUserInput = {
@@ -710,8 +671,8 @@ export type FormCreateWithoutUserInput = {
   userWhatsappCampaignName?: string | null
   fields?: Prisma.FormFieldCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
+  nextActions?: Prisma.NextActionTypeCreateNestedManyWithoutFormInput
   account?: Prisma.AccountCreateNestedOneWithoutFormsInput
-  nextAction?: Prisma.NextActionCreateNestedOneWithoutFormInput
 }
 
 export type FormUncheckedCreateWithoutUserInput = {
@@ -724,9 +685,9 @@ export type FormUncheckedCreateWithoutUserInput = {
   adminWhatsappCampaignName?: string | null
   userWhatsappCampaignName?: string | null
   accountId?: string | null
-  nextActionId?: string | null
   fields?: Prisma.FormFieldUncheckedCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
+  nextActions?: Prisma.NextActionTypeUncheckedCreateNestedManyWithoutFormInput
 }
 
 export type FormCreateOrConnectWithoutUserInput = {
@@ -765,9 +726,9 @@ export type FormCreateWithoutFieldsInput = {
   adminWhatsappCampaignName?: string | null
   userWhatsappCampaignName?: string | null
   responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
+  nextActions?: Prisma.NextActionTypeCreateNestedManyWithoutFormInput
   user: Prisma.UserCreateNestedOneWithoutFormsInput
   account?: Prisma.AccountCreateNestedOneWithoutFormsInput
-  nextAction?: Prisma.NextActionCreateNestedOneWithoutFormInput
 }
 
 export type FormUncheckedCreateWithoutFieldsInput = {
@@ -781,8 +742,8 @@ export type FormUncheckedCreateWithoutFieldsInput = {
   adminWhatsappCampaignName?: string | null
   userWhatsappCampaignName?: string | null
   accountId?: string | null
-  nextActionId?: string | null
   responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
+  nextActions?: Prisma.NextActionTypeUncheckedCreateNestedManyWithoutFormInput
 }
 
 export type FormCreateOrConnectWithoutFieldsInput = {
@@ -811,9 +772,9 @@ export type FormUpdateWithoutFieldsInput = {
   adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
+  nextActions?: Prisma.NextActionTypeUpdateManyWithoutFormNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutFormsNestedInput
   account?: Prisma.AccountUpdateOneWithoutFormsNestedInput
-  nextAction?: Prisma.NextActionUpdateOneWithoutFormNestedInput
 }
 
 export type FormUncheckedUpdateWithoutFieldsInput = {
@@ -827,8 +788,8 @@ export type FormUncheckedUpdateWithoutFieldsInput = {
   adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  nextActionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
+  nextActions?: Prisma.NextActionTypeUncheckedUpdateManyWithoutFormNestedInput
 }
 
 export type FormCreateWithoutResponsesInput = {
@@ -841,9 +802,9 @@ export type FormCreateWithoutResponsesInput = {
   adminWhatsappCampaignName?: string | null
   userWhatsappCampaignName?: string | null
   fields?: Prisma.FormFieldCreateNestedManyWithoutFormInput
+  nextActions?: Prisma.NextActionTypeCreateNestedManyWithoutFormInput
   user: Prisma.UserCreateNestedOneWithoutFormsInput
   account?: Prisma.AccountCreateNestedOneWithoutFormsInput
-  nextAction?: Prisma.NextActionCreateNestedOneWithoutFormInput
 }
 
 export type FormUncheckedCreateWithoutResponsesInput = {
@@ -857,8 +818,8 @@ export type FormUncheckedCreateWithoutResponsesInput = {
   adminWhatsappCampaignName?: string | null
   userWhatsappCampaignName?: string | null
   accountId?: string | null
-  nextActionId?: string | null
   fields?: Prisma.FormFieldUncheckedCreateNestedManyWithoutFormInput
+  nextActions?: Prisma.NextActionTypeUncheckedCreateNestedManyWithoutFormInput
 }
 
 export type FormCreateOrConnectWithoutResponsesInput = {
@@ -887,9 +848,9 @@ export type FormUpdateWithoutResponsesInput = {
   adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
+  nextActions?: Prisma.NextActionTypeUpdateManyWithoutFormNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutFormsNestedInput
   account?: Prisma.AccountUpdateOneWithoutFormsNestedInput
-  nextAction?: Prisma.NextActionUpdateOneWithoutFormNestedInput
 }
 
 export type FormUncheckedUpdateWithoutResponsesInput = {
@@ -903,11 +864,11 @@ export type FormUncheckedUpdateWithoutResponsesInput = {
   adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  nextActionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
+  nextActions?: Prisma.NextActionTypeUncheckedUpdateManyWithoutFormNestedInput
 }
 
-export type FormCreateWithoutNextActionInput = {
+export type FormCreateWithoutNextActionsInput = {
   id?: string
   formsId: string
   title: string
@@ -922,7 +883,7 @@ export type FormCreateWithoutNextActionInput = {
   account?: Prisma.AccountCreateNestedOneWithoutFormsInput
 }
 
-export type FormUncheckedCreateWithoutNextActionInput = {
+export type FormUncheckedCreateWithoutNextActionsInput = {
   id?: string
   formsId: string
   userId: string
@@ -937,30 +898,50 @@ export type FormUncheckedCreateWithoutNextActionInput = {
   responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
 }
 
-export type FormCreateOrConnectWithoutNextActionInput = {
+export type FormCreateOrConnectWithoutNextActionsInput = {
   where: Prisma.FormWhereUniqueInput
-  create: Prisma.XOR<Prisma.FormCreateWithoutNextActionInput, Prisma.FormUncheckedCreateWithoutNextActionInput>
+  create: Prisma.XOR<Prisma.FormCreateWithoutNextActionsInput, Prisma.FormUncheckedCreateWithoutNextActionsInput>
 }
 
-export type FormCreateManyNextActionInputEnvelope = {
-  data: Prisma.FormCreateManyNextActionInput | Prisma.FormCreateManyNextActionInput[]
-  skipDuplicates?: boolean
+export type FormUpsertWithoutNextActionsInput = {
+  update: Prisma.XOR<Prisma.FormUpdateWithoutNextActionsInput, Prisma.FormUncheckedUpdateWithoutNextActionsInput>
+  create: Prisma.XOR<Prisma.FormCreateWithoutNextActionsInput, Prisma.FormUncheckedCreateWithoutNextActionsInput>
+  where?: Prisma.FormWhereInput
 }
 
-export type FormUpsertWithWhereUniqueWithoutNextActionInput = {
-  where: Prisma.FormWhereUniqueInput
-  update: Prisma.XOR<Prisma.FormUpdateWithoutNextActionInput, Prisma.FormUncheckedUpdateWithoutNextActionInput>
-  create: Prisma.XOR<Prisma.FormCreateWithoutNextActionInput, Prisma.FormUncheckedCreateWithoutNextActionInput>
+export type FormUpdateToOneWithWhereWithoutNextActionsInput = {
+  where?: Prisma.FormWhereInput
+  data: Prisma.XOR<Prisma.FormUpdateWithoutNextActionsInput, Prisma.FormUncheckedUpdateWithoutNextActionsInput>
 }
 
-export type FormUpdateWithWhereUniqueWithoutNextActionInput = {
-  where: Prisma.FormWhereUniqueInput
-  data: Prisma.XOR<Prisma.FormUpdateWithoutNextActionInput, Prisma.FormUncheckedUpdateWithoutNextActionInput>
+export type FormUpdateWithoutNextActionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
+  responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutFormsNestedInput
+  account?: Prisma.AccountUpdateOneWithoutFormsNestedInput
 }
 
-export type FormUpdateManyWithWhereWithoutNextActionInput = {
-  where: Prisma.FormScalarWhereInput
-  data: Prisma.XOR<Prisma.FormUpdateManyMutationInput, Prisma.FormUncheckedUpdateManyWithoutNextActionInput>
+export type FormUncheckedUpdateWithoutNextActionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
+  responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
 }
 
 export type FormCreateManyAccountInput = {
@@ -973,7 +954,6 @@ export type FormCreateManyAccountInput = {
   createdAt?: Date | string
   adminWhatsappCampaignName?: string | null
   userWhatsappCampaignName?: string | null
-  nextActionId?: string | null
 }
 
 export type FormUpdateWithoutAccountInput = {
@@ -987,8 +967,8 @@ export type FormUpdateWithoutAccountInput = {
   userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
+  nextActions?: Prisma.NextActionTypeUpdateManyWithoutFormNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutFormsNestedInput
-  nextAction?: Prisma.NextActionUpdateOneWithoutFormNestedInput
 }
 
 export type FormUncheckedUpdateWithoutAccountInput = {
@@ -1001,9 +981,9 @@ export type FormUncheckedUpdateWithoutAccountInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  nextActionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
+  nextActions?: Prisma.NextActionTypeUncheckedUpdateManyWithoutFormNestedInput
 }
 
 export type FormUncheckedUpdateManyWithoutAccountInput = {
@@ -1016,7 +996,6 @@ export type FormUncheckedUpdateManyWithoutAccountInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  nextActionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type FormCreateManyUserInput = {
@@ -1029,7 +1008,6 @@ export type FormCreateManyUserInput = {
   adminWhatsappCampaignName?: string | null
   userWhatsappCampaignName?: string | null
   accountId?: string | null
-  nextActionId?: string | null
 }
 
 export type FormUpdateWithoutUserInput = {
@@ -1043,8 +1021,8 @@ export type FormUpdateWithoutUserInput = {
   userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
+  nextActions?: Prisma.NextActionTypeUpdateManyWithoutFormNestedInput
   account?: Prisma.AccountUpdateOneWithoutFormsNestedInput
-  nextAction?: Prisma.NextActionUpdateOneWithoutFormNestedInput
 }
 
 export type FormUncheckedUpdateWithoutUserInput = {
@@ -1057,71 +1035,14 @@ export type FormUncheckedUpdateWithoutUserInput = {
   adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  nextActionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
+  nextActions?: Prisma.NextActionTypeUncheckedUpdateManyWithoutFormNestedInput
 }
 
 export type FormUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   formsId?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  nextActionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-}
-
-export type FormCreateManyNextActionInput = {
-  id?: string
-  formsId: string
-  userId: string
-  title: string
-  description?: string | null
-  slug: string
-  createdAt?: Date | string
-  adminWhatsappCampaignName?: string | null
-  userWhatsappCampaignName?: string | null
-  accountId?: string | null
-}
-
-export type FormUpdateWithoutNextActionInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  formsId?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
-  responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutFormsNestedInput
-  account?: Prisma.AccountUpdateOneWithoutFormsNestedInput
-}
-
-export type FormUncheckedUpdateWithoutNextActionInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  formsId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  adminWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userWhatsappCampaignName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
-  responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
-}
-
-export type FormUncheckedUpdateManyWithoutNextActionInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  formsId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1139,11 +1060,13 @@ export type FormUncheckedUpdateManyWithoutNextActionInput = {
 export type FormCountOutputType = {
   fields: number
   responses: number
+  nextActions: number
 }
 
 export type FormCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fields?: boolean | FormCountOutputTypeCountFieldsArgs
   responses?: boolean | FormCountOutputTypeCountResponsesArgs
+  nextActions?: boolean | FormCountOutputTypeCountNextActionsArgs
 }
 
 /**
@@ -1170,6 +1093,13 @@ export type FormCountOutputTypeCountResponsesArgs<ExtArgs extends runtime.Types.
   where?: Prisma.ResponseWhereInput
 }
 
+/**
+ * FormCountOutputType without action
+ */
+export type FormCountOutputTypeCountNextActionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NextActionTypeWhereInput
+}
+
 
 export type FormSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1182,12 +1112,11 @@ export type FormSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   adminWhatsappCampaignName?: boolean
   userWhatsappCampaignName?: boolean
   accountId?: boolean
-  nextActionId?: boolean
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
   responses?: boolean | Prisma.Form$responsesArgs<ExtArgs>
+  nextActions?: boolean | Prisma.Form$nextActionsArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   account?: boolean | Prisma.Form$accountArgs<ExtArgs>
-  nextAction?: boolean | Prisma.Form$nextActionArgs<ExtArgs>
   _count?: boolean | Prisma.FormCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["form"]>
 
@@ -1202,10 +1131,8 @@ export type FormSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   adminWhatsappCampaignName?: boolean
   userWhatsappCampaignName?: boolean
   accountId?: boolean
-  nextActionId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   account?: boolean | Prisma.Form$accountArgs<ExtArgs>
-  nextAction?: boolean | Prisma.Form$nextActionArgs<ExtArgs>
 }, ExtArgs["result"]["form"]>
 
 export type FormSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1219,10 +1146,8 @@ export type FormSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   adminWhatsappCampaignName?: boolean
   userWhatsappCampaignName?: boolean
   accountId?: boolean
-  nextActionId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   account?: boolean | Prisma.Form$accountArgs<ExtArgs>
-  nextAction?: boolean | Prisma.Form$nextActionArgs<ExtArgs>
 }, ExtArgs["result"]["form"]>
 
 export type FormSelectScalar = {
@@ -1236,27 +1161,24 @@ export type FormSelectScalar = {
   adminWhatsappCampaignName?: boolean
   userWhatsappCampaignName?: boolean
   accountId?: boolean
-  nextActionId?: boolean
 }
 
-export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "formsId" | "userId" | "title" | "description" | "slug" | "createdAt" | "adminWhatsappCampaignName" | "userWhatsappCampaignName" | "accountId" | "nextActionId", ExtArgs["result"]["form"]>
+export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "formsId" | "userId" | "title" | "description" | "slug" | "createdAt" | "adminWhatsappCampaignName" | "userWhatsappCampaignName" | "accountId", ExtArgs["result"]["form"]>
 export type FormInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
   responses?: boolean | Prisma.Form$responsesArgs<ExtArgs>
+  nextActions?: boolean | Prisma.Form$nextActionsArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   account?: boolean | Prisma.Form$accountArgs<ExtArgs>
-  nextAction?: boolean | Prisma.Form$nextActionArgs<ExtArgs>
   _count?: boolean | Prisma.FormCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type FormIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   account?: boolean | Prisma.Form$accountArgs<ExtArgs>
-  nextAction?: boolean | Prisma.Form$nextActionArgs<ExtArgs>
 }
 export type FormIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   account?: boolean | Prisma.Form$accountArgs<ExtArgs>
-  nextAction?: boolean | Prisma.Form$nextActionArgs<ExtArgs>
 }
 
 export type $FormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1264,9 +1186,9 @@ export type $FormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     fields: Prisma.$FormFieldPayload<ExtArgs>[]
     responses: Prisma.$ResponsePayload<ExtArgs>[]
+    nextActions: Prisma.$NextActionTypePayload<ExtArgs>[]
     user: Prisma.$UserPayload<ExtArgs>
     account: Prisma.$AccountPayload<ExtArgs> | null
-    nextAction: Prisma.$NextActionPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1279,7 +1201,6 @@ export type $FormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     adminWhatsappCampaignName: string | null
     userWhatsappCampaignName: string | null
     accountId: string | null
-    nextActionId: string | null
   }, ExtArgs["result"]["form"]>
   composites: {}
 }
@@ -1676,9 +1597,9 @@ export interface Prisma__FormClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   fields<T extends Prisma.Form$fieldsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Form$fieldsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormFieldPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   responses<T extends Prisma.Form$responsesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Form$responsesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ResponsePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  nextActions<T extends Prisma.Form$nextActionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Form$nextActionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NextActionTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   account<T extends Prisma.Form$accountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Form$accountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  nextAction<T extends Prisma.Form$nextActionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Form$nextActionArgs<ExtArgs>>): Prisma.Prisma__NextActionClient<runtime.Types.Result.GetResult<Prisma.$NextActionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1718,7 +1639,6 @@ export interface FormFieldRefs {
   readonly adminWhatsappCampaignName: Prisma.FieldRef<"Form", 'String'>
   readonly userWhatsappCampaignName: Prisma.FieldRef<"Form", 'String'>
   readonly accountId: Prisma.FieldRef<"Form", 'String'>
-  readonly nextActionId: Prisma.FieldRef<"Form", 'String'>
 }
     
 
@@ -2163,6 +2083,30 @@ export type Form$responsesArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
+ * Form.nextActions
+ */
+export type Form$nextActionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the NextActionType
+   */
+  select?: Prisma.NextActionTypeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the NextActionType
+   */
+  omit?: Prisma.NextActionTypeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NextActionTypeInclude<ExtArgs> | null
+  where?: Prisma.NextActionTypeWhereInput
+  orderBy?: Prisma.NextActionTypeOrderByWithRelationInput | Prisma.NextActionTypeOrderByWithRelationInput[]
+  cursor?: Prisma.NextActionTypeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NextActionTypeScalarFieldEnum | Prisma.NextActionTypeScalarFieldEnum[]
+}
+
+/**
  * Form.account
  */
 export type Form$accountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2179,25 +2123,6 @@ export type Form$accountArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    */
   include?: Prisma.AccountInclude<ExtArgs> | null
   where?: Prisma.AccountWhereInput
-}
-
-/**
- * Form.nextAction
- */
-export type Form$nextActionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the NextAction
-   */
-  select?: Prisma.NextActionSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the NextAction
-   */
-  omit?: Prisma.NextActionOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.NextActionInclude<ExtArgs> | null
-  where?: Prisma.NextActionWhereInput
 }
 
 /**

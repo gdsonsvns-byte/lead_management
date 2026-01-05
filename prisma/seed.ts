@@ -58,27 +58,43 @@ const DEFAULT_NEXT_ACTIONS = [
 
 
 async function main() {
-  for (const action of DEFAULT_NEXT_ACTIONS) {
-    // const exists = await prisma.nextActionType.findFirst({
-    //   where: {
-    //     label: action.label,
-    //     isDefault: true,
-    //   },
-    // });
+  // const defaultNextActionType = await getDefaultNextActionType();
 
-    // if (!exists) {
-    await prisma.nextActionType.create({
-      data: {
-        label: action.label,
-        status: action.status as FollowUpStatus,
+  const forms = await prisma.form.findMany({
+    select: { id: true },
+  });
+
+  for (const form of forms) {
+    await prisma.nextActionType.createMany({
+      data: DEFAULT_NEXT_ACTIONS.map((a) => ({
+        label: a.label,
+        status: a.status as FollowUpStatus,
+        formId: form.id,
         isDefault: true,
-      },
+      })),
+      skipDuplicates: true,
     });
-    // }
   }
 
-  console.log("✅ Default NextActionTypes seeded");
+  console.log("✅ Default NextActionTypes attached to all forms");
 }
+
+
+
+// async function getDefaultNextActionType() {
+//   const actionType = await prisma.nextActionType.findMany({
+//     where: {
+//       isDefault: true,
+//       formId: null,
+//     }
+//   });
+
+//   if (!actionType) {
+//     throw new Error("No default NextActionType found");
+//   }
+
+//   return actionType;
+// }
 
 main()
   .then(() => prisma.$disconnect())

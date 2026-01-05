@@ -60,7 +60,6 @@ export const ModelName = {
   ResponseAnswer: 'ResponseAnswer',
   FollowUp: 'FollowUp',
   ApiAccessToken: 'ApiAccessToken',
-  NextAction: 'NextAction',
   NextActionType: 'NextActionType'
 } as const
 
@@ -132,8 +131,7 @@ export const FormScalarFieldEnum = {
   createdAt: 'createdAt',
   adminWhatsappCampaignName: 'adminWhatsappCampaignName',
   userWhatsappCampaignName: 'userWhatsappCampaignName',
-  accountId: 'accountId',
-  nextActionId: 'nextActionId'
+  accountId: 'accountId'
 } as const
 
 export type FormScalarFieldEnum = (typeof FormScalarFieldEnum)[keyof typeof FormScalarFieldEnum]
@@ -201,19 +199,11 @@ export const ApiAccessTokenScalarFieldEnum = {
 export type ApiAccessTokenScalarFieldEnum = (typeof ApiAccessTokenScalarFieldEnum)[keyof typeof ApiAccessTokenScalarFieldEnum]
 
 
-export const NextActionScalarFieldEnum = {
-  id: 'id',
-  nextActionTypeId: 'nextActionTypeId',
-  createdAt: 'createdAt'
-} as const
-
-export type NextActionScalarFieldEnum = (typeof NextActionScalarFieldEnum)[keyof typeof NextActionScalarFieldEnum]
-
-
 export const NextActionTypeScalarFieldEnum = {
   id: 'id',
   label: 'label',
   status: 'status',
+  formId: 'formId',
   isDefault: 'isDefault',
   createdAt: 'createdAt'
 } as const

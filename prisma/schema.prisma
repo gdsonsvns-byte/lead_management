@@ -86,27 +86,25 @@ model ManagedUser {
 }
 
 model Form {
-  id                        String      @id @default(uuid())
+  id                        String           @id @default(uuid())
   formsId                   String
   userId                    String
   title                     String
   description               String?
-  slug                      String      @unique
+  slug                      String           @unique
   fields                    FormField[]
   responses                 Response[]
-  createdAt                 DateTime    @default(now())
+  nextActions               NextActionType[]
+  createdAt                 DateTime         @default(now())
   adminWhatsappCampaignName String?
   userWhatsappCampaignName  String?
 
-  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  account      Account?    @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  accountId    String?
-  nextActionId String?
-  nextAction   NextAction? @relation(fields: [nextActionId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account   Account? @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId String?
 
   @@index([userId])
   @@index([accountId])
-  @@index([nextActionId])
   @@index([createdAt])
 }
 
@@ -190,29 +188,19 @@ model ApiAccessToken {
   @@index([expiresAt])
 }
 
-model NextAction {
-  id               String          @id @default(uuid())
-  nextActionTypeId String?
-  nextActionType   NextActionType? @relation(fields: [nextActionTypeId], references: [id], onDelete: Restrict)
-  createdAt        DateTime        @default(now())
-  form             Form[]
-
-  @@index([id])
-  @@index([nextActionTypeId])
-  @@index([createdAt])
-}
-
 model NextActionType {
-  id          String         @id @default(uuid())
-  label       String
-  status      FollowUpStatus @default(PENDING)
-  isDefault   Boolean        @default(false)
-  createdAt   DateTime       @default(now())
-  nextActions NextAction[]
+  id     String         @id @default(uuid())
+  label  String
+  status FollowUpStatus @default(PENDING)
 
-  @@index([id])
-  @@index([label])
-  @@index([status])
+  formId String?
+  form   Form?   @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@unique([label, formId])
+  @@index([formId])
   @@index([isDefault])
   @@index([createdAt])
 }

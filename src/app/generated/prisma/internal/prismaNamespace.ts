@@ -393,7 +393,6 @@ export const ModelName = {
   ResponseAnswer: 'ResponseAnswer',
   FollowUp: 'FollowUp',
   ApiAccessToken: 'ApiAccessToken',
-  NextAction: 'NextAction',
   NextActionType: 'NextActionType'
 } as const
 
@@ -410,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "user" | "managedUser" | "form" | "formField" | "response" | "responseAnswer" | "followUp" | "apiAccessToken" | "nextAction" | "nextActionType"
+    modelProps: "account" | "user" | "managedUser" | "form" | "formField" | "response" | "responseAnswer" | "followUp" | "apiAccessToken" | "nextActionType"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1080,80 +1079,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    NextAction: {
-      payload: Prisma.$NextActionPayload<ExtArgs>
-      fields: Prisma.NextActionFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.NextActionFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.NextActionFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionPayload>
-        }
-        findFirst: {
-          args: Prisma.NextActionFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.NextActionFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionPayload>
-        }
-        findMany: {
-          args: Prisma.NextActionFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionPayload>[]
-        }
-        create: {
-          args: Prisma.NextActionCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionPayload>
-        }
-        createMany: {
-          args: Prisma.NextActionCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.NextActionCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionPayload>[]
-        }
-        delete: {
-          args: Prisma.NextActionDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionPayload>
-        }
-        update: {
-          args: Prisma.NextActionUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionPayload>
-        }
-        deleteMany: {
-          args: Prisma.NextActionDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.NextActionUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.NextActionUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionPayload>[]
-        }
-        upsert: {
-          args: Prisma.NextActionUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionPayload>
-        }
-        aggregate: {
-          args: Prisma.NextActionAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateNextAction>
-        }
-        groupBy: {
-          args: Prisma.NextActionGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.NextActionGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.NextActionCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.NextActionCountAggregateOutputType> | number
-        }
-      }
-    }
     NextActionType: {
       payload: Prisma.$NextActionTypePayload<ExtArgs>
       fields: Prisma.NextActionTypeFieldRefs
@@ -1319,8 +1244,7 @@ export const FormScalarFieldEnum = {
   createdAt: 'createdAt',
   adminWhatsappCampaignName: 'adminWhatsappCampaignName',
   userWhatsappCampaignName: 'userWhatsappCampaignName',
-  accountId: 'accountId',
-  nextActionId: 'nextActionId'
+  accountId: 'accountId'
 } as const
 
 export type FormScalarFieldEnum = (typeof FormScalarFieldEnum)[keyof typeof FormScalarFieldEnum]
@@ -1388,19 +1312,11 @@ export const ApiAccessTokenScalarFieldEnum = {
 export type ApiAccessTokenScalarFieldEnum = (typeof ApiAccessTokenScalarFieldEnum)[keyof typeof ApiAccessTokenScalarFieldEnum]
 
 
-export const NextActionScalarFieldEnum = {
-  id: 'id',
-  nextActionTypeId: 'nextActionTypeId',
-  createdAt: 'createdAt'
-} as const
-
-export type NextActionScalarFieldEnum = (typeof NextActionScalarFieldEnum)[keyof typeof NextActionScalarFieldEnum]
-
-
 export const NextActionTypeScalarFieldEnum = {
   id: 'id',
   label: 'label',
   status: 'status',
+  formId: 'formId',
   isDefault: 'isDefault',
   createdAt: 'createdAt'
 } as const
@@ -1661,7 +1577,6 @@ export type GlobalOmitConfig = {
   responseAnswer?: Prisma.ResponseAnswerOmit
   followUp?: Prisma.FollowUpOmit
   apiAccessToken?: Prisma.ApiAccessTokenOmit
-  nextAction?: Prisma.NextActionOmit
   nextActionType?: Prisma.NextActionTypeOmit
 }
 
