@@ -98,13 +98,15 @@ model Form {
   adminWhatsappCampaignName String?
   userWhatsappCampaignName  String?
 
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  account     Account?     @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  accountId   String?
-  nextActions NextAction[]
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account      Account?    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId    String?
+  nextActionId String?
+  nextAction   NextAction? @relation(fields: [nextActionId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([accountId])
+  @@index([nextActionId])
   @@index([createdAt])
 }
 
@@ -189,16 +191,28 @@ model ApiAccessToken {
 }
 
 model NextAction {
-  id        String         @id @default(uuid())
-  label     String
-  status    FollowUpStatus @default(PENDING)
-  formId    String
-  form      Form           @relation(fields: [formId], references: [id], onDelete: Cascade)
-  createdAt DateTime       @default(now())
+  id               String          @id @default(uuid())
+  nextActionTypeId String?
+  nextActionType   NextActionType? @relation(fields: [nextActionTypeId], references: [id], onDelete: Restrict)
+  createdAt        DateTime        @default(now())
+  form             Form[]
+
+  @@index([id])
+  @@index([nextActionTypeId])
+  @@index([createdAt])
+}
+
+model NextActionType {
+  id          String         @id @default(uuid())
+  label       String
+  status      FollowUpStatus @default(PENDING)
+  isDefault   Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  nextActions NextAction[]
 
   @@index([id])
   @@index([label])
-  @@index([formId])
   @@index([status])
+  @@index([isDefault])
   @@index([createdAt])
 }

@@ -393,7 +393,8 @@ export const ModelName = {
   ResponseAnswer: 'ResponseAnswer',
   FollowUp: 'FollowUp',
   ApiAccessToken: 'ApiAccessToken',
-  NextAction: 'NextAction'
+  NextAction: 'NextAction',
+  NextActionType: 'NextActionType'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -409,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "user" | "managedUser" | "form" | "formField" | "response" | "responseAnswer" | "followUp" | "apiAccessToken" | "nextAction"
+    modelProps: "account" | "user" | "managedUser" | "form" | "formField" | "response" | "responseAnswer" | "followUp" | "apiAccessToken" | "nextAction" | "nextActionType"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1153,6 +1154,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    NextActionType: {
+      payload: Prisma.$NextActionTypePayload<ExtArgs>
+      fields: Prisma.NextActionTypeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NextActionTypeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NextActionTypeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>
+        }
+        findFirst: {
+          args: Prisma.NextActionTypeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NextActionTypeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>
+        }
+        findMany: {
+          args: Prisma.NextActionTypeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>[]
+        }
+        create: {
+          args: Prisma.NextActionTypeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>
+        }
+        createMany: {
+          args: Prisma.NextActionTypeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.NextActionTypeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>[]
+        }
+        delete: {
+          args: Prisma.NextActionTypeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>
+        }
+        update: {
+          args: Prisma.NextActionTypeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>
+        }
+        deleteMany: {
+          args: Prisma.NextActionTypeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NextActionTypeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.NextActionTypeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>[]
+        }
+        upsert: {
+          args: Prisma.NextActionTypeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>
+        }
+        aggregate: {
+          args: Prisma.NextActionTypeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNextActionType>
+        }
+        groupBy: {
+          args: Prisma.NextActionTypeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NextActionTypeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NextActionTypeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NextActionTypeCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1244,7 +1319,8 @@ export const FormScalarFieldEnum = {
   createdAt: 'createdAt',
   adminWhatsappCampaignName: 'adminWhatsappCampaignName',
   userWhatsappCampaignName: 'userWhatsappCampaignName',
-  accountId: 'accountId'
+  accountId: 'accountId',
+  nextActionId: 'nextActionId'
 } as const
 
 export type FormScalarFieldEnum = (typeof FormScalarFieldEnum)[keyof typeof FormScalarFieldEnum]
@@ -1314,13 +1390,22 @@ export type ApiAccessTokenScalarFieldEnum = (typeof ApiAccessTokenScalarFieldEnu
 
 export const NextActionScalarFieldEnum = {
   id: 'id',
-  label: 'label',
-  status: 'status',
-  formId: 'formId',
+  nextActionTypeId: 'nextActionTypeId',
   createdAt: 'createdAt'
 } as const
 
 export type NextActionScalarFieldEnum = (typeof NextActionScalarFieldEnum)[keyof typeof NextActionScalarFieldEnum]
+
+
+export const NextActionTypeScalarFieldEnum = {
+  id: 'id',
+  label: 'label',
+  status: 'status',
+  isDefault: 'isDefault',
+  createdAt: 'createdAt'
+} as const
+
+export type NextActionTypeScalarFieldEnum = (typeof NextActionTypeScalarFieldEnum)[keyof typeof NextActionTypeScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1577,6 +1662,7 @@ export type GlobalOmitConfig = {
   followUp?: Prisma.FollowUpOmit
   apiAccessToken?: Prisma.ApiAccessTokenOmit
   nextAction?: Prisma.NextActionOmit
+  nextActionType?: Prisma.NextActionTypeOmit
 }
 
 /* Types for Logging */

@@ -67,3 +67,8 @@ export type ApiAccessToken = Prisma.ApiAccessTokenModel
  * 
  */
 export type NextAction = Prisma.NextActionModel
+/**
+ * Model NextActionType
+ * 
+ */
+export type NextActionType = Prisma.NextActionTypeModel

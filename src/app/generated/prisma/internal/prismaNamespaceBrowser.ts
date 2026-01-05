@@ -60,7 +60,8 @@ export const ModelName = {
   ResponseAnswer: 'ResponseAnswer',
   FollowUp: 'FollowUp',
   ApiAccessToken: 'ApiAccessToken',
-  NextAction: 'NextAction'
+  NextAction: 'NextAction',
+  NextActionType: 'NextActionType'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -131,7 +132,8 @@ export const FormScalarFieldEnum = {
   createdAt: 'createdAt',
   adminWhatsappCampaignName: 'adminWhatsappCampaignName',
   userWhatsappCampaignName: 'userWhatsappCampaignName',
-  accountId: 'accountId'
+  accountId: 'accountId',
+  nextActionId: 'nextActionId'
 } as const
 
 export type FormScalarFieldEnum = (typeof FormScalarFieldEnum)[keyof typeof FormScalarFieldEnum]
@@ -201,13 +203,22 @@ export type ApiAccessTokenScalarFieldEnum = (typeof ApiAccessTokenScalarFieldEnu
 
 export const NextActionScalarFieldEnum = {
   id: 'id',
-  label: 'label',
-  status: 'status',
-  formId: 'formId',
+  nextActionTypeId: 'nextActionTypeId',
   createdAt: 'createdAt'
 } as const
 
 export type NextActionScalarFieldEnum = (typeof NextActionScalarFieldEnum)[keyof typeof NextActionScalarFieldEnum]
+
+
+export const NextActionTypeScalarFieldEnum = {
+  id: 'id',
+  label: 'label',
+  status: 'status',
+  isDefault: 'isDefault',
+  createdAt: 'createdAt'
+} as const
+
+export type NextActionTypeScalarFieldEnum = (typeof NextActionTypeScalarFieldEnum)[keyof typeof NextActionTypeScalarFieldEnum]
 
 
 export const SortOrder = {
