@@ -190,6 +190,17 @@ export async function GET(req: NextRequest) {
                     select: {
                         id: true,
                         submittedAt: true,
+                        form: {
+                            select: {
+                                nextActions: {
+                                    select: {
+                                        id: true,
+                                        label: true,
+                                        status: true
+                                    }
+                                }
+                            }
+                        },
                         answers: {
                             select: {
                                 value: true,

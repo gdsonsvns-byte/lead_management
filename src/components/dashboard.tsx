@@ -1,5 +1,5 @@
 'use client';
-import { JSX, useEffect, useState } from 'react'
+import { JSX, useEffect, useMemo, useState } from 'react'
 import {
     Select,
     SelectContent,
@@ -168,19 +168,6 @@ function extractLeadInfo(response: LeadResponse) {
 
     return info;
 }
-const CLOSED_BUSINESS_STATUSES = ["Client Converted", "Client not Interested"];
-
-const BUSINESS_STATUSES = [
-    "Client Converted",
-    "Client will Call",
-    "Client will Visit",
-    "Client will Message",
-    "Call Client",
-    "Message Client",
-    "Visit Client",
-    "Put on Backburner",
-    "Client not Interested",
-];
 
 const FOLLOWUP_TYPES = [
     { value: "NOTE", label: "Note" },
@@ -257,6 +244,7 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
             note?: string | null;
             nextFollowUpDate?: string | null;
             businessStatus: string;
+            status: string;
         }) => {
             const res = await axios.post("/api/v1/followup", payload, {
                 withCredentials: true,
@@ -295,16 +283,25 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
             note: followNote || null,
             nextFollowUpDate: followNextDate || null,
             businessStatus: followBusinessStatus,
+            status: openResponse.response.form.nextActions.find((action) => action.label === followBusinessStatus)?.status!,
         });
     };
+
     useEffect(() => {
         if (!openResponse) return;
-        const lastFU = openResponse.followUpHistory?.at(-1) ?? null;
+        const lastFU = openResponse.lastFollowUp ?? null;
         setFollowType(lastFU?.type ?? "NOTE");
-        setFollowNote("");
-        setFollowNextDate(lastFU?.nextFollowUpDate ?? "");
+        setFollowNote(lastFU?.note ?? "");
+        setFollowNextDate(new Date(lastFU?.createdAt ?? "").toISOString().split("T")[0] ?? "");
         setFollowBusinessStatus(lastFU?.businessStatus ?? "");
     }, [openResponse]);
+    const selectedAction = useMemo(
+        () =>
+            openResponse?.response.form.nextActions?.find(
+                (a) => a.label === followBusinessStatus
+            ),
+        [openResponse?.response.form.nextActions, followBusinessStatus]
+    );
     const status = last.status;
 
     return (
@@ -530,25 +527,37 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
                             label="Next Action"
                             select
                             value={followBusinessStatus}
+                            InputLabelProps={{ shrink: true }}
                             onChange={(e) => {
-                                setFollowBusinessStatus(e.target.value);
-                                if (CLOSED_BUSINESS_STATUSES.includes(e.target.value)) {
+                                const selectedLabel = e.target.value;
+                                setFollowBusinessStatus(selectedLabel);
+
+                                const selectedAction = openResponse?.response.form.nextActions.find(
+                                    (a) => a.label === selectedLabel
+                                );
+
+                                if (
+                                    selectedAction?.status === "COMPLETED" ||
+                                    selectedAction?.status === "CANCELLED"
+                                ) {
                                     setFollowNextDate("");
                                 }
                             }}
                             SelectProps={{ native: true }}
                             fullWidth
                         >
-                            <option value="">Select status</option>
-                            {BUSINESS_STATUSES.map((s) => (
-                                <option key={s} value={s}>
-                                    {s}
+                            <option value="">Select Next Action</option>
+                            {openResponse?.response.form.nextActions.map((s) => (
+                                <option key={s.id} value={s.label}>
+                                    {s.label}
                                 </option>
                             ))}
                         </TextField>
 
                         {followBusinessStatus &&
-                            !CLOSED_BUSINESS_STATUSES.includes(followBusinessStatus) && (
+                            selectedAction &&
+                            selectedAction.status !== "COMPLETED" &&
+                            selectedAction.status !== "CANCELLED" && (
                                 <TextField
                                     label="Next Follow-Up Date"
                                     type="date"
@@ -600,6 +609,13 @@ interface FollowUp {
 interface LeadResponse {
     id: string;
     submittedAt: string;
+    form: {
+        nextActions: {
+            id: string;
+            label: string;
+            status: string;
+        }[];
+    }
     answers: {
         value: string;
         field: {
