@@ -392,7 +392,8 @@ export const ModelName = {
   Response: 'Response',
   ResponseAnswer: 'ResponseAnswer',
   FollowUp: 'FollowUp',
-  ApiAccessToken: 'ApiAccessToken'
+  ApiAccessToken: 'ApiAccessToken',
+  NextActionType: 'NextActionType'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -408,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "user" | "managedUser" | "form" | "formField" | "response" | "responseAnswer" | "followUp" | "apiAccessToken"
+    modelProps: "account" | "user" | "managedUser" | "form" | "formField" | "response" | "responseAnswer" | "followUp" | "apiAccessToken" | "nextActionType"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1078,6 +1079,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    NextActionType: {
+      payload: Prisma.$NextActionTypePayload<ExtArgs>
+      fields: Prisma.NextActionTypeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NextActionTypeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NextActionTypeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>
+        }
+        findFirst: {
+          args: Prisma.NextActionTypeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NextActionTypeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>
+        }
+        findMany: {
+          args: Prisma.NextActionTypeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>[]
+        }
+        create: {
+          args: Prisma.NextActionTypeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>
+        }
+        createMany: {
+          args: Prisma.NextActionTypeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.NextActionTypeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>[]
+        }
+        delete: {
+          args: Prisma.NextActionTypeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>
+        }
+        update: {
+          args: Prisma.NextActionTypeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>
+        }
+        deleteMany: {
+          args: Prisma.NextActionTypeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NextActionTypeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.NextActionTypeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>[]
+        }
+        upsert: {
+          args: Prisma.NextActionTypeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NextActionTypePayload>
+        }
+        aggregate: {
+          args: Prisma.NextActionTypeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNextActionType>
+        }
+        groupBy: {
+          args: Prisma.NextActionTypeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NextActionTypeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NextActionTypeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NextActionTypeCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1235,6 +1310,18 @@ export const ApiAccessTokenScalarFieldEnum = {
 } as const
 
 export type ApiAccessTokenScalarFieldEnum = (typeof ApiAccessTokenScalarFieldEnum)[keyof typeof ApiAccessTokenScalarFieldEnum]
+
+
+export const NextActionTypeScalarFieldEnum = {
+  id: 'id',
+  label: 'label',
+  status: 'status',
+  formId: 'formId',
+  isDefault: 'isDefault',
+  createdAt: 'createdAt'
+} as const
+
+export type NextActionTypeScalarFieldEnum = (typeof NextActionTypeScalarFieldEnum)[keyof typeof NextActionTypeScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1490,6 +1577,7 @@ export type GlobalOmitConfig = {
   responseAnswer?: Prisma.ResponseAnswerOmit
   followUp?: Prisma.FollowUpOmit
   apiAccessToken?: Prisma.ApiAccessTokenOmit
+  nextActionType?: Prisma.NextActionTypeOmit
 }
 
 /* Types for Logging */

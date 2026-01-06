@@ -2,7 +2,7 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import { CopyIcon, EyeIcon, Pencil, SettingsIcon, Trash2Icon, ViewIcon } from "lucide-react";
+import { CopyIcon, EyeIcon, InboxIcon, Pencil, SettingsIcon, Trash2Icon, ViewIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -107,6 +107,17 @@ export default function FormDropDown({ formData }: Props) {
                             }
 
                         </button>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
+                        <Link
+                            href={`?form_id=${formData.id}`}
+                            className="flex items-center justify-between w-full"
+                        >
+                            Manage Response
+                            <InboxIcon size={14} className="text-zinc-700" />
+
+                        </Link>
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator className="bg-gray-300" />

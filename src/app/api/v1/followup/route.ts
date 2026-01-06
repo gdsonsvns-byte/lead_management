@@ -12,6 +12,7 @@ interface FollowUpPayload {
     note?: string | null;
     nextFollowUpDate?: string | null;
     businessStatus: string;
+    status: string;
 }
 // Create a follow up
 export async function POST(req: NextRequest) {
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const user = await verifyRole(["SUPERADMIN", "ADMIN","MANAGER"]);
+        const user = await verifyRole(["SUPERADMIN", "ADMIN", "MANAGER"]);
         const apiClient = await verifyApiAccessToken(req);
 
         if (!user && !apiClient) {
@@ -51,22 +52,10 @@ export async function POST(req: NextRequest) {
         if (!body.businessStatus) {
             return NextResponse.json({ error: "businessStatus is required" }, { status: 400 });
         }
-
-        const validBusinessStatuses = [
-            "Client Converted",
-            "Client will Call",
-            "Client will Visit",
-            "Client will Message",
-            "Call Client",
-            "Message Client",
-            "Visit Client",
-            "Put on Backburner",
-            "Client not Interested",
-        ];
-
-        if (!validBusinessStatuses.includes(body.businessStatus)) {
-            return NextResponse.json({ error: "Invalid business status" }, { status: 400 });
+        if (!body.status) {
+            return NextResponse.json({ error: "status is required" }, { status: 400 });
         }
+
 
         const parentResponse = await prisma.response.findUnique({
             where: { id: body.responseId },
@@ -82,8 +71,8 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Lead response not found" }, { status: 404 });
         }
         const lastFollowUp = parentResponse.followUps[0];
-        const closedStatuses = ["Client Converted", "Client not Interested"];
-        if (lastFollowUp && closedStatuses.includes(lastFollowUp.businessStatus)) {
+
+        if (lastFollowUp && (lastFollowUp.status === FollowUpStatus.COMPLETED || lastFollowUp.status === FollowUpStatus.CANCELLED)) {
             return NextResponse.json(
                 {
                     error:
@@ -93,45 +82,47 @@ export async function POST(req: NextRequest) {
                 { status: 400 }
             );
         }
-        let internalStatus: FollowUpStatus = FollowUpStatus.PENDING;
 
-        switch (body.businessStatus) {
-            case "Client Converted":
-                internalStatus = FollowUpStatus.COMPLETED;
-                break;
-            case "Client not Interested":
-                internalStatus = FollowUpStatus.CANCELLED;
-                break;
-            case "Put on Backburner":
-                internalStatus = FollowUpStatus.SKIPPED;
-                break;
-            default:
-                internalStatus = FollowUpStatus.PENDING;
+        const nextAction = await prisma.nextActionType.findFirst({
+            where: {
+                label: body.businessStatus,
+                formId: parentResponse.formId
+            },
+            orderBy: {
+                isDefault: "desc",
+            },
+        });
+
+        if (!nextAction) {
+            return NextResponse.json(
+                { error: "Invalid next action label" },
+                { status: 400 }
+            );
         }
 
-        const nextDate = body.nextFollowUpDate
-            ? new Date(body.nextFollowUpDate)
-            : null;
+        const internalStatus: FollowUpStatus = nextAction.status;
 
-        const followup = await prisma.followUp.create({
+        const nextDate = internalStatus === FollowUpStatus.COMPLETED ||
+            internalStatus === FollowUpStatus.CANCELLED
+            ? null
+            : body.nextFollowUpDate
+                ? new Date(body.nextFollowUpDate)
+                : null;
+
+        await prisma.followUp.create({
             data: {
                 responseId: body.responseId,
                 addedByUserId: userId,
                 type: body.type as FollowUpType,
                 note: body.note ?? null,
                 nextFollowUpDate: nextDate,
-                businessStatus: body.businessStatus,
+                businessStatus: nextAction.label,
                 status: internalStatus,
-            },
-            include: {
-                addedBy: {
-                    select: { id: true, name: true, email: true },
-                },
-            },
+            }
         });
 
         return NextResponse.json(
-            { success: true, followup },
+            { success: true, },
             { status: 201 }
         );
     } catch (err: any) {
@@ -154,7 +145,7 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        const user = await verifyRole(["SUPERADMIN", "ADMIN","MANAGER"]);
+        const user = await verifyRole(["SUPERADMIN", "ADMIN", "MANAGER"]);
         const apiClient = await verifyApiAccessToken(req);
 
         if (!user && !apiClient) {
@@ -199,6 +190,17 @@ export async function GET(req: NextRequest) {
                     select: {
                         id: true,
                         submittedAt: true,
+                        form: {
+                            select: {
+                                nextActions: {
+                                    select: {
+                                        id: true,
+                                        label: true,
+                                        status: true
+                                    }
+                                }
+                            }
+                        },
                         answers: {
                             select: {
                                 value: true,

@@ -84,3 +84,8 @@ export type FollowUp = Prisma.FollowUpModel
  * 
  */
 export type ApiAccessToken = Prisma.ApiAccessTokenModel
+/**
+ * Model NextActionType
+ * 
+ */
+export type NextActionType = Prisma.NextActionTypeModel

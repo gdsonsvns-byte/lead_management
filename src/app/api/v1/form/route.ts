@@ -5,6 +5,8 @@ import { isRateLimited } from "@/src/lib/limiter"
 import { verifyRole } from "@/src/lib/verifyRole"
 import prisma from "@/src/lib/prisma"
 import { verifyApiAccessToken } from "@/src/lib/verifyApiAccessToken"
+import { DEFAULT_NEXT_ACTIONS } from "@/src/constants/actions"
+import { FollowUpStatus } from "@/src/app/generated/prisma/enums"
 
 // get all form associted with Account
 export async function GET(req: NextRequest) {
@@ -17,7 +19,7 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        const user = await verifyRole(["ADMIN", "SUPERADMIN","MANAGER"])
+        const user = await verifyRole(["ADMIN", "SUPERADMIN", "MANAGER"])
         const apiClient = await verifyApiAccessToken(req);
 
         if (!user && !apiClient) {
@@ -231,27 +233,41 @@ export async function POST(req: NextRequest) {
         const prefix = (adminName || "FORM").slice(0, 4).toUpperCase();
         const formsId = `${prefix}-${String(count + 1).padStart(4, "0")}-${new Date().toDateString().split(" ").join("-")}`;
 
-        const form = await prisma.form.create({
-            data: {
-                title: cleanTitle,
-                description: cleanDescription,
-                slug,
-                formsId,
-                userId: adminId,
-                accountId,
-                adminWhatsappCampaignName: adminCampaign ?? null,
-                userWhatsappCampaignName: userCampaign ?? null,
-                fields: {
-                    create: fields?.map((f, idx) => ({
-                        label: f.label.trim(),
-                        type: f.type,
-                        required: f.required ?? false,
-                        options: f.options ? JSON.stringify(f.options) : undefined,
-                        order: f.order ?? idx + 1,
-                    })),
+        const form = await prisma.$transaction(async (tx) => {
+            const createdForm = await tx.form.create({
+                data: {
+                    title: cleanTitle,
+                    description: cleanDescription,
+                    slug,
+                    formsId,
+                    userId: adminId,
+                    accountId,
+                    adminWhatsappCampaignName: adminCampaign ?? null,
+                    userWhatsappCampaignName: userCampaign ?? null,
+                    fields: {
+                        create: fields?.map((f, idx) => ({
+                            label: f.label.trim(),
+                            type: f.type,
+                            required: f.required ?? false,
+                            options: f.options ? JSON.stringify(f.options) : undefined,
+                            order: f.order ?? idx + 1,
+                        })),
+                    },
                 },
-            },
-            include: { fields: true },
+            });
+
+            if (DEFAULT_NEXT_ACTIONS?.length) {
+                await tx.nextActionType.createMany({
+                    data: DEFAULT_NEXT_ACTIONS.map((a) => ({
+                        label: a.label,
+                        status: a.status as FollowUpStatus,
+                        formId: createdForm.id,
+                        isDefault: true,
+                    })),
+                    skipDuplicates: true,
+                });
+            }
+            return createdForm;
         });
 
         return NextResponse.json(

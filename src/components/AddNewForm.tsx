@@ -1,12 +1,14 @@
 "use client";
 import { X, ClipboardListIcon, PlusIcon } from "lucide-react";
-import { Dispatch, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import Input from "./ui/Input";
 import FieldItem from "./FieldItem";
 import Spinner from "./ui/spinner";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import toast, { Toaster } from 'react-hot-toast';
+import CustomFollowUpActions from "./common/custom_follow_up_actions";
+import { FollowUpStatus } from "../app/generated/prisma/enums";
 
 interface FormField {
   label: string;
@@ -37,13 +39,17 @@ export default function AddNewForm({ accountId }: { accountId?: string }) {
 interface CreateFormPayload {
   title: string;
   description: string;
-  adminCampaign?:string;
-  userCampaign?:string;
+  adminCampaign?: string;
+  userCampaign?: string;
   fields: FormField[];
 }
 interface Props {
   onClose: Dispatch<React.SetStateAction<boolean>>;
   accountId?: string
+}
+interface NextAction {
+  label: string;
+  status: FollowUpStatus
 }
 
 function OpenForm({ onClose, accountId }: Props) {
@@ -54,6 +60,9 @@ function OpenForm({ onClose, accountId }: Props) {
   const [fields, setFields] = useState<FormField[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [nextActions, setNextActions] = useState<NextAction[]>([]);
+  const [openNextActionModal, setOpenNextActionModal] = useState(false);
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
 
   const showMessage = (type: "success" | "error", text: string) => {
     setMessage({ type, text });
@@ -113,7 +122,7 @@ function OpenForm({ onClose, accountId }: Props) {
       showMessage("error", "Form name is required.");
       return;
     }
-    const payload = { title, description, adminCampaign,userCampaign, fields };
+    const payload = { title, description, adminCampaign, userCampaign, fields };
     mutate(payload);
   };
 
@@ -221,6 +230,75 @@ function OpenForm({ onClose, accountId }: Props) {
           </div>
         )}
       </div>
+      {/* {openConfirmModal &&
+        <NextActionConfirmation
+          onClose={setOpenConfirmModal}
+          openActionModal={setOpenNextActionModal}
+        />}
+      {openNextActionModal &&
+        <CustomFollowUpActions
+          onClose={setOpenNextActionModal}
+          nextAction={nextActions}
+          setNextAction={setNextActions}
+        />} */}
     </section>
   );
 }
+
+// interface NextActionConfirmationProps {
+//   onClose: Dispatch<SetStateAction<boolean>>;
+//   openActionModal: Dispatch<SetStateAction<boolean>>;
+// }
+
+// function NextActionConfirmation({ onClose, openActionModal }: NextActionConfirmationProps) {
+//   const [loader, setLoader] = useState(false)
+//   return (
+//     <section className="fixed inset-0 min-h-screen bg-black/20 z-50 p-8 overflow-y-auto flex items-center backdrop-blur-xs">
+//       <div className="relative w-full max-w-2xl mx-auto bg-white p-6 rounded-2xl z-50">
+//         <div className="flex items-center justify-between">
+//           <span className="font-normal text-zinc-800 text-lg">Next Action Confirmation</span>
+
+//           <button
+//             className="w-8 h-8 bg-zinc-800 text-white flex items-center justify-center rounded-full cursor-pointer"
+//             onClick={() => onClose(false)}
+//           >
+//             <X size={16} />
+//           </button>
+//         </div>
+
+//         <div className="mt-10 w-full flex items-center justify-center">
+//           <h2 className="text-gray-800 lg:text-4xl md:text-3xl sm:text-xl text-lg font-bold">
+//             Want to create custom follow up actions or keep default ones?
+//           </h2>
+//         </div>
+
+//         <div className="mt-10 w-full flex items-center gap-5">
+//           <button
+//             className="bg-blue-600 text-white px-4 py-2 rounded-full flex  items-center gap-2 cursor-pointer"
+//             onClick={() => {
+//               setLoader(true)
+//               new Promise((resolve) => {
+//                 setTimeout(() => {
+//                   resolve(true);
+//                 }, 1000);
+//               }).then(() => {
+//                 openActionModal(true);
+//                 onClose(false);
+//                 setLoader(false);
+//               })
+//             }}
+//           >
+//             Create Custom {loader ? <Spinner color="white" /> : <PlusIcon size={16} />}
+//           </button>
+//           <button
+//             className="bg-white text-blue-600 border border-blue-600 cursor-pointer px-4 py-2 rounded-full flex  items-center gap-2"
+//             onClick={() => onClose(false)}
+//           >
+//             Keep Default
+//           </button>
+//         </div>
+
+//       </div>
+//     </section>
+//   );
+// }

@@ -86,15 +86,16 @@ model ManagedUser {
 }
 
 model Form {
-  id                        String      @id @default(uuid())
+  id                        String           @id @default(uuid())
   formsId                   String
   userId                    String
   title                     String
   description               String?
-  slug                      String      @unique
+  slug                      String           @unique
   fields                    FormField[]
   responses                 Response[]
-  createdAt                 DateTime    @default(now())
+  nextActions               NextActionType[]
+  createdAt                 DateTime         @default(now())
   adminWhatsappCampaignName String?
   userWhatsappCampaignName  String?
 
@@ -185,4 +186,22 @@ model ApiAccessToken {
   @@index([accountId])
   @@index([createdById])
   @@index([expiresAt])
+}
+
+model NextActionType {
+  id     String         @id @default(uuid())
+  label  String
+  status FollowUpStatus @default(PENDING)
+
+  formId String?
+  form   Form?   @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@unique([label, formId])
+  @@index([formId])
+  @@index([label])
+  @@index([isDefault])
+  @@index([createdAt])
 }
