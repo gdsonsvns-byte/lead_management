@@ -1,8 +1,11 @@
+import { FollowUpStatus } from "@/src/app/generated/prisma/enums";
 import { isRateLimited } from "@/src/lib/limiter";
 import prisma from "@/src/lib/prisma";
 import { verifyApiAccessToken } from "@/src/lib/verifyApiAccessToken";
 import { verifyRole } from "@/src/lib/verifyRole";
+import { NextActionSchema } from "@/src/types/next_actions";
 import { NextRequest, NextResponse } from "next/server";
+import z from "zod";
 
 // get all next action with formid
 export async function GET(req: NextRequest) {
@@ -184,6 +187,91 @@ export async function DELETE(req: NextRequest) {
 
     } catch (error: any) {
         console.error("Delete FollowUps Actions Error:", error.message);
+        return NextResponse.json(
+            { error: "Internal Server Error" },
+            { status: 500 }
+        );
+    }
+}
+
+// creating new actions
+export async function POST(req: NextRequest) {
+    try {
+        const ip = req.headers.get("x-forwarded-for") || "unknown";
+        if (isRateLimited(ip)) {
+            return NextResponse.json(
+                { error: "Too many requests. Try again later." },
+                { status: 429 }
+            );
+        }
+
+        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        const apiClient = await verifyApiAccessToken(req);
+
+        if (!user && !apiClient) {
+            return NextResponse.json(
+                { error: "Unauthorized User" },
+                { status: 401 }
+            );
+        }
+
+        const body = await req.json();
+        const { success, data, error } = NextActionSchema.safeParse(body);
+
+        if (!success) {
+            return NextResponse.json(
+                { error: z.prettifyError(error) },
+                { status: 400 }
+            );
+        }
+
+        const form = await prisma.form.findUnique({
+            where: {
+                id: data.formId,
+            },
+            select: {
+                id: true,
+                accountId: true,
+            }
+        });
+        if (!form) {
+            return NextResponse.json(
+                { error: "Form not found" },
+                { status: 404 }
+            );
+        }
+
+        if (user?.role === "ADMIN" && user.accountId !== form.accountId) {
+            return NextResponse.json(
+                { error: "Unauthorized User" },
+                { status: 401 }
+            );
+        }
+
+        if (!user && apiClient && apiClient.accountId !== form.accountId) {
+            return NextResponse.json(
+                { error: "Unauthorized User" },
+                { status: 401 }
+            );
+        }
+
+        const nextAction = await prisma.nextActionType.create({
+            data: {
+                label: data.label,
+                formId: data.formId,
+                status: data.status,
+            },
+        });
+
+        return NextResponse.json(
+            {
+                success: true,
+                data: nextAction,
+            },
+            { status: 201 }
+        );
+    } catch (error: any) {
+        console.error("Creating FollowUps Actions Error:", error.message);
         return NextResponse.json(
             { error: "Internal Server Error" },
             { status: 500 }

@@ -9,7 +9,6 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 
-
 interface Actions {
     title: string;
     description: string;
@@ -162,11 +161,12 @@ export default function ManageResponse() {
                             {data.actions.map((action) => (
                                 <div
                                     key={action.id}
-                                    className={`flex items-center justify-between rounded-lg border px-4 py-3 transition
+                                    className={`flex items-center justify-between rounded-lg border px-4 py-3 transition cursor-pointer
                                          ${isSelected(action.id)
                                             ? "border-blue-400 bg-blue-50"
                                             : "border-zinc-200 hover:bg-zinc-50"
                                         }`}
+                                    onClick={() => toggleSelect(action.id)}
                                 >
                                     <div className="flex items-center gap-3">
                                         <input
@@ -191,12 +191,8 @@ export default function ManageResponse() {
                                 </div>
                             ))}
                         </div>
-
-
                     </div>
                 )}
-
-
             </div>
         </section>
     )
