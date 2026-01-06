@@ -10,6 +10,7 @@ import { Toaster } from 'react-hot-toast';
 import EditForm from "./common/EditForm";
 import FormDropDown from "./FormDropDown";
 import ConfigureWapCampaign from "./common/configure_whatsapp_campaign_for_user_and_admin";
+import ManageResponse from "./common/manage_response";
 
 interface FormItem {
     id: string;
@@ -247,6 +248,7 @@ export default function FormsList({ accountId }: { accountId?: string }) {
                     limit={limit}
                     accountId={accountId}
                 />
+                <ManageResponse />
             </Suspense>
         </div>
     );
