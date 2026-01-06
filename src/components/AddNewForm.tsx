@@ -7,7 +7,6 @@ import Spinner from "./ui/spinner";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import toast, { Toaster } from 'react-hot-toast';
-import CustomFollowUpActions from "./common/custom_follow_up_actions";
 import { FollowUpStatus } from "../app/generated/prisma/enums";
 
 interface FormField {
