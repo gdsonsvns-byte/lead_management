@@ -34,7 +34,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
         const form = await prisma.form.findFirst({
             where: { id: formId },
             include: {
-                nextActions: true,
                 fields: {
                     orderBy: {
                         order: "asc",

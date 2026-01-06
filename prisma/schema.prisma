@@ -201,6 +201,7 @@ model NextActionType {
 
   @@unique([label, formId])
   @@index([formId])
+  @@index([label])
   @@index([isDefault])
   @@index([createdAt])
 }

@@ -50,18 +50,6 @@ const TYPE_ICONS: Record<string, JSX.Element> = {
     MEETING: <EventIcon fontSize="small" color="secondary" />,
     NOTE: <NoteIcon fontSize="small" color="action" />,
 };
-const CLOSED_BUSINESS_STATUSES = ["Client Converted", "Client not Interested"];
-const BUSINESS_STATUSES = [
-    "Client Converted",
-    "Client will Call",
-    "Client will Visit",
-    "Client will Message",
-    "Call Client",
-    "Message Client",
-    "Visit Client",
-    "Put on Backburner",
-    "Client not Interested",
-];
 const FOLLOWUP_TYPES = [
     { value: "NOTE", label: "Note" },
     { value: "CALL", label: "Phone Call" },
@@ -88,9 +76,15 @@ export interface FollowUpItem {
         email: string;
     };
 }
+export interface NextActionType {
+    id: string;
+    label: string;
+    status: string;
+}
 export interface FormResponseItem {
     responseId: string;
     submittedAt: string;
+    nextActions: NextActionType[];
     answers: FormAnswers;
     followUps: FollowUpItem[];
     followUpCount: number;
@@ -155,10 +149,10 @@ export default function UsersData({ formId }: { formId: string }) {
 
     useEffect(() => {
         if (!openResponse) return;
-        const lastFU = openResponse.followUps?.at(-1) ?? null;
+        const lastFU = openResponse.lastFollowUp ?? null;
         setFollowType(lastFU?.type ?? "NOTE");
-        setFollowNote("");
-        setFollowNextDate(lastFU?.nextFollowUpDate ?? "");
+        setFollowNote(lastFU?.note ?? "");
+        setFollowNextDate(new Date(lastFU?.createdAt ?? "").toISOString().split("T")[0] ?? "");
         setFollowBusinessStatus(lastFU?.businessStatus ?? "");
     }, [openResponse]);
 
@@ -313,8 +307,7 @@ export default function UsersData({ formId }: { formId: string }) {
             return;
         }
 
-        const lastFU = openResponse.followUps.at(-1);
-        if (lastFU && CLOSED_BUSINESS_STATUSES.includes(lastFU.businessStatus)) {
+        if (openResponse && (openResponse.leadStatus === "COMPLETED" || openResponse.leadStatus === "CANCELLED")) {
             toast.error("No further follow-ups allowed for this lead");
             return;
         }
@@ -328,6 +321,13 @@ export default function UsersData({ formId }: { formId: string }) {
         });
     };
 
+    const selectedAction = useMemo(
+        () =>
+            openResponse?.nextActions?.find(
+                (a) => a.label === followBusinessStatus
+            ),
+        [openResponse?.nextActions, followBusinessStatus]
+    );
 
     return (
         <div className="w-full overflow-hidden">
@@ -529,8 +529,8 @@ export default function UsersData({ formId }: { formId: string }) {
                                         </Typography>
 
                                         {(() => {
-                                            const lastFU = openResponse.followUps.at(-1);
-                                            if (lastFU && CLOSED_BUSINESS_STATUSES.includes(lastFU.businessStatus)) {
+                                            const lastFU = openResponse.lastFollowUp;
+                                            if (lastFU && (openResponse.leadStatus === "COMPLETED" || openResponse.leadStatus === "CANCELLED")) {
                                                 return <Alert severity="info">This lead is marked as <b>{lastFU.businessStatus}</b>. No further follow-ups can be added.</Alert>;
                                             }
 
@@ -570,39 +570,51 @@ export default function UsersData({ formId }: { formId: string }) {
                                                         value={followBusinessStatus}
                                                         InputLabelProps={{ shrink: true }}
                                                         onChange={(e) => {
-                                                            setFollowBusinessStatus(e.target.value);
-                                                            if (CLOSED_BUSINESS_STATUSES.includes(e.target.value)) {
+                                                            const selectedLabel = e.target.value;
+                                                            setFollowBusinessStatus(selectedLabel);
+
+                                                            const selectedAction = openResponse.nextActions.find(
+                                                                (a) => a.label === selectedLabel
+                                                            );
+
+                                                            if (
+                                                                selectedAction?.status === "COMPLETED" ||
+                                                                selectedAction?.status === "CANCELLED"
+                                                            ) {
                                                                 setFollowNextDate("");
                                                             }
                                                         }}
                                                         SelectProps={{ native: true }}
                                                         fullWidth
                                                     >
-                                                        <option value="">Select status</option>
-                                                        {BUSINESS_STATUSES.map((s) => (
-                                                            <option key={s} value={s}>
-                                                                {s}
+                                                        <option value="">Select Next Action</option>
+                                                        {openResponse.nextActions.map((s) => (
+                                                            <option key={s.id} value={s.label}>
+                                                                {s.label}
                                                             </option>
                                                         ))}
                                                     </TextField>
 
-                                                    {followBusinessStatus && !CLOSED_BUSINESS_STATUSES.includes(followBusinessStatus) && (
-                                                        <TextField
-                                                            label="Next Follow-Up Date"
-                                                            type="date"
-                                                            value={followNextDate}
-                                                            onChange={(e) => setFollowNextDate(e.target.value)}
-                                                            InputLabelProps={{ shrink: true }}
-                                                            fullWidth
-                                                        />
-                                                    )}
+                                                    {followBusinessStatus &&
+                                                        selectedAction &&
+                                                        selectedAction.status !== "COMPLETED" &&
+                                                        selectedAction.status !== "CANCELLED" && (
+                                                            <TextField
+                                                                label="Next Follow-Up Date"
+                                                                type="date"
+                                                                value={followNextDate}
+                                                                onChange={(e) => setFollowNextDate(e.target.value)}
+                                                                InputLabelProps={{ shrink: true }}
+                                                                fullWidth
+                                                            />
+                                                        )}
 
                                                     <Button
                                                         variant="contained"
                                                         size="large"
                                                         onClick={handleAddFollowUp}
                                                         sx={{ mt: 1 }}
-                                                        disabled={addFollowUpMutation.isPending || !followBusinessStatus}
+                                                        disabled={addFollowUpMutation.isPending || !followBusinessStatus || openResponse.leadStatus === "COMPLETED" || openResponse.leadStatus === "CANCELLED"}
                                                     >
                                                         {addFollowUpMutation.isPending ? <Spinner color="white" /> : "Add Follow-Up"}
                                                     </Button>

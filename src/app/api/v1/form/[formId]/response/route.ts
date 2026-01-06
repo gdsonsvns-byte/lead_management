@@ -332,6 +332,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             },
             orderBy: { submittedAt: "desc" },
             include: {
+                form: {
+                    select: {
+                        nextActions: {
+                            select: {
+                                id: true,
+                                label: true,
+                                status: true
+                            }
+                        }
+                    }
+                },
                 answers: {
                     include: {
                         field: {
@@ -451,6 +462,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                 idx: skip + idx + 1,
                 responseId: res.id,
                 submittedAt: res.submittedAt,
+                nextActions: res.form.nextActions,
                 answers: answerMap,
                 followUps,
                 followUpCount: followUps.length,
