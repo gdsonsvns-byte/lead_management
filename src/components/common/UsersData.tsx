@@ -269,6 +269,7 @@ export default function UsersData({ formId }: { formId: string }) {
             note?: string | null;
             nextFollowUpDate?: string | null;
             businessStatus: string;
+            status: string;
         }) => {
             const res = await axios.post("/api/v1/followup", payload, { withCredentials: true });
             return res.data;
@@ -318,6 +319,7 @@ export default function UsersData({ formId }: { formId: string }) {
             note: followNote || null,
             nextFollowUpDate: followNextDate || null,
             businessStatus: followBusinessStatus,
+            status: openResponse && openResponse.nextActions?.find((a) => a.label === followBusinessStatus)?.status!,
         });
     };
 
