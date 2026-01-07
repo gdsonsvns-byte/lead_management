@@ -363,6 +363,17 @@ export async function PATCH(req: NextRequest) {
                 });
             }
 
+            for (const a of actions) {
+                if (a.id) {
+                    await tx.nextActionType.update({
+                        where: { id: a.id },
+                        data: {
+                            order: a.order,
+                        },
+                    });
+                }
+            }
+
             const newActions = actions.filter(
                 (a) => !a.id || a.id === ""
             );
