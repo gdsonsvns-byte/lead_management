@@ -20,14 +20,25 @@ export type NextActionTypeModel = runtime.Types.Result.DefaultSelection<Prisma.$
 
 export type AggregateNextActionType = {
   _count: NextActionTypeCountAggregateOutputType | null
+  _avg: NextActionTypeAvgAggregateOutputType | null
+  _sum: NextActionTypeSumAggregateOutputType | null
   _min: NextActionTypeMinAggregateOutputType | null
   _max: NextActionTypeMaxAggregateOutputType | null
+}
+
+export type NextActionTypeAvgAggregateOutputType = {
+  order: number | null
+}
+
+export type NextActionTypeSumAggregateOutputType = {
+  order: number | null
 }
 
 export type NextActionTypeMinAggregateOutputType = {
   id: string | null
   label: string | null
   status: $Enums.FollowUpStatus | null
+  order: number | null
   formId: string | null
   isDefault: boolean | null
   createdAt: Date | null
@@ -37,6 +48,7 @@ export type NextActionTypeMaxAggregateOutputType = {
   id: string | null
   label: string | null
   status: $Enums.FollowUpStatus | null
+  order: number | null
   formId: string | null
   isDefault: boolean | null
   createdAt: Date | null
@@ -46,6 +58,7 @@ export type NextActionTypeCountAggregateOutputType = {
   id: number
   label: number
   status: number
+  order: number
   formId: number
   isDefault: number
   createdAt: number
@@ -53,10 +66,19 @@ export type NextActionTypeCountAggregateOutputType = {
 }
 
 
+export type NextActionTypeAvgAggregateInputType = {
+  order?: true
+}
+
+export type NextActionTypeSumAggregateInputType = {
+  order?: true
+}
+
 export type NextActionTypeMinAggregateInputType = {
   id?: true
   label?: true
   status?: true
+  order?: true
   formId?: true
   isDefault?: true
   createdAt?: true
@@ -66,6 +88,7 @@ export type NextActionTypeMaxAggregateInputType = {
   id?: true
   label?: true
   status?: true
+  order?: true
   formId?: true
   isDefault?: true
   createdAt?: true
@@ -75,6 +98,7 @@ export type NextActionTypeCountAggregateInputType = {
   id?: true
   label?: true
   status?: true
+  order?: true
   formId?: true
   isDefault?: true
   createdAt?: true
@@ -119,6 +143,18 @@ export type NextActionTypeAggregateArgs<ExtArgs extends runtime.Types.Extensions
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: NextActionTypeAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: NextActionTypeSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: NextActionTypeMinAggregateInputType
@@ -149,6 +185,8 @@ export type NextActionTypeGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   _count?: NextActionTypeCountAggregateInputType | true
+  _avg?: NextActionTypeAvgAggregateInputType
+  _sum?: NextActionTypeSumAggregateInputType
   _min?: NextActionTypeMinAggregateInputType
   _max?: NextActionTypeMaxAggregateInputType
 }
@@ -157,10 +195,13 @@ export type NextActionTypeGroupByOutputType = {
   id: string
   label: string
   status: $Enums.FollowUpStatus
+  order: number | null
   formId: string | null
   isDefault: boolean
   createdAt: Date
   _count: NextActionTypeCountAggregateOutputType | null
+  _avg: NextActionTypeAvgAggregateOutputType | null
+  _sum: NextActionTypeSumAggregateOutputType | null
   _min: NextActionTypeMinAggregateOutputType | null
   _max: NextActionTypeMaxAggregateOutputType | null
 }
@@ -187,6 +228,7 @@ export type NextActionTypeWhereInput = {
   id?: Prisma.StringFilter<"NextActionType"> | string
   label?: Prisma.StringFilter<"NextActionType"> | string
   status?: Prisma.EnumFollowUpStatusFilter<"NextActionType"> | $Enums.FollowUpStatus
+  order?: Prisma.IntNullableFilter<"NextActionType"> | number | null
   formId?: Prisma.StringNullableFilter<"NextActionType"> | string | null
   isDefault?: Prisma.BoolFilter<"NextActionType"> | boolean
   createdAt?: Prisma.DateTimeFilter<"NextActionType"> | Date | string
@@ -197,6 +239,7 @@ export type NextActionTypeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  order?: Prisma.SortOrderInput | Prisma.SortOrder
   formId?: Prisma.SortOrderInput | Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -211,6 +254,7 @@ export type NextActionTypeWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.NextActionTypeWhereInput | Prisma.NextActionTypeWhereInput[]
   label?: Prisma.StringFilter<"NextActionType"> | string
   status?: Prisma.EnumFollowUpStatusFilter<"NextActionType"> | $Enums.FollowUpStatus
+  order?: Prisma.IntNullableFilter<"NextActionType"> | number | null
   formId?: Prisma.StringNullableFilter<"NextActionType"> | string | null
   isDefault?: Prisma.BoolFilter<"NextActionType"> | boolean
   createdAt?: Prisma.DateTimeFilter<"NextActionType"> | Date | string
@@ -221,12 +265,15 @@ export type NextActionTypeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  order?: Prisma.SortOrderInput | Prisma.SortOrder
   formId?: Prisma.SortOrderInput | Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.NextActionTypeCountOrderByAggregateInput
+  _avg?: Prisma.NextActionTypeAvgOrderByAggregateInput
   _max?: Prisma.NextActionTypeMaxOrderByAggregateInput
   _min?: Prisma.NextActionTypeMinOrderByAggregateInput
+  _sum?: Prisma.NextActionTypeSumOrderByAggregateInput
 }
 
 export type NextActionTypeScalarWhereWithAggregatesInput = {
@@ -236,6 +283,7 @@ export type NextActionTypeScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"NextActionType"> | string
   label?: Prisma.StringWithAggregatesFilter<"NextActionType"> | string
   status?: Prisma.EnumFollowUpStatusWithAggregatesFilter<"NextActionType"> | $Enums.FollowUpStatus
+  order?: Prisma.IntNullableWithAggregatesFilter<"NextActionType"> | number | null
   formId?: Prisma.StringNullableWithAggregatesFilter<"NextActionType"> | string | null
   isDefault?: Prisma.BoolWithAggregatesFilter<"NextActionType"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"NextActionType"> | Date | string
@@ -245,6 +293,7 @@ export type NextActionTypeCreateInput = {
   id?: string
   label: string
   status?: $Enums.FollowUpStatus
+  order?: number | null
   isDefault?: boolean
   createdAt?: Date | string
   form?: Prisma.FormCreateNestedOneWithoutNextActionsInput
@@ -254,6 +303,7 @@ export type NextActionTypeUncheckedCreateInput = {
   id?: string
   label: string
   status?: $Enums.FollowUpStatus
+  order?: number | null
   formId?: string | null
   isDefault?: boolean
   createdAt?: Date | string
@@ -263,6 +313,7 @@ export type NextActionTypeUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+  order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   form?: Prisma.FormUpdateOneWithoutNextActionsNestedInput
@@ -272,6 +323,7 @@ export type NextActionTypeUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+  order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   formId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -281,6 +333,7 @@ export type NextActionTypeCreateManyInput = {
   id?: string
   label: string
   status?: $Enums.FollowUpStatus
+  order?: number | null
   formId?: string | null
   isDefault?: boolean
   createdAt?: Date | string
@@ -290,6 +343,7 @@ export type NextActionTypeUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+  order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -298,6 +352,7 @@ export type NextActionTypeUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+  order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   formId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -322,15 +377,21 @@ export type NextActionTypeCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  order?: Prisma.SortOrder
   formId?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type NextActionTypeAvgOrderByAggregateInput = {
+  order?: Prisma.SortOrder
 }
 
 export type NextActionTypeMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  order?: Prisma.SortOrder
   formId?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -340,9 +401,14 @@ export type NextActionTypeMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  order?: Prisma.SortOrder
   formId?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type NextActionTypeSumOrderByAggregateInput = {
+  order?: Prisma.SortOrder
 }
 
 export type NextActionTypeCreateNestedManyWithoutFormInput = {
@@ -391,6 +457,7 @@ export type NextActionTypeCreateWithoutFormInput = {
   id?: string
   label: string
   status?: $Enums.FollowUpStatus
+  order?: number | null
   isDefault?: boolean
   createdAt?: Date | string
 }
@@ -399,6 +466,7 @@ export type NextActionTypeUncheckedCreateWithoutFormInput = {
   id?: string
   label: string
   status?: $Enums.FollowUpStatus
+  order?: number | null
   isDefault?: boolean
   createdAt?: Date | string
 }
@@ -436,6 +504,7 @@ export type NextActionTypeScalarWhereInput = {
   id?: Prisma.StringFilter<"NextActionType"> | string
   label?: Prisma.StringFilter<"NextActionType"> | string
   status?: Prisma.EnumFollowUpStatusFilter<"NextActionType"> | $Enums.FollowUpStatus
+  order?: Prisma.IntNullableFilter<"NextActionType"> | number | null
   formId?: Prisma.StringNullableFilter<"NextActionType"> | string | null
   isDefault?: Prisma.BoolFilter<"NextActionType"> | boolean
   createdAt?: Prisma.DateTimeFilter<"NextActionType"> | Date | string
@@ -445,6 +514,7 @@ export type NextActionTypeCreateManyFormInput = {
   id?: string
   label: string
   status?: $Enums.FollowUpStatus
+  order?: number | null
   isDefault?: boolean
   createdAt?: Date | string
 }
@@ -453,6 +523,7 @@ export type NextActionTypeUpdateWithoutFormInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+  order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -461,6 +532,7 @@ export type NextActionTypeUncheckedUpdateWithoutFormInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+  order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -469,6 +541,7 @@ export type NextActionTypeUncheckedUpdateManyWithoutFormInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+  order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -479,6 +552,7 @@ export type NextActionTypeSelect<ExtArgs extends runtime.Types.Extensions.Intern
   id?: boolean
   label?: boolean
   status?: boolean
+  order?: boolean
   formId?: boolean
   isDefault?: boolean
   createdAt?: boolean
@@ -489,6 +563,7 @@ export type NextActionTypeSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   id?: boolean
   label?: boolean
   status?: boolean
+  order?: boolean
   formId?: boolean
   isDefault?: boolean
   createdAt?: boolean
@@ -499,6 +574,7 @@ export type NextActionTypeSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   id?: boolean
   label?: boolean
   status?: boolean
+  order?: boolean
   formId?: boolean
   isDefault?: boolean
   createdAt?: boolean
@@ -509,12 +585,13 @@ export type NextActionTypeSelectScalar = {
   id?: boolean
   label?: boolean
   status?: boolean
+  order?: boolean
   formId?: boolean
   isDefault?: boolean
   createdAt?: boolean
 }
 
-export type NextActionTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "status" | "formId" | "isDefault" | "createdAt", ExtArgs["result"]["nextActionType"]>
+export type NextActionTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "status" | "order" | "formId" | "isDefault" | "createdAt", ExtArgs["result"]["nextActionType"]>
 export type NextActionTypeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   form?: boolean | Prisma.NextActionType$formArgs<ExtArgs>
 }
@@ -534,6 +611,7 @@ export type $NextActionTypePayload<ExtArgs extends runtime.Types.Extensions.Inte
     id: string
     label: string
     status: $Enums.FollowUpStatus
+    order: number | null
     formId: string | null
     isDefault: boolean
     createdAt: Date
@@ -964,6 +1042,7 @@ export interface NextActionTypeFieldRefs {
   readonly id: Prisma.FieldRef<"NextActionType", 'String'>
   readonly label: Prisma.FieldRef<"NextActionType", 'String'>
   readonly status: Prisma.FieldRef<"NextActionType", 'FollowUpStatus'>
+  readonly order: Prisma.FieldRef<"NextActionType", 'Int'>
   readonly formId: Prisma.FieldRef<"NextActionType", 'String'>
   readonly isDefault: Prisma.FieldRef<"NextActionType", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"NextActionType", 'DateTime'>

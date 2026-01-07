@@ -192,7 +192,7 @@ model NextActionType {
   id     String         @id @default(uuid())
   label  String
   status FollowUpStatus @default(PENDING)
-
+  order  Int?
   formId String?
   form   Form?   @relation(fields: [formId], references: [id], onDelete: Cascade)
 

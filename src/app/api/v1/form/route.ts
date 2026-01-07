@@ -262,6 +262,7 @@ export async function POST(req: NextRequest) {
                         label: a.label,
                         status: a.status as FollowUpStatus,
                         formId: createdForm.id,
+                        order: a.order,
                         isDefault: true,
                     })),
                     skipDuplicates: true,

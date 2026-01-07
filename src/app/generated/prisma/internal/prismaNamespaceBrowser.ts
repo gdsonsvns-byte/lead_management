@@ -203,6 +203,7 @@ export const NextActionTypeScalarFieldEnum = {
   id: 'id',
   label: 'label',
   status: 'status',
+  order: 'order',
   formId: 'formId',
   isDefault: 'isDefault',
   createdAt: 'createdAt'
