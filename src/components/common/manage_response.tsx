@@ -2,13 +2,15 @@
 import { FollowUpStatus } from "@/src/app/generated/prisma/enums";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import { PlusIcon, X } from "lucide-react";
+import { PlusIcon, X, GripVertical } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Spinner from "../ui/spinner";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { MenuItem, TextField } from "@mui/material";
-
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface Actions {
     title: string;
@@ -23,12 +25,12 @@ interface Actions {
 }
 interface NewActions {
     id: string,
+    clientId: string;
     label: string,
     status: FollowUpStatus,
     order: number,
     isDefault: boolean,
 }
-
 
 export default function ManageResponse() {
     const queryClient = useQueryClient();
@@ -43,6 +45,7 @@ export default function ManageResponse() {
             ...prev,
             {
                 id: "",
+                clientId: crypto.randomUUID(),
                 label: "",
                 status: FollowUpStatus.PENDING,
                 order: prev.length + 1,
@@ -85,6 +88,7 @@ export default function ManageResponse() {
                 .sort((a: any, b: any) => a.order - b.order)
                 .map((f: any) => ({
                     id: f.id,
+                    clientId: f.id,
                     label: f.label,
                     status: f.status,
                     order: f.order,
@@ -174,52 +178,107 @@ export default function ManageResponse() {
                         </div>
 
                         <div className="space-y-6 mt-6">
-                            {actions.map((action, index) => (
-                                <div
-                                    key={index}
-                                    className="flex flex-col gap-3"
-                                >
-                                    <div className="flex justify-between items-center">
-                                        <h3 className="font-medium text-gray-700">Field #{index + 1}</h3>
-                                        <button onClick={() => removeField(index)} className="bg-blue-600 text-white p-2 rounded-full cursor-pointer">
-                                            <X size={14} />
-                                        </button>
-                                    </div>
-                                    <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <div className="flex-1 w-full">
-                                            <TextField
-                                                label="Action Name"
-                                                value={action.label}
-                                                fullWidth
-                                                variant="outlined"
-                                                disabled={action.id !== ""}
-                                                onChange={(e) =>
-                                                    updateField(index, { label: e.target.value })
-                                                }
-                                            />
-                                        </div>
+                            <DndContext
+                                collisionDetection={closestCenter}
+                                onDragEnd={(event) => {
+                                    const { active, over } = event;
+                                    if (!over || active.id === over.id) return;
 
-                                        <div className="flex-1 w-full">
-                                            <TextField
-                                                select
-                                                label="Action Status"
-                                                value={action.status}
-                                                fullWidth
-                                                disabled={action.id !== ""}
-                                                onChange={(e) =>
-                                                    updateField(index, { status: e.target.value as FollowUpStatus })
-                                                }
-                                            >
-                                                {Object.values(FollowUpStatus).map((s) => (
-                                                    <MenuItem key={s} value={s}>
-                                                        {s}
-                                                    </MenuItem>
-                                                ))}
-                                            </TextField>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
+                                    setActions((items) => {
+                                        const oldIndex = items.findIndex(
+                                            (i) => i.clientId === active.id
+                                        );
+                                        const newIndex = items.findIndex(
+                                            (i) => i.clientId === over.id
+                                        );
+
+                                        const reordered = arrayMove(items, oldIndex, newIndex);
+
+                                        return reordered.map((a, idx) => ({
+                                            ...a,
+                                            order: idx + 1,
+                                        }));
+                                    });
+                                }}
+                            >
+                                <SortableContext
+                                    items={actions.map((a) => a.clientId)}
+                                    strategy={verticalListSortingStrategy}
+                                >
+                                    {actions.map((action, index) => (
+                                        <SortableItem key={action.clientId} id={action.clientId}>
+                                            {({ setActivatorNodeRef, attributes, listeners }) => (
+                                                <div className="flex flex-col gap-3">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold flex items-center justify-center">
+                                                                {index + 1}
+                                                            </span>
+                                                            <h3 className="font-medium text-gray-700">
+                                                                Action #{index + 1}
+                                                            </h3>
+                                                        </div>
+
+                                                        <button
+                                                            onClick={() => removeField(index)}
+                                                            className="bg-red-100 text-red-700 p-2 rounded-full hover:bg-red-200 cursor-pointer"
+                                                        >
+                                                            <X size={14} />
+                                                        </button>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-2 w-full">
+                                                        <span
+                                                            ref={setActivatorNodeRef}
+                                                            {...attributes}
+                                                            {...listeners}
+                                                            className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600"
+                                                            title="Drag to reorder"
+                                                        >
+                                                            <GripVertical size={20} />
+                                                        </span>
+
+                                                        <div className="flex-1 w-full">
+                                                            <TextField
+                                                                label="Action Name"
+                                                                value={action.label}
+                                                                fullWidth
+                                                                disabled={action.id !== ""}
+                                                                onChange={(e) =>
+                                                                    updateField(index, { label: e.target.value })
+                                                                }
+                                                            />
+                                                        </div>
+
+                                                        <div className="flex-1 w-full">
+                                                            <TextField
+                                                                select
+                                                                label="Action Status"
+                                                                value={action.status}
+                                                                fullWidth
+                                                                disabled={action.id !== ""}
+                                                                onChange={(e) =>
+                                                                    updateField(index, {
+                                                                        status: e.target.value as FollowUpStatus,
+                                                                    })
+                                                                }
+                                                            >
+                                                                {Object.values(FollowUpStatus).map((s) => (
+                                                                    <MenuItem key={s} value={s}>
+                                                                        {s}
+                                                                    </MenuItem>
+                                                                ))}
+                                                            </TextField>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </SortableItem>
+                                    ))}
+
+                                </SortableContext>
+                            </DndContext>
+
                             <div className="flex items-center justify-between mt-10">
                                 <h2 className="font-medium text-zinc-800">Actions</h2>
 
@@ -252,4 +311,40 @@ export default function ManageResponse() {
             </div>
         </section>
     )
+}
+
+function SortableItem({
+    id,
+    children,
+}: {
+    id: string;
+    children: (args: {
+        setActivatorNodeRef: (node: HTMLElement | null) => void;
+        attributes: any;
+        listeners: any;
+    }) => React.ReactNode;
+}) {
+    const {
+        setNodeRef,
+        setActivatorNodeRef,
+        attributes,
+        listeners,
+        transform,
+        transition,
+    } = useSortable({ id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style}>
+            {children({
+                setActivatorNodeRef,
+                attributes,
+                listeners,
+            })}
+        </div>
+    );
 }
