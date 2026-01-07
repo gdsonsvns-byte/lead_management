@@ -76,12 +76,20 @@ export async function GET(req: NextRequest) {
                 id: true,
                 label: true,
                 status: true,
+                order: true,
+                isDefault: true,
             },
             orderBy: {
-                createdAt: "desc",
+                order: "asc",
             },
         });
 
+        if (!actions) {
+            return NextResponse.json(
+                { error: "Actions not found" },
+                { status: 404 }
+            );
+        }
         const response = {
             actions,
             title: form.title,
@@ -195,7 +203,92 @@ export async function DELETE(req: NextRequest) {
 }
 
 // creating new actions
-export async function POST(req: NextRequest) {
+// export async function POST(req: NextRequest) {
+//     try {
+//         const ip = req.headers.get("x-forwarded-for") || "unknown";
+//         if (isRateLimited(ip)) {
+//             return NextResponse.json(
+//                 { error: "Too many requests. Try again later." },
+//                 { status: 429 }
+//             );
+//         }
+
+//         const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+//         const apiClient = await verifyApiAccessToken(req);
+
+//         if (!user && !apiClient) {
+//             return NextResponse.json(
+//                 { error: "Unauthorized User" },
+//                 { status: 401 }
+//             );
+//         }
+
+//         const body = await req.json();
+//         const { success, data, error } = NextActionSchema.safeParse(body);
+
+//         if (!success) {
+//             return NextResponse.json(
+//                 { error: z.prettifyError(error) },
+//                 { status: 400 }
+//             );
+//         }
+
+//         const form = await prisma.form.findUnique({
+//             where: {
+//                 id: data.formId,
+//             },
+//             select: {
+//                 id: true,
+//                 accountId: true,
+//             }
+//         });
+//         if (!form) {
+//             return NextResponse.json(
+//                 { error: "Form not found" },
+//                 { status: 404 }
+//             );
+//         }
+
+//         if (user?.role === "ADMIN" && user.accountId !== form.accountId) {
+//             return NextResponse.json(
+//                 { error: "Unauthorized User" },
+//                 { status: 401 }
+//             );
+//         }
+
+//         if (!user && apiClient && apiClient.accountId !== form.accountId) {
+//             return NextResponse.json(
+//                 { error: "Unauthorized User" },
+//                 { status: 401 }
+//             );
+//         }
+
+//         const nextAction = await prisma.nextActionType.create({
+//             data: {
+//                 label: data.label,
+//                 formId: data.formId,
+//                 status: data.status,
+//             },
+//         });
+
+//         return NextResponse.json(
+//             {
+//                 success: true,
+//                 data: nextAction,
+//             },
+//             { status: 201 }
+//         );
+//     } catch (error: any) {
+//         console.error("Creating FollowUps Actions Error:", error.message);
+//         return NextResponse.json(
+//             { error: "Internal Server Error" },
+//             { status: 500 }
+//         );
+//     }
+// }
+
+// update actions
+export async function PATCH(req: NextRequest) {
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";
         if (isRateLimited(ip)) {
@@ -210,13 +303,12 @@ export async function POST(req: NextRequest) {
 
         if (!user && !apiClient) {
             return NextResponse.json(
-                { error: "Unauthorized User" },
+                { error: "Unauthorized" },
                 { status: 401 }
             );
         }
-
         const body = await req.json();
-        const { success, data, error } = NextActionSchema.safeParse(body);
+        const { success, data, error } = NextActionSchema.safeParse(body?.data);
 
         if (!success) {
             return NextResponse.json(
@@ -225,15 +317,17 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        const { formId, actions } = data;
+
         const form = await prisma.form.findUnique({
             where: {
-                id: data.formId,
+                id: formId,
             },
-            select: {
-                id: true,
-                accountId: true,
+            include: {
+                nextActions: true
             }
         });
+
         if (!form) {
             return NextResponse.json(
                 { error: "Form not found" },
@@ -255,25 +349,47 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const nextAction = await prisma.nextActionType.create({
-            data: {
-                label: data.label,
-                formId: data.formId,
-                status: data.status,
-            },
+        const incomingIds = actions.map((a) => a.id).filter((id): id is string => !!id && id.length > 0);
+        const existingIds = form.nextActions.map((a) => a.id);
+        const toDelete = existingIds.filter((id) => !incomingIds.includes(id));
+
+        await prisma.$transaction(async (tx) => {
+            if (toDelete.length > 0) {
+                await tx.nextActionType.deleteMany({
+                    where: {
+                        id: { in: toDelete },
+                        formId,
+                    },
+                });
+            }
+
+            const newActions = actions.filter(
+                (a) => !a.id || a.id === ""
+            );
+
+            if (newActions.length > 0) {
+                await tx.nextActionType.createMany({
+                    data: newActions.map((a, idx) => ({
+                        formId,
+                        label: a.label.trim(),
+                        status: a.status,
+                        isDefault: a.isDefault ?? true,
+                        order:
+                            a.order ??
+                            form.nextActions.length + idx + 1,
+                    })),
+                });
+            }
         });
 
         return NextResponse.json(
-            {
-                success: true,
-                data: nextAction,
-            },
-            { status: 201 }
+            { success: true },
+            { status: 200 }
         );
-    } catch (error: any) {
-        console.error("Creating FollowUps Actions Error:", error.message);
+    } catch (err: any) {
+        console.error("PATCH /next-actions error:", err);
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            { error: "Failed to update next actions" },
             { status: 500 }
         );
     }
