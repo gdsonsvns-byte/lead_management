@@ -364,7 +364,7 @@ export async function PATCH(req: NextRequest) {
             }
 
             for (const a of actions) {
-                if (a.id) {
+                if (a.id && a.id !== "") {
                     await tx.nextActionType.update({
                         where: { id: a.id },
                         data: {

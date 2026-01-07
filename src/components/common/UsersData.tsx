@@ -591,7 +591,7 @@ export default function UsersData({ formId }: { formId: string }) {
                                                     >
                                                         <option value="">Select Next Action</option>
                                                         {openResponse.nextActions.map((s) => (
-                                                            <option key={s.id} value={s.label}>
+                                                            <option key={s.id} value={s.label} className={`${s.status === "COMPLETED" ? "text-green-600" : s.status === "CANCELLED" ? "text-red-600" : "text-zinc-600"} font-medium`}>
                                                                 {s.label}
                                                             </option>
                                                         ))}
