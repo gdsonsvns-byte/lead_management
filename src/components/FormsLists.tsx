@@ -71,9 +71,7 @@ export default function FormsList({ accountId }: { accountId?: string }) {
     }
 
     if (isError) {
-        const errMsg = (error as AxiosError<{ error: string }>)?.response?.data?.error ??
-            "Something went wrong.";
-
+        const errMsg = (error as AxiosError<any>)?.response?.data?.error ?? "Something went wrong.";
         return (
             <p className="text-red-500 text-center py-10 text-lg font-medium">
                 {errMsg}
@@ -96,8 +94,11 @@ export default function FormsList({ accountId }: { accountId?: string }) {
                         className="group relative flex flex-col justify-between gap-5 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
                     >
                         <div className="flex flex-col gap-5">
-                            <div className="absolute right-5 top-5 rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white shadow">
-                                {form.formsId.split("-")[0]}-{form.formsId.split("-")[1]}
+                            <div className="absolute right-3 top-3 rounded-full bg-blue-600 px-3 py-2 text-xs font-semibold text-white shadow">
+                                {/* {form.formsId.split("-")[0]}-{form.formsId.split("-")[1]} */}
+                                <Link href={`?view=${form.id}`} className="flex items-center gap-1">
+                                    Add Entry <ArrowRight className="h-4 w-4" />
+                                </Link>
                             </div>
 
                             <div>
