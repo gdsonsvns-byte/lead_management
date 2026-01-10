@@ -149,11 +149,10 @@ export default function UsersData({ formId }: { formId: string }) {
 
     useEffect(() => {
         if (!openResponse) return;
-        const lastFU = openResponse.lastFollowUp ?? null;
-        setFollowType(lastFU?.type ?? "NOTE");
-        setFollowNote(lastFU?.note ?? "");
-        setFollowNextDate(new Date(lastFU?.createdAt ?? "").toISOString().split("T")[0] ?? "");
-        setFollowBusinessStatus(lastFU?.businessStatus ?? "");
+        setFollowType("NOTE");
+        setFollowNote("");
+        setFollowNextDate("");
+        setFollowBusinessStatus("");
     }, [openResponse]);
 
 

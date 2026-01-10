@@ -12,7 +12,7 @@ import {
 import axios, { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from './ui/spinner';
-import { Phone, Clock, CheckCircle, Eye, AlertCircle, Plus } from "lucide-react";
+import { Clock, AlertCircle, Plus } from "lucide-react";
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import toast, { Toaster } from 'react-hot-toast';
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
@@ -289,11 +289,10 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
 
     useEffect(() => {
         if (!openResponse) return;
-        const lastFU = openResponse.lastFollowUp ?? null;
-        setFollowType(lastFU?.type ?? "NOTE");
-        setFollowNote(lastFU?.note ?? "");
-        setFollowNextDate(new Date(lastFU?.createdAt ?? "").toISOString().split("T")[0] ?? "");
-        setFollowBusinessStatus(lastFU?.businessStatus ?? "");
+        setFollowType("");
+        setFollowNote("");
+        setFollowNextDate("");
+        setFollowBusinessStatus("");
     }, [openResponse]);
     const selectedAction = useMemo(
         () =>
