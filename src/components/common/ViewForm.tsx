@@ -4,9 +4,10 @@ import Spinner from "../ui/spinner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { TextField } from "@mui/material";
+import { FollowUpStatus } from "@/src/app/generated/prisma/enums";
 
 interface Field {
     id: string;
@@ -16,18 +17,6 @@ interface Field {
     options?: string | null;
     order?: number;
 }
-const BUSINESS_STATUSES = [
-    "Client Converted",
-    "Client will Call",
-    "Client will Visit",
-    "Client will Message",
-    "Call Client",
-    "Message Client",
-    "Visit Client",
-    "Put on Backburner",
-    "Client not Interested",
-];
-const CLOSED_BUSINESS_STATUSES = ["Client Converted", "Client not Interested"];
 export default function ViewForm() {
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -46,10 +35,10 @@ export default function ViewForm() {
         }));
     };
 
-    const { data, isLoading, isError } = useQuery({
+    const { data, isLoading, isError } = useQuery<Form>({
         queryKey: ["view-form", formId],
         queryFn: async () => {
-            const res = await axios.get(`/api/v1/form/${formId}`, {
+            const res = await axios.get<MainForm>(`/api/v1/form/${formId}`, {
                 withCredentials: true,
             });
 
@@ -222,13 +211,23 @@ export default function ViewForm() {
         });
         if (initialFollowUp?.nextAction) {
             formData.append("nextAction", initialFollowUp.nextAction);
+            formData.append("nextFollowStatus", data?.nextActions?.find((a) => a.label === initialFollowUp.nextAction)?.status!);
         }
 
         if (initialFollowUp?.nextFollowUpDate) {
             formData.append("nextFollowUpDate", initialFollowUp.nextFollowUpDate);
         }
+        // console.log(initialFollowUp);
         submitMutation.mutate(formData);
     };
+
+    const selectedAction = useMemo(
+        () =>
+            data?.nextActions?.find(
+                (a) => a.label === initialFollowUp.nextAction
+            ),
+        [data?.nextActions, initialFollowUp.nextAction]
+    );
 
     if (!hasFormId) return null;
 
@@ -312,9 +311,23 @@ export default function ViewForm() {
                                         select
                                         value={initialFollowUp.nextAction}
                                         onChange={(e) => {
-                                            setInitialFollowUp((prev) => ({ ...prev, nextAction: e.target.value }));
-                                            if (CLOSED_BUSINESS_STATUSES.includes(e.target.value)) {
-                                                setInitialFollowUp((prev) => ({ ...prev, nextDate: "" }));
+                                            const selectedLabel = e.target.value;
+                                            setInitialFollowUp((prev) => ({
+                                                ...prev,
+                                                nextAction: selectedLabel
+                                            }));
+                                            const selectedAction = data.nextActions.find(
+                                                (a) => a.label === selectedLabel
+                                            );
+
+                                            if (
+                                                selectedAction?.status === "COMPLETED" ||
+                                                selectedAction?.status === "CANCELLED"
+                                            ) {
+                                                setInitialFollowUp((prev) => ({
+                                                    ...prev,
+                                                    nextFollowUpDate: ""
+                                                }));
                                             }
                                         }}
                                         SelectProps={{ native: true }}
@@ -322,25 +335,33 @@ export default function ViewForm() {
                                         fullWidth
                                     >
                                         <option value="">Select status</option>
-                                        {BUSINESS_STATUSES.map((s) => (
-                                            <option key={s} value={s}>
-                                                {s}
+
+                                        {data.nextActions.map((action) => (
+                                            <option key={action.id} value={action.label}>
+                                                {action.label}
                                             </option>
                                         ))}
                                     </TextField>
-                                    {
-                                        initialFollowUp.nextAction && !CLOSED_BUSINESS_STATUSES.includes(initialFollowUp.nextAction) && (
+
+                                    {selectedAction &&
+                                        selectedAction.status !== "COMPLETED" &&
+                                        selectedAction.status !== "CANCELLED" && (
                                             <TextField
                                                 label="Next Follow-Up Date"
                                                 type="date"
                                                 value={initialFollowUp.nextFollowUpDate}
-                                                onChange={(e) => setInitialFollowUp((prev) => ({ ...prev, nextFollowUpDate: e.target.value }))}
+                                                onChange={(e) => {
+                                                    setInitialFollowUp((prev) => ({
+                                                        ...prev,
+                                                        nextFollowUpDate: e.target.value
+                                                    }));
+                                                }}
                                                 InputLabelProps={{ shrink: true }}
                                                 fullWidth
                                             />
-                                        )
-                                    }
+                                        )}
                                 </div>
+
                             </div>
                         </div>
 
@@ -371,3 +392,36 @@ export default function ViewForm() {
         </section>
     );
 }
+
+interface MainForm {
+    form: Form
+}
+export interface Form {
+    id: string;
+    formsId: string;
+    userId: string;
+    accountId: string;
+    title: string;
+    description: string;
+    slug: string;
+    adminWhatsappCampaignName: string;
+    userWhatsappCampaignName: string;
+    createdAt: string;
+    fields: FormField[];
+    nextActions: NextAction[];
+}
+export interface NextAction {
+    id: string;
+    label: string;
+    status: FollowUpStatus;
+}
+export interface FormField {
+    id: string;
+    formId: string;
+    label: string;
+    type: string;
+    options: string;
+    required: boolean;
+    order: number;
+}
+

@@ -82,11 +82,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
         }
 
         const formData = await req.formData();
-        const nextAction = formData.get("nextAction")?.toString() || null;
+        const nextActionLabel = formData.get("nextAction")?.toString() || null;
         const nextFollowUpDate = formData.get("nextFollowUpDate")?.toString() || null;
         const incoming: Record<string, any> = {};
-        const DEFAULT_NEXT_ACTION = "Call Client";
-        const DEFAULT_NOTE = nextAction ? "Default Follow up." : "Auto Follow up add by the System.";
 
         for (const ff of form.fields) {
             const values = formData.getAll(ff.id);
@@ -183,41 +181,46 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             return response;
         });
 
-        let internalStatus: FollowUpStatus = FollowUpStatus.PENDING;
+        const nextActionData = await prisma.nextActionType.findFirst({
+            where: {
+                formId,
+                ...(nextActionLabel
+                    ? { label: nextActionLabel }
+                    : { isDefault: true }),
+            },
+            orderBy: { isDefault: "desc" },
+        });
 
-        if (nextAction) {
-            switch (nextAction) {
-                case "Client Converted":
-                    internalStatus = FollowUpStatus.COMPLETED;
-                    break;
-                case "Client not Interested":
-                    internalStatus = FollowUpStatus.CANCELLED;
-                    break;
-                case "Put on Backburner":
-                    internalStatus = FollowUpStatus.SKIPPED;
-                    break;
-                default:
-                    internalStatus = FollowUpStatus.PENDING;
-            }
+        if (!nextActionData) {
+            return NextResponse.json(
+                { error: "No default follow-up configured for this form" },
+                { status: 400 }
+            );
         }
 
-        const nextDate = nextFollowUpDate && !isNaN(Date.parse(nextFollowUpDate)) ? new Date(nextFollowUpDate) : new Date();
+        const internalStatus: FollowUpStatus = nextActionData.status;
 
-        const followup = await prisma.followUp.create({
+        const nextDate = internalStatus === FollowUpStatus.COMPLETED ||
+            internalStatus === FollowUpStatus.CANCELLED
+            ? null
+            : nextFollowUpDate
+                ? new Date(nextFollowUpDate)
+                : null;
+
+        const note = nextActionLabel
+            ? "Follow-up added by user"
+            : "Auto follow-up added by system";
+
+        await prisma.followUp.create({
             data: {
                 responseId: result.id,
                 addedByUserId: form.userId,
                 type: FollowUpType.STATUS_CHANGE,
-                note: DEFAULT_NOTE,
-                nextFollowUpDate: nextDate ?? new Date(),
-                businessStatus: nextAction ?? DEFAULT_NEXT_ACTION,
+                note,
+                nextFollowUpDate: nextDate,
+                businessStatus: nextActionData.label,
                 status: internalStatus,
-            },
-            include: {
-                addedBy: {
-                    select: { id: true, name: true, email: true },
-                },
-            },
+            }
         });
 
         const sendNotificationMessage: Promise<any>[] = [];
