@@ -197,6 +197,9 @@ export async function GET(req: NextRequest) {
                                         id: true,
                                         label: true,
                                         status: true
+                                    },
+                                    orderBy: {
+                                        order: "asc"
                                     }
                                 }
                             }
