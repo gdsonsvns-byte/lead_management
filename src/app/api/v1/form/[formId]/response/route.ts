@@ -338,7 +338,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                             select: {
                                 id: true,
                                 label: true,
-                                status: true
+                                status: true,
+                            },
+                            orderBy: {
+                                order: "asc",
                             }
                         }
                     }
