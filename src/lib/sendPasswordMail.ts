@@ -15,6 +15,28 @@ export async function sendLoginDetails(email: string, name: string, password: st
         <p><b>Email:</b> ${email}</p>
         <p><b>Password:</b> ${password}</p>
         <p>You can now log in and change your password from dashboard.</p>
+        
+        <div style="text-align:center; margin-top:24px;">
+          <a
+            href="https://leads.wizards.co.in"
+            target="_blank"
+            style="
+              display:inline-block;
+              background:#2563eb;
+              color:#ffffff;
+              text-decoration:none;
+              padding:10px 16px;
+              border-radius:6px;
+              font-size:14px;
+            "
+          >
+            Open Dashboard
+          </a>
+        </div>
+
+        <p style="font-size:12px; color:#9ca3af; margin-top:20px;">
+          This is an automated reminder. Please do not reply.
+        </p>
         <p>Regards,<br/>Team</p>
       </div>
     `,
