@@ -19,6 +19,7 @@ export const NextActionSchema = z.object({
         status: z.enum(FollowUpStatus, {
             error: "Status is required",
         }),
+        autoApplyOnFirstFollowUp:z.boolean({error:"Default Follow Up is required."}),
         isDefault: z.boolean().optional().default(true),
         order: z.number().optional(),
     }))

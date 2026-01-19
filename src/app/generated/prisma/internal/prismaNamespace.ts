@@ -1273,8 +1273,8 @@ export const AccountScalarFieldEnum = {
   phone: 'phone',
   location: 'location',
   email: 'email',
-  whatsappApiKey: 'whatsappApiKey',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  whatsappApiKey: 'whatsappApiKey'
 } as const
 
 export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]

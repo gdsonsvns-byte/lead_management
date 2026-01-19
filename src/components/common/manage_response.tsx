@@ -11,6 +11,7 @@ import { MenuItem, TextField } from "@mui/material";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Radio, FormControlLabel } from "@mui/material";
 
 interface Actions {
     title: string;
@@ -21,6 +22,7 @@ interface Actions {
         status: FollowUpStatus,
         order: number,
         isDefault: boolean,
+        autoApplyOnFirstFollowUp:boolean,
     }[]
 }
 interface NewActions {
@@ -30,6 +32,7 @@ interface NewActions {
     status: FollowUpStatus,
     order: number,
     isDefault: boolean,
+    autoApplyOnFirstFollowUp: boolean;
 }
 
 export default function ManageResponse() {
@@ -49,6 +52,7 @@ export default function ManageResponse() {
                 label: "",
                 status: FollowUpStatus.PENDING,
                 order: prev.length + 1,
+                autoApplyOnFirstFollowUp: false,
                 isDefault: true,
             },
         ]);
@@ -93,6 +97,7 @@ export default function ManageResponse() {
                     status: f.status,
                     order: f.order,
                     isDefault: f.isDefault,
+                    autoApplyOnFirstFollowUp: f.autoApplyOnFirstFollowUp
                 }));
 
             setActions(mappedActions);
@@ -133,6 +138,15 @@ export default function ManageResponse() {
         }
         updateAction();
     }
+    const toggleAutoApply = (index: number) => {
+        setActions((prev) =>
+            prev.map((action, i) => ({
+                ...action,
+                autoApplyOnFirstFollowUp: i === index,
+            }))
+        );
+    };
+
 
     if (!hasFormId) return null;
     return (
@@ -217,6 +231,17 @@ export default function ManageResponse() {
                                                             <h3 className="font-medium text-gray-700">
                                                                 Action #{index + 1}
                                                             </h3>
+                                                            <div className="flex gap-2 ml-3 items-center">
+                                                                <label 
+                                                                className="text-xs">
+                                                                    Default for first followup
+                                                                    </label>
+                                                                <input
+                                                                    type="radio"
+                                                                    checked={action.autoApplyOnFirstFollowUp}
+                                                                    onChange={() => toggleAutoApply(index)}
+                                                                />
+                                                            </div>
                                                         </div>
 
                                                         <button

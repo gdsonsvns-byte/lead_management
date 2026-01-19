@@ -78,6 +78,7 @@ export async function GET(req: NextRequest) {
                 status: true,
                 order: true,
                 isDefault: true,
+                autoApplyOnFirstFollowUp: true,
             },
             orderBy: {
                 order: "asc",
@@ -369,6 +370,7 @@ export async function PATCH(req: NextRequest) {
                         where: { id: a.id },
                         data: {
                             order: a.order,
+                            autoApplyOnFirstFollowUp: a.autoApplyOnFirstFollowUp
                         },
                     });
                 }
@@ -385,6 +387,7 @@ export async function PATCH(req: NextRequest) {
                         label: a.label.trim(),
                         status: a.status,
                         isDefault: a.isDefault ?? true,
+                        autoApplyOnFirstFollowUp: a.autoApplyOnFirstFollowUp,
                         order:
                             a.order ??
                             form.nextActions.length + idx + 1,

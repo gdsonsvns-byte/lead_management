@@ -186,7 +186,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                 formId,
                 ...(nextActionLabel
                     ? { label: nextActionLabel }
-                    : { isDefault: true }),
+                    : { autoApplyOnFirstFollowUp: true }),
             },
             orderBy: { isDefault: "desc" },
         });
