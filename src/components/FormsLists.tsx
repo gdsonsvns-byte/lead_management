@@ -52,7 +52,7 @@ export default function FormsList({ accountId }: { accountId?: string }) {
     const [page, setPage] = useState(1);
     const limit = 10;
 
-    const { data, isLoading, isError, error } = useQuery({
+    const { data, isLoading, isError, error, isFetching } = useQuery({
         queryKey: ["forms", page, limit, accountId],
         queryFn: () => fetchForms(page, limit, accountId ?? ''),
         placeholderData: (prev) => prev,
@@ -62,7 +62,7 @@ export default function FormsList({ accountId }: { accountId?: string }) {
     const forms = data?.response?.forms ?? [];
     const pagination = data?.response;
 
-    if (isLoading) {
+    if (isLoading || isFetching) {
         return (
             <div className="w-full flex justify-center py-20">
                 <Spinner />

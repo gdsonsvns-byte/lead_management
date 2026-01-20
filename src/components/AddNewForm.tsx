@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import Input from "./ui/Input";
 import FieldItem from "./FieldItem";
 import Spinner from "./ui/spinner";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import toast, { Toaster } from 'react-hot-toast';
 import { FollowUpStatus } from "../app/generated/prisma/enums";
@@ -52,6 +52,7 @@ interface NextAction {
 }
 
 function OpenForm({ onClose, accountId }: Props) {
+  const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [adminCampaign, setAdminCampaign] = useState<string | "">("");
@@ -59,9 +60,8 @@ function OpenForm({ onClose, accountId }: Props) {
   const [fields, setFields] = useState<FormField[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [nextActions, setNextActions] = useState<NextAction[]>([]);
-  const [openNextActionModal, setOpenNextActionModal] = useState(false);
-  const [openConfirmModal, setOpenConfirmModal] = useState(false);
+  const page = 1;
+  const limit = 10;
 
   const showMessage = (type: "success" | "error", text: string) => {
     setMessage({ type, text });
@@ -109,6 +109,7 @@ function OpenForm({ onClose, accountId }: Props) {
       toast.success('Form created successfully!', {
         duration: 5000
       });
+      queryClient.invalidateQueries({ queryKey: ["forms", page, limit, accountId] });
       showMessage("success", "Form created successfully!");
       setTimeout(() => onClose(false), 800);
     },
