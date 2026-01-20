@@ -43,16 +43,26 @@ export async function PATCH(req: NextRequest) {
 
         const existingAccess = await prisma.formAccess.findMany({
             where: { formId: form.id },
-            select: { userId: true },
+            select: {
+                userId: true,
+                user: {
+                    select: {
+                        role: true,
+                    },
+                },
+            },
         });
-
+        const protectedUserIds = new Set(existingAccess.filter(a => a.user.role === "ADMIN" || a.user.role === "SUPERADMIN").map(a => a.userId));
         const existingUserIds = new Set(existingAccess.map(a => a.userId));
         const incomingUserIds = new Set(data.userIds);
 
         const toAdd = data.userIds.filter(id => !existingUserIds.has(id));
         const toRemove = [...existingUserIds].filter(
-            id => !incomingUserIds.has(id)
+            id =>
+                !incomingUserIds.has(id) &&
+                !protectedUserIds.has(id)
         );
+
 
         await prisma.$transaction([
             ...(toAdd.length
