@@ -73,7 +73,7 @@ export const updateFormFieldSchema = z
                 .min(1, "Option cannot be empty")
                 .max(50, "Option too long")
         ).optional(),
-        optionsText : z.string().optional(),
+        optionsText: z.string().optional(),
         order: z.number().int().min(0).optional(),
     })
     .refine(
@@ -126,6 +126,13 @@ export const updateFormSchema = z.object({
     fields: z.array(updateFormFieldSchema).optional(),
 })
 
+export const userId = z.object({
+    formId: z.uuid({ error: "Invalid formId" }),
+    userIds: z
+        .array(z.uuid({ error: "Invalid userId" }))
+        .min(1, { error: "At least one userId is required" })
+        .max(50, { error: "You can assign max 50 users at once" }),
+})
 
 
 
