@@ -205,7 +205,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             ? null
             : nextFollowUpDate
                 ? new Date(nextFollowUpDate)
-                : null;
+                : new Date();
 
         const note = nextActionLabel
             ? "Follow-up added by user"

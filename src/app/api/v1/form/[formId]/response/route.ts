@@ -195,21 +195,31 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             return response;
         });
 
-        const followup = await prisma.followUp.create({
+        const nextActionData = await prisma.nextActionType.findFirst({
+            where: {
+                formId,
+                autoApplyOnFirstFollowUp: true,
+            },
+            orderBy: { isDefault: "desc" },
+        });
+
+        if (!nextActionData) {
+            return NextResponse.json(
+                { error: "No default follow-up configured for this form" },
+                { status: 400 }
+            );
+        }
+        const internalStatus: FollowUpStatus = nextActionData.status;
+        await prisma.followUp.create({
             data: {
                 responseId: result.id,
                 addedByUserId: form.userId,
                 type: FollowUpType.STATUS_CHANGE,
                 note: "Auto Follow up add by the System.",
                 nextFollowUpDate: new Date(),
-                businessStatus: "Call Client",
-                status: FollowUpStatus.PENDING,
-            },
-            include: {
-                addedBy: {
-                    select: { id: true, name: true, email: true },
-                },
-            },
+                businessStatus: nextActionData.label,
+                status: internalStatus,
+            }
         });
 
         const sendNotificationMessage: Promise<any>[] = [];
