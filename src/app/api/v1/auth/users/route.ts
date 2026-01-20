@@ -23,6 +23,7 @@ export async function GET(req: NextRequest) {
 
         const { searchParams } = new URL(req.url);
         const queryAccountId = searchParams.get("account_id")?.trim();
+        const formId = searchParams.get("form_id")?.trim();
 
         if (user.role === "SUPERADMIN" && !queryAccountId) {
             return NextResponse.json(
@@ -30,32 +31,63 @@ export async function GET(req: NextRequest) {
                 { status: 404 }
             );
         }
+        if (!formId) {
+            return NextResponse.json(
+                { error: "form_id is required" },
+                { status: 400 }
+            );
+        }
 
-        const users = await prisma.user.findMany({
+        const accountId = user.role === "SUPERADMIN" ? queryAccountId! : user.accountId;
+
+        const form = await prisma.form.findFirst({
             where: {
-                ...(user.role === "SUPERADMIN" ? {
-                    accountId: queryAccountId,
-                    role: { not: "ADMIN" },
-                } : {
-                    accountId: user.accountId,
-                    role: { not: "ADMIN" },
-                })
+                id: formId,
+                accountId,
             },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                createdAt: true,
-            },
-            orderBy: { createdAt: "desc" },
-        })
+            select: { id: true },
+        });
+
+        if (!form) {
+            return NextResponse.json(
+                { error: "Form not found or access denied" },
+                { status: 404 }
+            );
+        }
+
+        const [users, access] = await Promise.all([
+            prisma.user.findMany({
+                where: {
+                    accountId,
+                    role: { not: "ADMIN" },
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                    createdAt: true,
+                },
+                orderBy: { createdAt: "desc" },
+            }),
+
+            prisma.formAccess.findMany({
+                where: { formId },
+                select: { userId: true },
+            }),
+        ]);
+
+        const accessSet = new Set(access.map(a => a.userId));
+        const usersWithAccess = users.map(u => ({
+            ...u,
+            hasAccess: accessSet.has(u.id),
+        }));
 
         return NextResponse.json(
             {
                 success: true,
-                count: users.length,
-                users,
+                count: usersWithAccess.length,
+                users: usersWithAccess,
             },
             { status: 200 }
         );

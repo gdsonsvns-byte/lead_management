@@ -5,7 +5,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Spinner from "../ui/spinner";
 import toast from "react-hot-toast";
 
@@ -28,13 +28,22 @@ export default function ManageAccess() {
     const { data, isLoading, isError } = useQuery<Response>({
         queryKey: ["view-users", accountId, formId],
         queryFn: async () => {
-            const res = await axios.get<Response>(`/api/v1/auth/users?account_id=${accountId}`, {
+            const res = await axios.get<Response>(`/api/v1/auth/users?account_id=${accountId}&form_id=${formId}`, {
                 withCredentials: true,
             });
             return res.data
         },
         enabled: hasAccountId,
     });
+    useEffect(() => {
+        if (data?.users) {
+            const preSelected = data.users
+                .filter((u) => u.hasAccess)
+                .map((u) => u.id);
+
+            setSelectedUserIds(preSelected);
+        }
+    }, [data]);
 
     const toggleUser = (userId: string) => {
         setSelectedUserIds((prev) =>
@@ -144,5 +153,6 @@ interface Response {
         email: string;
         role: Role;
         createdAt: string
+        hasAccess: boolean
     }[]
 }
