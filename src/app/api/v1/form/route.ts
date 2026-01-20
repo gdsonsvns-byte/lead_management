@@ -146,6 +146,7 @@ export async function POST(req: NextRequest) {
         let accountId: string;
         let adminId: string;
         let adminName: string;
+        let superAdminId: string | null = null;
 
         if (user) {
             if (user.role === "SUPERADMIN") {
@@ -161,7 +162,7 @@ export async function POST(req: NextRequest) {
 
                 const accountExists = await prisma.account.findUnique({
                     where: { id: targetAccountId },
-                    select: { id: true, users: { where: { role: "ADMIN" }, select: { id: true, name: true } } },
+                    select: { id: true, users: { where: { role: "ADMIN" }, select: { id: true, name: true, role: true } } },
                 });
 
                 if (!accountExists) {
@@ -174,27 +175,34 @@ export async function POST(req: NextRequest) {
                 accountId = targetAccountId;
                 adminId = accountExists.users[0].id;
                 adminName = accountExists.users[0].name;
+                superAdminId = user.sub
             } else {
-                const accountExists = await prisma.account.findUnique({
-                    where: { id: user.accountId },
-                    select: { id: true, users: { where: { role: "ADMIN" }, select: { id: true, name: true } } },
-                });
-
-                if (!accountExists) {
-                    return NextResponse.json(
-                        { error: "Account not found" },
-                        { status: 404 }
-                    );
+                const [accounts, superAdmin] = await Promise.all([
+                    await prisma.account.findUnique({
+                        where: { id: user.accountId },
+                        select: { id: true, users: { where: { role: "ADMIN" }, select: { id: true, name: true } } },
+                    }),
+                    await prisma.user.findFirst({ where: { role: "SUPERADMIN" } })
+                ])
+                if (!accounts || !superAdmin) {
+                    return NextResponse.json({ error: "Account Not Found" }, { status: 400 })
                 }
                 accountId = user.accountId;
-                adminId = accountExists.users[0].id;
-                adminName = accountExists.users[0].name;
+                adminId = accounts.users[0].id;
+                adminName = accounts.users[0].name;
+                superAdminId = superAdmin.id
             }
         } else {
+            const superAdmin = await prisma.user.findFirst({ where: { role: "SUPERADMIN" } })
+            if (!superAdmin) {
+                return NextResponse.json({ error: "Superadmin Account Not Found" }, { status: 400 })
+            }
             accountId = apiClient?.accountId!;
             adminId = apiClient?.adminId!;
             adminName = apiClient?.adminName!;
+            superAdminId = superAdmin.id
         }
+
         const rawAdmin = body.adminCampaign;
         const rawUser = body.userCampaign;
         const adminCampaign = typeof rawAdmin === "string" ? rawAdmin.trim() : null;
@@ -256,6 +264,17 @@ export async function POST(req: NextRequest) {
                 },
             });
 
+            const accessUsers = [
+                { formId: createdForm.id, userId: adminId },
+                superAdminId && { formId: createdForm.id, userId: superAdminId },
+            ].filter(Boolean) as { formId: string; userId: string }[];
+
+            await tx.formAccess.createMany({
+                data: accessUsers,
+                skipDuplicates: true,
+            });
+
+
             if (DEFAULT_NEXT_ACTIONS?.length) {
                 await tx.nextActionType.createMany({
                     data: DEFAULT_NEXT_ACTIONS.map((a) => ({
@@ -268,6 +287,7 @@ export async function POST(req: NextRequest) {
                     skipDuplicates: true,
                 });
             }
+            
             return createdForm;
         });
 
