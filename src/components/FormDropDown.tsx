@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import Spinner from "./ui/spinner";
+import { useAuth } from "../hooks/useAuth";
 
 interface FormItem {
     id: string;
@@ -26,11 +27,13 @@ interface Props {
 }
 
 export default function FormDropDown({ formData }: Props) {
+    const {user} = useAuth()
     const queryClient = useQueryClient();
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
     const [copyLoading, setCopyLoading] = useState<boolean>(false)
-
+    console.log(user?.role);
+    
     function handleCopy(formId: string) {
         setCopyLoading(true);
         if (!formId) {

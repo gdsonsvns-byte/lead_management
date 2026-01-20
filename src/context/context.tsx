@@ -1,12 +1,8 @@
 "use client";
-
-import { createContext, useEffect, useState } from "react";
+import { createContext, useState } from "react";
 import Cookies from "js-cookie";
-import jwt from "jsonwebtoken";
 import { Role } from "../app/generated/prisma/enums";
 
-
-const JWT_SECRET = process.env.JWT_SECRET!;
 type AuthUser = {
     sub: string;
     accountId: string;
@@ -19,48 +15,22 @@ type AuthContextType = {
     logout: () => void;
 };
 
-function safeVerifyToken(token: string | null) {
-    if (!token) return null;
-    try {
-        return jwt.verify(token, JWT_SECRET) as {
-            sub: string;
-            accountId: string;
-            role: Role;
-        };
-    } catch {
-        return null;
-    }
-}
-
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function ContextProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<AuthUser | null>(null);
-
-    useEffect(() => {
-        const token = Cookies.get("token") || null;
-        const decoded = safeVerifyToken(token);
-
-        if (decoded) {
-            setUser(decoded);
-        } else {
-            setUser(null);
-        }
-    }, []);
-
+export function ContextProvider({ children, initialUser }: { children: React.ReactNode, initialUser: AuthUser | null; }) {
+    const [user, setUser] = useState<AuthUser | null>(initialUser);
     const logout = () => {
         Cookies.remove("token");
         setUser(null);
     };
 
+    const value = {
+        user,
+        isAuthenticated: !!user,
+        logout,
+    }
     return (
-        <AuthContext.Provider
-            value={{
-                user,
-                isAuthenticated: !!user,
-                logout,
-            }}
-        >
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );
