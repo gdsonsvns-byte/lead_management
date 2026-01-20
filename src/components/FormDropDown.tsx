@@ -2,11 +2,12 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import { CopyIcon, EyeIcon, InboxIcon, Pencil, SettingsIcon, Trash2Icon, ViewIcon } from "lucide-react";
+import { CopyIcon, EyeIcon, InboxIcon, Pencil, SettingsIcon, Trash2Icon, UserCog, ViewIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import Spinner from "./ui/spinner";
+import { useAuth } from "../hooks/useAuth";
 
 interface FormItem {
     id: string;
@@ -26,10 +27,12 @@ interface Props {
 }
 
 export default function FormDropDown({ formData }: Props) {
+    const { user } = useAuth()
     const queryClient = useQueryClient();
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
     const [copyLoading, setCopyLoading] = useState<boolean>(false)
+    const [openAccessModal, setOpenAccessModal] = useState<boolean>(true)
 
     function handleCopy(formId: string) {
         setCopyLoading(true);
@@ -73,16 +76,40 @@ export default function FormDropDown({ formData }: Props) {
 
             <DropdownMenuContent align="start" className="w-56 bg-white border border-gray-300 mt-3">
                 <DropdownMenuGroup>
-                    <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
-                        <Link
-                            href={`?update=${formData.id}`}
-                            className="flex items-center justify-between"
-                            title="Edit Form"
-                        >
-                            Edit Form
-                            <Pencil size={14} className="text-zinc-700" />
-                        </Link>
-                    </DropdownMenuItem>
+                    {(user?.role === "ADMIN" || user?.role === "SUPERADMIN") && (
+                        <>
+                            <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
+                                <Link
+                                    href={`?update=${formData.id}`}
+                                    className="flex items-center justify-between"
+                                    title="Edit Form"
+                                >
+                                    Edit Form
+                                    <Pencil size={14} className="text-zinc-700" />
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
+                                <Link
+                                    href={`?form_id=${formData.id}`}
+                                    className="flex items-center justify-between w-full"
+                                >
+                                    Manage Response
+                                    <InboxIcon size={14} className="text-zinc-700" />
+
+                                </Link>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
+                                <Link
+                                    href={`?account_id=${formData.accountId}&f_id=${formData.id}`}
+                                    className="flex items-center justify-between w-full"
+                                >
+                                    Manage Access
+                                    <UserCog size={14} className="text-zinc-700" />
+                                </Link>
+                            </DropdownMenuItem>
+                        </>
+                    )}
 
                     <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
                         <Link
@@ -109,32 +136,27 @@ export default function FormDropDown({ formData }: Props) {
                         </button>
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
-                        <Link
-                            href={`?form_id=${formData.id}`}
-                            className="flex items-center justify-between w-full"
-                        >
-                            Manage Response
-                            <InboxIcon size={14} className="text-zinc-700" />
-
-                        </Link>
-                    </DropdownMenuItem>
-
-                    <DropdownMenuSeparator className="bg-gray-300" />
-                    <DropdownMenuItem
-                        title="Delete this form"
-                        onSelect={(e) => e.preventDefault()}
-                        onClick={() => deleteMutation.mutate(formData.id)}
-                        disabled={deletingId === formData.id}
-                        className="text-red-600 cursor-pointer hover:bg-gray-100 flex items-center w-full justify-between"
-                    >
-                        Delete Form
-                        {deletingId === formData.id ? (
-                            <Spinner />
-                        ) : (
-                            <Trash2Icon size={14} className="text-zinc-700" />
-                        )}
-                    </DropdownMenuItem>
+                    {
+                        (user?.role === "ADMIN" || user?.role === "SUPERADMIN") && (
+                            <>
+                                <DropdownMenuSeparator className="bg-gray-300" />
+                                <DropdownMenuItem
+                                    title="Delete this form"
+                                    onSelect={(e) => e.preventDefault()}
+                                    onClick={() => deleteMutation.mutate(formData.id)}
+                                    disabled={deletingId === formData.id}
+                                    className="text-red-600 cursor-pointer hover:bg-gray-100 flex items-center w-full justify-between"
+                                >
+                                    Delete Form
+                                    {deletingId === formData.id ? (
+                                        <Spinner />
+                                    ) : (
+                                        <Trash2Icon size={14} className="text-zinc-700" />
+                                    )}
+                                </DropdownMenuItem>
+                            </>
+                        )
+                    }
                 </DropdownMenuGroup>
             </DropdownMenuContent>
         </DropdownMenu>

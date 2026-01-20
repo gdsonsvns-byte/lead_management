@@ -7,40 +7,17 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  SUPERADMIN
-  ADMIN
-  MANAGER
-}
-
-enum FollowUpType {
-  CALL
-  EMAIL
-  WHATSAPP
-  MEETING
-  NOTE
-  STATUS_CHANGE
-}
-
-enum FollowUpStatus {
-  PENDING
-  COMPLETED
-  SKIPPED
-  CANCELLED
-}
-
 model Account {
-  id             String  @id @default(uuid())
-  businessName   String?
-  phone          String?
-  location       String?
-  email          String  @unique
-  whatsappApiKey String?
-  users          User[]
-  forms          Form[]
-
+  id              String           @id @default(uuid())
+  businessName    String?
+  phone           String?
+  location        String?
+  email           String           @unique
   createdAt       DateTime         @default(now())
+  whatsappApiKey  String?
   apiAccessTokens ApiAccessToken[]
+  forms           Form[]
+  users           User[]
 
   @@index([createdAt])
 }
@@ -63,6 +40,9 @@ model User {
   createdAt           DateTime         @default(now())
   followUps           FollowUp[]
   apiAccessTokens     ApiAccessToken[]
+  formAccesses        FormAccess[]
+  assignedResponses   Response[]       @relation("AssignedResponses")
+  assignedByResponses Response[]       @relation("AssignedBy")
 
   @@index([accountId])
   @@index([role])
@@ -78,8 +58,7 @@ model ManagedUser {
   phone     String?
   roleTitle String?
   createdAt DateTime @default(now())
-
-  admin User @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  admin     User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
 
   @@index([adminId])
   @@index([createdAt])
@@ -99,9 +78,10 @@ model Form {
   adminWhatsappCampaignName String?
   userWhatsappCampaignName  String?
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  account   Account? @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  accountId String?
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account     Account?     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId   String?
+  accessUsers FormAccess[]
 
   @@index([userId])
   @@index([accountId])
@@ -123,25 +103,33 @@ model FormField {
 }
 
 model Response {
-  id          String           @id @default(uuid())
+  id          String   @id @default(uuid())
   formId      String
-  submittedAt DateTime         @default(now())
-  form        Form             @relation(fields: [formId], references: [id], onDelete: Cascade)
-  answers     ResponseAnswer[]
-  followUps   FollowUp[]
+  submittedAt DateTime @default(now())
+
+  assignedToId String?
+  assignedAt   DateTime?
+  assignedById String?
+
+  form      Form             @relation(fields: [formId], references: [id], onDelete: Cascade)
+  answers   ResponseAnswer[]
+  followUps FollowUp[]
+
+  assignedTo User? @relation("AssignedResponses", fields: [assignedToId], references: [id], onDelete: SetNull)
+  assignedBy User? @relation("AssignedBy", fields: [assignedById], references: [id], onDelete: SetNull)
 
   @@index([formId])
   @@index([submittedAt])
+  @@index([assignedToId])
 }
 
 model ResponseAnswer {
-  id         String @id @default(uuid())
+  id         String    @id @default(uuid())
   responseId String
   fieldId    String
   value      String
-
-  response Response  @relation(fields: [responseId], references: [id], onDelete: Cascade)
-  field    FormField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  field      FormField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  response   Response  @relation(fields: [responseId], references: [id], onDelete: Cascade)
 
   @@index([responseId])
   @@index([fieldId])
@@ -194,14 +182,53 @@ model NextActionType {
   status FollowUpStatus @default(PENDING)
   order  Int?
   formId String?
-  form   Form?   @relation(fields: [formId], references: [id], onDelete: Cascade)
+  form   Form?          @relation(fields: [formId], references: [id], onDelete: Cascade)
 
   isDefault Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  autoApplyOnFirstFollowUp Boolean @default(false)
 
   @@unique([label, formId])
   @@index([formId])
   @@index([label])
   @@index([isDefault])
+  @@index([autoApplyOnFirstFollowUp])
   @@index([createdAt])
+}
+
+model FormAccess {
+  id        String   @id @default(uuid())
+  formId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  form Form @relation(fields: [formId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([formId, userId])
+  @@index([formId])
+  @@index([userId])
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  MANAGER
+}
+
+enum FollowUpType {
+  CALL
+  EMAIL
+  WHATSAPP
+  MEETING
+  NOTE
+  STATUS_CHANGE
+}
+
+enum FollowUpStatus {
+  PENDING
+  COMPLETED
+  SKIPPED
+  CANCELLED
 }

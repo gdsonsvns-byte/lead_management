@@ -11,6 +11,7 @@ import EditForm from "./common/EditForm";
 import FormDropDown from "./FormDropDown";
 import ConfigureWapCampaign from "./common/configure_whatsapp_campaign_for_user_and_admin";
 import ManageResponse from "./common/manage_response";
+import ManageAccess from "./common/manage_access";
 
 interface FormItem {
     id: string;
@@ -52,7 +53,7 @@ export default function FormsList({ accountId }: { accountId?: string }) {
     const [page, setPage] = useState(1);
     const limit = 10;
 
-    const { data, isLoading, isError, error } = useQuery({
+    const { data, isLoading, isError, error, isFetching } = useQuery({
         queryKey: ["forms", page, limit, accountId],
         queryFn: () => fetchForms(page, limit, accountId ?? ''),
         placeholderData: (prev) => prev,
@@ -62,7 +63,7 @@ export default function FormsList({ accountId }: { accountId?: string }) {
     const forms = data?.response?.forms ?? [];
     const pagination = data?.response;
 
-    if (isLoading) {
+    if (isLoading || isFetching) {
         return (
             <div className="w-full flex justify-center py-20">
                 <Spinner />
@@ -250,6 +251,7 @@ export default function FormsList({ accountId }: { accountId?: string }) {
                     accountId={accountId}
                 />
                 <ManageResponse />
+                <ManageAccess />
             </Suspense>
         </div>
     );

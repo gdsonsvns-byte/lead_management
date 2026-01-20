@@ -42,6 +42,7 @@ export type NextActionTypeMinAggregateOutputType = {
   formId: string | null
   isDefault: boolean | null
   createdAt: Date | null
+  autoApplyOnFirstFollowUp: boolean | null
 }
 
 export type NextActionTypeMaxAggregateOutputType = {
@@ -52,6 +53,7 @@ export type NextActionTypeMaxAggregateOutputType = {
   formId: string | null
   isDefault: boolean | null
   createdAt: Date | null
+  autoApplyOnFirstFollowUp: boolean | null
 }
 
 export type NextActionTypeCountAggregateOutputType = {
@@ -62,6 +64,7 @@ export type NextActionTypeCountAggregateOutputType = {
   formId: number
   isDefault: number
   createdAt: number
+  autoApplyOnFirstFollowUp: number
   _all: number
 }
 
@@ -82,6 +85,7 @@ export type NextActionTypeMinAggregateInputType = {
   formId?: true
   isDefault?: true
   createdAt?: true
+  autoApplyOnFirstFollowUp?: true
 }
 
 export type NextActionTypeMaxAggregateInputType = {
@@ -92,6 +96,7 @@ export type NextActionTypeMaxAggregateInputType = {
   formId?: true
   isDefault?: true
   createdAt?: true
+  autoApplyOnFirstFollowUp?: true
 }
 
 export type NextActionTypeCountAggregateInputType = {
@@ -102,6 +107,7 @@ export type NextActionTypeCountAggregateInputType = {
   formId?: true
   isDefault?: true
   createdAt?: true
+  autoApplyOnFirstFollowUp?: true
   _all?: true
 }
 
@@ -199,6 +205,7 @@ export type NextActionTypeGroupByOutputType = {
   formId: string | null
   isDefault: boolean
   createdAt: Date
+  autoApplyOnFirstFollowUp: boolean
   _count: NextActionTypeCountAggregateOutputType | null
   _avg: NextActionTypeAvgAggregateOutputType | null
   _sum: NextActionTypeSumAggregateOutputType | null
@@ -232,6 +239,7 @@ export type NextActionTypeWhereInput = {
   formId?: Prisma.StringNullableFilter<"NextActionType"> | string | null
   isDefault?: Prisma.BoolFilter<"NextActionType"> | boolean
   createdAt?: Prisma.DateTimeFilter<"NextActionType"> | Date | string
+  autoApplyOnFirstFollowUp?: Prisma.BoolFilter<"NextActionType"> | boolean
   form?: Prisma.XOR<Prisma.FormNullableScalarRelationFilter, Prisma.FormWhereInput> | null
 }
 
@@ -243,6 +251,7 @@ export type NextActionTypeOrderByWithRelationInput = {
   formId?: Prisma.SortOrderInput | Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  autoApplyOnFirstFollowUp?: Prisma.SortOrder
   form?: Prisma.FormOrderByWithRelationInput
 }
 
@@ -258,6 +267,7 @@ export type NextActionTypeWhereUniqueInput = Prisma.AtLeast<{
   formId?: Prisma.StringNullableFilter<"NextActionType"> | string | null
   isDefault?: Prisma.BoolFilter<"NextActionType"> | boolean
   createdAt?: Prisma.DateTimeFilter<"NextActionType"> | Date | string
+  autoApplyOnFirstFollowUp?: Prisma.BoolFilter<"NextActionType"> | boolean
   form?: Prisma.XOR<Prisma.FormNullableScalarRelationFilter, Prisma.FormWhereInput> | null
 }, "id" | "label_formId">
 
@@ -269,6 +279,7 @@ export type NextActionTypeOrderByWithAggregationInput = {
   formId?: Prisma.SortOrderInput | Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  autoApplyOnFirstFollowUp?: Prisma.SortOrder
   _count?: Prisma.NextActionTypeCountOrderByAggregateInput
   _avg?: Prisma.NextActionTypeAvgOrderByAggregateInput
   _max?: Prisma.NextActionTypeMaxOrderByAggregateInput
@@ -287,6 +298,7 @@ export type NextActionTypeScalarWhereWithAggregatesInput = {
   formId?: Prisma.StringNullableWithAggregatesFilter<"NextActionType"> | string | null
   isDefault?: Prisma.BoolWithAggregatesFilter<"NextActionType"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"NextActionType"> | Date | string
+  autoApplyOnFirstFollowUp?: Prisma.BoolWithAggregatesFilter<"NextActionType"> | boolean
 }
 
 export type NextActionTypeCreateInput = {
@@ -296,6 +308,7 @@ export type NextActionTypeCreateInput = {
   order?: number | null
   isDefault?: boolean
   createdAt?: Date | string
+  autoApplyOnFirstFollowUp?: boolean
   form?: Prisma.FormCreateNestedOneWithoutNextActionsInput
 }
 
@@ -307,6 +320,7 @@ export type NextActionTypeUncheckedCreateInput = {
   formId?: string | null
   isDefault?: boolean
   createdAt?: Date | string
+  autoApplyOnFirstFollowUp?: boolean
 }
 
 export type NextActionTypeUpdateInput = {
@@ -316,6 +330,7 @@ export type NextActionTypeUpdateInput = {
   order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  autoApplyOnFirstFollowUp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   form?: Prisma.FormUpdateOneWithoutNextActionsNestedInput
 }
 
@@ -327,6 +342,7 @@ export type NextActionTypeUncheckedUpdateInput = {
   formId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  autoApplyOnFirstFollowUp?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type NextActionTypeCreateManyInput = {
@@ -337,6 +353,7 @@ export type NextActionTypeCreateManyInput = {
   formId?: string | null
   isDefault?: boolean
   createdAt?: Date | string
+  autoApplyOnFirstFollowUp?: boolean
 }
 
 export type NextActionTypeUpdateManyMutationInput = {
@@ -346,6 +363,7 @@ export type NextActionTypeUpdateManyMutationInput = {
   order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  autoApplyOnFirstFollowUp?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type NextActionTypeUncheckedUpdateManyInput = {
@@ -356,6 +374,7 @@ export type NextActionTypeUncheckedUpdateManyInput = {
   formId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  autoApplyOnFirstFollowUp?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type NextActionTypeListRelationFilter = {
@@ -381,6 +400,7 @@ export type NextActionTypeCountOrderByAggregateInput = {
   formId?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  autoApplyOnFirstFollowUp?: Prisma.SortOrder
 }
 
 export type NextActionTypeAvgOrderByAggregateInput = {
@@ -395,6 +415,7 @@ export type NextActionTypeMaxOrderByAggregateInput = {
   formId?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  autoApplyOnFirstFollowUp?: Prisma.SortOrder
 }
 
 export type NextActionTypeMinOrderByAggregateInput = {
@@ -405,6 +426,7 @@ export type NextActionTypeMinOrderByAggregateInput = {
   formId?: Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  autoApplyOnFirstFollowUp?: Prisma.SortOrder
 }
 
 export type NextActionTypeSumOrderByAggregateInput = {
@@ -460,6 +482,7 @@ export type NextActionTypeCreateWithoutFormInput = {
   order?: number | null
   isDefault?: boolean
   createdAt?: Date | string
+  autoApplyOnFirstFollowUp?: boolean
 }
 
 export type NextActionTypeUncheckedCreateWithoutFormInput = {
@@ -469,6 +492,7 @@ export type NextActionTypeUncheckedCreateWithoutFormInput = {
   order?: number | null
   isDefault?: boolean
   createdAt?: Date | string
+  autoApplyOnFirstFollowUp?: boolean
 }
 
 export type NextActionTypeCreateOrConnectWithoutFormInput = {
@@ -508,6 +532,7 @@ export type NextActionTypeScalarWhereInput = {
   formId?: Prisma.StringNullableFilter<"NextActionType"> | string | null
   isDefault?: Prisma.BoolFilter<"NextActionType"> | boolean
   createdAt?: Prisma.DateTimeFilter<"NextActionType"> | Date | string
+  autoApplyOnFirstFollowUp?: Prisma.BoolFilter<"NextActionType"> | boolean
 }
 
 export type NextActionTypeCreateManyFormInput = {
@@ -517,6 +542,7 @@ export type NextActionTypeCreateManyFormInput = {
   order?: number | null
   isDefault?: boolean
   createdAt?: Date | string
+  autoApplyOnFirstFollowUp?: boolean
 }
 
 export type NextActionTypeUpdateWithoutFormInput = {
@@ -526,6 +552,7 @@ export type NextActionTypeUpdateWithoutFormInput = {
   order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  autoApplyOnFirstFollowUp?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type NextActionTypeUncheckedUpdateWithoutFormInput = {
@@ -535,6 +562,7 @@ export type NextActionTypeUncheckedUpdateWithoutFormInput = {
   order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  autoApplyOnFirstFollowUp?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type NextActionTypeUncheckedUpdateManyWithoutFormInput = {
@@ -544,6 +572,7 @@ export type NextActionTypeUncheckedUpdateManyWithoutFormInput = {
   order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  autoApplyOnFirstFollowUp?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -556,6 +585,7 @@ export type NextActionTypeSelect<ExtArgs extends runtime.Types.Extensions.Intern
   formId?: boolean
   isDefault?: boolean
   createdAt?: boolean
+  autoApplyOnFirstFollowUp?: boolean
   form?: boolean | Prisma.NextActionType$formArgs<ExtArgs>
 }, ExtArgs["result"]["nextActionType"]>
 
@@ -567,6 +597,7 @@ export type NextActionTypeSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   formId?: boolean
   isDefault?: boolean
   createdAt?: boolean
+  autoApplyOnFirstFollowUp?: boolean
   form?: boolean | Prisma.NextActionType$formArgs<ExtArgs>
 }, ExtArgs["result"]["nextActionType"]>
 
@@ -578,6 +609,7 @@ export type NextActionTypeSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   formId?: boolean
   isDefault?: boolean
   createdAt?: boolean
+  autoApplyOnFirstFollowUp?: boolean
   form?: boolean | Prisma.NextActionType$formArgs<ExtArgs>
 }, ExtArgs["result"]["nextActionType"]>
 
@@ -589,9 +621,10 @@ export type NextActionTypeSelectScalar = {
   formId?: boolean
   isDefault?: boolean
   createdAt?: boolean
+  autoApplyOnFirstFollowUp?: boolean
 }
 
-export type NextActionTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "status" | "order" | "formId" | "isDefault" | "createdAt", ExtArgs["result"]["nextActionType"]>
+export type NextActionTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "status" | "order" | "formId" | "isDefault" | "createdAt" | "autoApplyOnFirstFollowUp", ExtArgs["result"]["nextActionType"]>
 export type NextActionTypeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   form?: boolean | Prisma.NextActionType$formArgs<ExtArgs>
 }
@@ -615,6 +648,7 @@ export type $NextActionTypePayload<ExtArgs extends runtime.Types.Extensions.Inte
     formId: string | null
     isDefault: boolean
     createdAt: Date
+    autoApplyOnFirstFollowUp: boolean
   }, ExtArgs["result"]["nextActionType"]>
   composites: {}
 }
@@ -1046,6 +1080,7 @@ export interface NextActionTypeFieldRefs {
   readonly formId: Prisma.FieldRef<"NextActionType", 'String'>
   readonly isDefault: Prisma.FieldRef<"NextActionType", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"NextActionType", 'DateTime'>
+  readonly autoApplyOnFirstFollowUp: Prisma.FieldRef<"NextActionType", 'Boolean'>
 }
     
 
