@@ -26,6 +26,8 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized User" }, { status: 401 });
         }
         const accountId = user?.accountId || apiClient?.accountId;
+        const requesterId = user?.sub || apiClient?.adminId;
+
         const { searchParams } = new URL(req.url);
         const page = Math.max(Number(searchParams.get("page")) || 1, 1);
         const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 10, 1), 50);
@@ -53,34 +55,44 @@ export async function GET(req: NextRequest) {
         }
 
         const finalAccountId = queryAccountId !== "" ? queryAccountId : accountId;
-
-        const forms = await prisma.form.findMany({
-            where: { accountId: finalAccountId },
-            skip,
-            take: limit,
-            orderBy: { createdAt: "desc" },
-            select: {
-                id: true,
-                formsId: true,
-                userId: true,
-                title: true,
-                description: true,
-                slug: true,
-                createdAt: true,
-                adminWhatsappCampaignName: true,
-                userWhatsappCampaignName: true,
-                accountId: true,
-                _count: {
-                    select: {
-                        fields: true,
-                    },
+        const accessCondition = user?.role === "SUPERADMIN" ? { accountId: finalAccountId } : {
+            accountId: finalAccountId,
+            accessUsers: {
+                some: {
+                    userId: requesterId,
                 },
             },
-        });
+        };
 
-        const totalForm = await prisma.form.count({
-            where: { accountId: finalAccountId }
-        });
+
+        const [forms, totalForm] = await Promise.all([
+            prisma.form.findMany({
+                where: accessCondition,
+                skip,
+                take: limit,
+                orderBy: { createdAt: "desc" },
+                select: {
+                    id: true,
+                    formsId: true,
+                    userId: true,
+                    title: true,
+                    description: true,
+                    slug: true,
+                    createdAt: true,
+                    adminWhatsappCampaignName: true,
+                    userWhatsappCampaignName: true,
+                    accountId: true,
+                    _count: {
+                        select: {
+                            fields: true,
+                        },
+                    },
+                },
+            }),
+            await prisma.form.count({
+                where: accessCondition
+            })
+        ]);
 
         if (forms.length === 0) {
             return NextResponse.json(
@@ -287,7 +299,7 @@ export async function POST(req: NextRequest) {
                     skipDuplicates: true,
                 });
             }
-            
+
             return createdForm;
         });
 
