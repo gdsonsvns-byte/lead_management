@@ -4,14 +4,19 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/src/lib/utils";
 import { ADMIN_TABS, SYSTEM_ADMIN } from "@/src/constants/adminTabs";
 import { Dispatch, SetStateAction } from "react";
+import { useAuth } from "@/src/hooks/useAuth";
 
 
 export default function Tabs({ setOpen }: { setOpen: Dispatch<SetStateAction<boolean>> }) {
     const pathname = usePathname();
+    const { user } = useAuth();
+    const role = user?.role;
 
+    const tabs = pathname.startsWith("/admin") ? ADMIN_TABS : SYSTEM_ADMIN;
+    const filteredTabs = role ? tabs.filter((tab) => tab.roles && tab.roles.includes(role)) : [];
     return (
         <div className="flex flex-col gap-1 pl-5 pt-5 overflow-y-auto flex-1">
-            {((pathname.startsWith("/admin") ? ADMIN_TABS : SYSTEM_ADMIN)).map((tab) => {
+            {filteredTabs.map((tab) => {
                 const isActive = pathname.startsWith(tab.page);
                 const Icon = tab.icon;
                 return (
