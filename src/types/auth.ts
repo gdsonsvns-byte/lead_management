@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { Role } from "../app/generated/prisma/enums";
 
 export const loginSchema = z.object({
   email: z
@@ -166,4 +167,18 @@ export interface AccountCounts {
 
 export interface FormCounts {
   responses: number;
+}
+
+export interface ManagerResponse {
+  account: Omit<AccountData, "users" | "forms" | "_count">;
+  user: AccountUser;
+  initials: string;
+}
+export interface NormalizedAccount {
+  account: Omit<AccountData, "users" | "forms" | "_count">;
+  users: AccountUser[];
+  forms?: AccountForm[];
+  counts?: AccountCounts;
+  initials: string;
+  total_response?: number;
 }

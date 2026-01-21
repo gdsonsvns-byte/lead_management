@@ -5,6 +5,7 @@ import { verifyRole } from "@/src/lib/verifyRole";
 import { resetPasswordSchema } from "@/src/types/auth";
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
+import z from "zod";
 
 export async function PATCH(req: NextRequest) {
     try {
@@ -16,9 +17,9 @@ export async function PATCH(req: NextRequest) {
             );
         }
 
-        const user = await verifyRole(["ADMIN", "SUPERADMIN"])
+        const user = await verifyRole(["ADMIN", "SUPERADMIN","MANAGER"])
         const apiClient = await verifyApiAccessToken(req);
-
+        
         if (!user && !apiClient) {
             return NextResponse.json(
                 { error: "Unauthorized" },
@@ -26,7 +27,7 @@ export async function PATCH(req: NextRequest) {
             );
         }
         let userId: string | null = null;
-        if (user && (user.role === "ADMIN" || user.role === "SUPERADMIN")) {
+        if (user && (user.role === "ADMIN" || user.role === "SUPERADMIN" || user.role === "MANAGER")) {
             userId = user.sub;
         } else if (!user && apiClient) {
             userId = apiClient.adminId;
@@ -41,11 +42,8 @@ export async function PATCH(req: NextRequest) {
         const pass = resetPasswordSchema.safeParse({ password: newPassword });
 
         if (!pass.success) {
-            const flat = pass.error.flatten().fieldErrors;
-            const firstError = Object.values(flat).flat()[0];
-
             return NextResponse.json(
-                { error: firstError || "Invalid password" },
+                { error: z.prettifyError(pass.error) || "Invalid password" },
                 { status: 400 }
             );
         }
