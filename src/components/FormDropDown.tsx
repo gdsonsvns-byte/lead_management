@@ -32,7 +32,7 @@ export default function FormDropDown({ formData }: Props) {
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
     const [copyLoading, setCopyLoading] = useState<boolean>(false)
-    const [openAccessModal, setOpenAccessModal] = useState<boolean>(true)
+    const isAdmin = user?.role === "ADMIN" || user?.role === "SUPERADMIN";
 
     function handleCopy(formId: string) {
         setCopyLoading(true);
@@ -76,7 +76,7 @@ export default function FormDropDown({ formData }: Props) {
 
             <DropdownMenuContent align="start" className="w-56 bg-white border border-gray-300 mt-3">
                 <DropdownMenuGroup>
-                    {(user?.role === "ADMIN" || user?.role === "SUPERADMIN") && (
+                    {isAdmin && (
                         <>
                             <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
                                 <Link
@@ -137,7 +137,7 @@ export default function FormDropDown({ formData }: Props) {
                     </DropdownMenuItem>
 
                     {
-                        (user?.role === "ADMIN" || user?.role === "SUPERADMIN") && (
+                        isAdmin && (
                             <>
                                 <DropdownMenuSeparator className="bg-gray-300" />
                                 <DropdownMenuItem

@@ -58,8 +58,12 @@ export async function GET(req: NextRequest) {
         const [users, access] = await Promise.all([
             prisma.user.findMany({
                 where: {
-                    accountId,
-                    role: { not: "ADMIN" },
+                    ...(user.role === "SUPERADMIN" ? {
+                        accountId,
+                    } : {
+                        accountId,
+                        role: { not: "ADMIN" },
+                    })
                 },
                 select: {
                     id: true,
