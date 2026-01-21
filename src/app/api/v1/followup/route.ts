@@ -166,11 +166,14 @@ export async function GET(req: NextRequest) {
         const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
 
         let accountId: string | null = null;
+        let userId: string | null = null;
 
         if (user?.role === "ADMIN" || user?.role === "MANAGER") {
             accountId = user.accountId;
+            userId = user.sub
         } else if (!user && apiClient) {
             accountId = apiClient.accountId;
+            userId = apiClient.adminId
         }
 
         const followUps = await prisma.followUp.findMany({
@@ -178,6 +181,11 @@ export async function GET(req: NextRequest) {
                 response: {
                     form: {
                         accountId: accountId,
+                        accessUsers: {
+                            some: {
+                                userId: userId!
+                            }
+                        }
                     },
                 },
             },
