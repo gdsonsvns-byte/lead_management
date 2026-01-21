@@ -91,8 +91,9 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
         );
     }
     const account = data.account;
+    const counts = data.counts;
+    const users = data.users;
     const displayName = !isAdmin ? data.users[0]?.name : account.businessName;
-    console.log(data);
 
     return (
         <div className="w-full space-y-5">
@@ -140,12 +141,12 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
             {isAdmin && <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 <div className="p-6 rounded-xl bg-white shadow flex flex-col items-start">
                     <p className="text-gray-500">Total Users</p>
-                    <p className="text-3xl font-semibold">{account._count.users}</p>
+                    <p className="text-3xl font-semibold">{counts?.users}</p>
                 </div>
 
                 <div className="p-6 rounded-xl bg-white shadow flex flex-col items-start">
                     <p className="text-gray-500">Total Forms</p>
-                    <p className="text-3xl font-semibold">{account._count.forms}</p>
+                    <p className="text-3xl font-semibold">{counts?.forms}</p>
                 </div>
 
                 <div className="p-6 rounded-xl bg-white shadow flex flex-col items-start">
@@ -160,7 +161,7 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
                 </h2>
 
                 <div className="space-y-3">
-                    {account.users.map((u) => (
+                    {users.map((u) => (
                         <div
                             key={u.id}
                             className="relative p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition"
