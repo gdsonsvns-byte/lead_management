@@ -4,6 +4,7 @@ import { SendPasswordResetEmail } from "@/src/lib/sendPasswordResetEmail";
 import prisma from "@/src/lib/prisma";
 import { forgetPasswordEMail } from "@/src/types/auth";
 import { isRateLimited } from "@/src/lib/limiter";
+import z from "zod";
 
 export async function POST(req: Request) {
 
@@ -19,11 +20,8 @@ export async function POST(req: Request) {
         const { email } = await req.json();
         const validEmail = forgetPasswordEMail.safeParse({ email: email })
         if (!validEmail.success) {
-            const flat = validEmail.error.flatten().fieldErrors;
-            const firstError = Object.values(flat).flat()[0];
-
             return NextResponse.json(
-                { error: firstError || "Invalid email" },
+                { error: z.prettifyError(validEmail.error) || "Invalid email" },
                 { status: 400 }
             );
         }

@@ -5,6 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { redirect } from "next/navigation";
+import Spinner from "../ui/spinner";
 
 export default function ResetPassword({ token }: { token: string }) {
     const [password, setPassword] = useState<string>('')
@@ -56,7 +57,7 @@ export default function ResetPassword({ token }: { token: string }) {
                 role='button'
                 className={`w-full bg-blue-600 py-2.5 text-white mt-3 rounded font-medium text-lg ${isPending ? 'cursor-not-allowed' : 'cursor-pointer'} `}
             >
-                {isPending ? "Loading..." : 'Save'}
+                {isPending ? <Spinner color="white" /> : 'Save'}
             </button>
             {isError && (
                 <p className="text-red-500 text-sm mt-1">

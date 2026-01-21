@@ -6,8 +6,7 @@ export default async function AuthBoundary({
 }: {
     children: React.ReactNode;
 }) {
-    const user = await getServerUser();
-
+    const user = await getServerUser();    
     return (
         <ContextProvider initialUser={user}>
             {children}

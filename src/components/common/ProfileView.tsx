@@ -1,5 +1,5 @@
 "use client";
-import { AccountSummaryResponse } from "@/src/types/auth";
+import { AccountSummaryResponse, ManagerResponse, NormalizedAccount } from "@/src/types/auth";
 import { Button } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -11,8 +11,11 @@ import { useState } from "react";
 import ShowApiToken from "./show_api_toke";
 import Spinner from "../ui/spinner";
 import UpdatePassword from "../UpdatePassword";
+import { useAuth } from "@/src/hooks/useAuth";
 
 export default function ProfileView({ accountId }: { accountId?: string }) {
+    const { user } = useAuth()
+    const isAdmin = user && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
     const currentPath = usePathname()
     const queryClient = useQueryClient();
     const [openFormModal, setOpenFormModal] = useState(false);
@@ -22,16 +25,34 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
         message: "",
         token: "",
     });
-    const { data, isLoading, error } = useQuery<AccountSummaryResponse>({
+    const { data, isLoading, error } = useQuery<NormalizedAccount>({
         queryKey: ["view-profile", accountId],
         queryFn: async () => {
-            const res = await axios.get(`/api/v1/auth/me?account_id=${accountId ?? ''}`, {
-                withCredentials: true,
-            });
-            return res.data;
+            const res = await axios.get<AccountSummaryResponse | ManagerResponse>(`/api/v1/auth/me?account_id=${accountId ?? ""}`,
+                {
+                    withCredentials: true,
+                }
+            );
+
+            const apiData = res.data;
+            if ("user" in apiData) {
+                return {
+                    account: apiData.account,
+                    users: [apiData.user],
+                    initials: apiData.initials,
+                };
+            }
+            return {
+                account: apiData.data,
+                users: apiData.data.users,
+                forms: apiData.data.forms,
+                counts: apiData.data._count,
+                initials: apiData.initials,
+                total_response: apiData.total_response,
+            };
         },
-        staleTime: 1000 * 60 * 60,
     });
+
     const deleteMutation = useMutation({
         mutationFn: async (user_id: string) => {
             setDeletingId(user_id);
@@ -69,7 +90,9 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
             </p>
         );
     }
-    const account = data.data;
+    const account = data.account;
+    const displayName = !isAdmin ? data.users[0]?.name : account.businessName;
+    console.log(data);
 
     return (
         <div className="w-full space-y-5">
@@ -80,12 +103,12 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
                     </div>
                     <div>
                         <h1 className="text-2xl font-semibold text-gray-800">
-                            {account.businessName}
+                            {displayName}
                         </h1>
-                        <p className="text-gray-500">{account.email}</p>
+                        <p className="text-gray-500">{isAdmin ? account.email : data.users[0]?.email}</p>
                     </div>
                     {
-                        currentPath !== '/system_admin/setting' && (
+                        isAdmin && currentPath !== '/system_admin/setting' && (
                             <div className="ml-auto">
                                 <Button variant="contained" onClick={() => setOpenFormModal(true)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300 ease-in-out">
                                     <Settings className="w-4 h-4" />
@@ -99,7 +122,7 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
 
             <div className="p-6 rounded-xl bg-white shadow">
                 <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                    Account Details
+                    {isAdmin ? "Account Details" : "Account Owner Detalis"}
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -114,7 +137,7 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {isAdmin && <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 <div className="p-6 rounded-xl bg-white shadow flex flex-col items-start">
                     <p className="text-gray-500">Total Users</p>
                     <p className="text-3xl font-semibold">{account._count.users}</p>
@@ -129,9 +152,9 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
                     <p className="text-gray-500">Total Responses</p>
                     <p className="text-3xl font-semibold">{data.total_response}</p>
                 </div>
-            </div>
+            </div>}
 
-            <div className="p-6 rounded-xl bg-white shadow">
+            {isAdmin && <div className="p-6 rounded-xl bg-white shadow">
                 <h2 className="text-lg font-semibold text-gray-800 mb-4">
                     Users
                 </h2>
@@ -166,9 +189,9 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
                         </div>
                     ))}
                 </div>
-            </div>
-            
-            <UpdatePassword/>
+            </div>}
+
+            <UpdatePassword />
             {openFormModal && <GenerateApiKey setOpenFormModal={setOpenFormModal} apiKey={apiKey} setapiKey={setapiKey} setOpenTokenModal={setOpenTokenModal} />}
             {openTokenModal && <ShowApiToken setOpenTokenModal={setOpenTokenModal} apiKey={apiKey} />}
             <Toaster />

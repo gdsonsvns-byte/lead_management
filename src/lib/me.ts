@@ -11,13 +11,22 @@ export async function getServerUser() {
     if (!token) {
         return null;
     }
-    return safeVerifyToken(token);
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET) as {
+            sub: string;
+            accountId: string;
+            role: Role;
+        };
+        return decoded
+    } catch (error: any) {
+        throw new Error(error.message)
+    }
 }
 
-function safeVerifyToken(token: string | null) {
-    if (!token) return null;
+async function safeVerifyToken(token: string | null) {
     try {
-        return jwt.verify(token, JWT_SECRET) as {
+        if (!token) return null;
+        return await jwt.verify(token, JWT_SECRET) as {
             sub: string;
             accountId: string;
             role: Role;

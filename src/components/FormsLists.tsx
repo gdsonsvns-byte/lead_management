@@ -12,6 +12,7 @@ import FormDropDown from "./FormDropDown";
 import ConfigureWapCampaign from "./common/configure_whatsapp_campaign_for_user_and_admin";
 import ManageResponse from "./common/manage_response";
 import ManageAccess from "./common/manage_access";
+import { useAuth } from "../hooks/useAuth";
 
 interface FormItem {
     id: string;
@@ -52,14 +53,14 @@ async function fetchForms(page: number, limit: number = 10, accountId: string): 
 export default function FormsList({ accountId }: { accountId?: string }) {
     const [page, setPage] = useState(1);
     const limit = 10;
-
+    const { user } = useAuth();
     const { data, isLoading, isError, error, isFetching } = useQuery({
         queryKey: ["forms", page, limit, accountId],
         queryFn: () => fetchForms(page, limit, accountId ?? ''),
         placeholderData: (prev) => prev,
         retry: 1,
     });
-
+    const isAdmin = user && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
     const forms = data?.response?.forms ?? [];
     const pagination = data?.response;
 
@@ -154,7 +155,7 @@ export default function FormsList({ accountId }: { accountId?: string }) {
                                 </span>
                             </div>
 
-                            {!form.adminWhatsappCampaignName && !form.userWhatsappCampaignName && (
+                            {isAdmin && !form.adminWhatsappCampaignName && !form.userWhatsappCampaignName && (
                                 <div>
                                     <Link
                                         href={`?configure_wap=${form.id}`}

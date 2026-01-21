@@ -12,39 +12,72 @@ export async function GET(req: NextRequest) {
                 { status: 429 }
             );
         }
-        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+
+        const user = await verifyRole(["SUPERADMIN", "ADMIN", "MANAGER"]);
         if (!user) {
             return NextResponse.json(
                 { error: "Unauthorized" },
                 { status: 401 }
             );
         }
+
         const { searchParams } = new URL(req.url);
         const queryAccountId = searchParams.get("account_id")?.trim() || "";
 
-        if (queryAccountId !== "") {
-            const validAccount = await prisma.account.findUnique({
-                where: { id: queryAccountId }
+        if (user.role === "MANAGER") {
+            const manager = await prisma.user.findUnique({
+                where: { id: user.sub },
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                    account: {
+                        select: {
+                            id: true,
+                            businessName: true,
+                            phone: true,
+                            location: true,
+                            email: true,
+                            createdAt: true,
+                        },
+                    },
+                },
             });
 
-            if (!validAccount) {
+            if (!manager || !manager.account) {
                 return NextResponse.json(
-                    { error: "Invalid Account." },
+                    { error: "Account not found." },
                     { status: 404 }
                 );
             }
+
+            return NextResponse.json(
+                {
+                    account: manager.account,
+                    user: {
+                        id: manager.id,
+                        name: manager.name,
+                        email: manager.email,
+                        role: manager.role,
+                    },
+                    initials: generateNameInitials(manager.name),
+                },
+                { status: 200 }
+            );
         }
 
-        if (!user.accountId && queryAccountId === "") {
+
+        const finalAccountId = queryAccountId || user.accountId;
+
+        if (!finalAccountId) {
             return NextResponse.json(
                 { error: "Account not found." },
                 { status: 404 }
             );
         }
 
-        const finalAccountId = queryAccountId !== "" ? queryAccountId : user.accountId;
-
-        const user_account = await prisma.account.findUnique({
+        const account = await prisma.account.findUnique({
             where: { id: finalAccountId },
             include: {
                 users: {
@@ -53,50 +86,47 @@ export async function GET(req: NextRequest) {
                         name: true,
                         email: true,
                         role: true,
-                    }
+                    },
                 },
                 forms: {
                     select: {
                         id: true,
                         _count: {
-                            select: {
-                                responses: true
-                            }
-                        }
-                    }
+                            select: { responses: true },
+                        },
+                    },
                 },
                 _count: {
                     select: {
                         forms: true,
-                        users: true
-                    }
-                }
-            }
+                        users: true,
+                    },
+                },
+            },
         });
 
-        if (!user_account) {
+        if (!account) {
             return NextResponse.json(
                 { error: "Account not found." },
                 { status: 404 }
             );
         }
-        const totalResponses = user_account.forms.reduce(
-            (sum, f) => sum + f._count.responses, 0
-        );
 
-        const initials = generateNameInitials(user_account.businessName)
+        const totalResponses = account.forms.reduce(
+            (sum, f) => sum + f._count.responses,
+            0
+        );
 
         return NextResponse.json(
             {
-                data: user_account,
-                initials,
+                data: account,
+                initials: generateNameInitials(account.businessName),
                 total_response: totalResponses,
             },
             { status: 200 }
         );
-
     } catch (err: any) {
-        console.error(err.message);
+        console.error(err);
         return NextResponse.json(
             { error: err.message || "Internal server error" },
             { status: 500 }
@@ -108,9 +138,10 @@ function generateNameInitials(name?: string | null): string {
     if (!name || !name.trim()) return "";
     const parts = name.trim().split(/\s+/);
     if (parts.length === 1) {
-        return parts[0].charAt(0).toUpperCase();
+        return parts[0][0].toUpperCase();
     }
-    const first = parts[0].charAt(0).toUpperCase();
-    const last = parts[parts.length - 1].charAt(0).toUpperCase();
-    return first + last;
+    return (
+        parts[0][0].toUpperCase() +
+        parts[parts.length - 1][0].toUpperCase()
+    );
 }

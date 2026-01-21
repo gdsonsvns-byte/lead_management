@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { verifyResetJwt } from "@/src/lib/resetJwt";
 import { resetPasswordSchema } from "@/src/types/auth";
 import { isRateLimited } from "@/src/lib/limiter";
+import z from "zod";
 
 export async function POST(req: Request) {
     try {
@@ -17,11 +18,8 @@ export async function POST(req: Request) {
         const { token, password } = await req.json();
         const pass = resetPasswordSchema.safeParse({ password: password });
         if (!pass.success) {
-            const flat = pass.error.flatten().fieldErrors;
-            const firstError = Object.values(flat).flat()[0];
-
             return NextResponse.json(
-                { error: firstError || "Invalid password" },
+                { error: z.prettifyError(pass.error) || "Invalid password" },
                 { status: 400 }
             );
         }

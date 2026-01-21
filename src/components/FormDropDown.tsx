@@ -27,12 +27,12 @@ interface Props {
 }
 
 export default function FormDropDown({ formData }: Props) {
-    const { user } = useAuth()
+    const { user } = useAuth();
     const queryClient = useQueryClient();
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
-    const [copyLoading, setCopyLoading] = useState<boolean>(false)
-    const isAdmin = user?.role === "ADMIN" || user?.role === "SUPERADMIN";
+    const [copyLoading, setCopyLoading] = useState<boolean>(false);
+    const isAdmin = user && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
 
     function handleCopy(formId: string) {
         setCopyLoading(true);
