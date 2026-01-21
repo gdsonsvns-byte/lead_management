@@ -308,7 +308,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
         const skip = (page - 1) * limit;
         const state = (searchParams.get("state") || "pending_today").toLowerCase();
         const { formId } = await params;
-
+        let userId: string;
+        const role = user ? user.role : apiClient?.adminRole;
         const now = new Date();
         const endOfToday = new Date(
             now.getFullYear(),
@@ -317,12 +318,23 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             23, 59, 59
         );
 
-        const formWhere: any = { id: formId };
+        const formWhere: any = {
+            id: formId,
+            ...(role !== "SUPERADMIN" && {
+                accessUsers: {
+                    some: {
+                        userId: userId!
+                    }
+                }
+            })
+        };
 
         if (user?.role === "ADMIN" || user?.role === "MANAGER") {
             formWhere.accountId = user.accountId;
+            userId = user.sub
         } else if (!user && apiClient) {
             formWhere.accountId = apiClient.accountId;
+            userId = apiClient.adminId
         }
 
         const form = await prisma.form.findUnique({
@@ -339,6 +351,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
         const responses = await prisma.response.findMany({
             where: {
                 formId,
+                form: {
+                    ...(role !== "SUPERADMIN" && {
+                        accessUsers: {
+                            some: {
+                                userId: userId!
+                            }
+                        }
+                    })
+                }
             },
             orderBy: { submittedAt: "desc" },
             include: {
