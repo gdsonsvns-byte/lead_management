@@ -714,8 +714,8 @@ function AssignUserDialog({ open, onClose, formId, responseId, account_id }: Pro
     });
 
     const handleAssignUser = () => {
-        // assignUserMutation.mutate();
-        console.log(assignUserId, formId, responseId);
+        assignUserMutation.mutate();
+        // console.log(assignUserId, formId, responseId);
     };
 
     return (
