@@ -711,11 +711,13 @@ function AssignUserDialog({ open, onClose, formId, responseId, account_id }: Pro
             setAssignUserId("");
             toast.success("User assigned successfully");
         },
+        onError(error: any) {
+            toast.error(error?.response?.data?.error || "Something went wrong");
+        },
     });
 
     const handleAssignUser = () => {
         assignUserMutation.mutate();
-        // console.log(assignUserId, formId, responseId);
     };
 
     return (
@@ -776,7 +778,7 @@ function AssignUserDialog({ open, onClose, formId, responseId, account_id }: Pro
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => { onClose(), setAssignUserId("") }}>Close</Button>
-                        <Button variant="contained" onClick={handleAssignUser}>
+                        <Button variant="contained" onClick={handleAssignUser} disabled={assignUserMutation.isPending}>
                             {assignUserMutation.isPending ? <Spinner color="white" /> : "Assign"}
                         </Button>
                     </DialogActions>
