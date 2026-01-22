@@ -41,8 +41,9 @@ model User {
   followUps           FollowUp[]
   apiAccessTokens     ApiAccessToken[]
   formAccesses        FormAccess[]
-  assignedResponses   Response[]       @relation("AssignedResponses")
-  assignedByResponses Response[]       @relation("AssignedBy")
+
+  assignments ResponseAssignment[]
+  assignedBy  ResponseAssignment[] @relation("AssignedByUser")
 
   @@index([accountId])
   @@index([role])
@@ -107,20 +108,14 @@ model Response {
   formId      String
   submittedAt DateTime @default(now())
 
-  assignedToId String?
-  assignedAt   DateTime?
-  assignedById String?
-
   form      Form             @relation(fields: [formId], references: [id], onDelete: Cascade)
   answers   ResponseAnswer[]
   followUps FollowUp[]
 
-  assignedTo User? @relation("AssignedResponses", fields: [assignedToId], references: [id], onDelete: SetNull)
-  assignedBy User? @relation("AssignedBy", fields: [assignedById], references: [id], onDelete: SetNull)
+  assignments ResponseAssignment[]
 
   @@index([formId])
   @@index([submittedAt])
-  @@index([assignedToId])
 }
 
 model ResponseAnswer {
@@ -208,6 +203,27 @@ model FormAccess {
 
   @@unique([formId, userId])
   @@index([formId])
+  @@index([userId])
+}
+
+model ResponseAssignment {
+  id String @id @default(uuid())
+
+  responseId String
+  userId     String
+
+  isActive     Boolean @default(true)
+
+  assignedAt   DateTime @default(now())
+  assignedById String?
+
+  response Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  assignedBy User? @relation("AssignedByUser", fields: [assignedById], references: [id])
+
+  @@unique([responseId, userId])
+  @@index([responseId])
   @@index([userId])
 }
 

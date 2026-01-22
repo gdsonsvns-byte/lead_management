@@ -394,7 +394,8 @@ export const ModelName = {
   FollowUp: 'FollowUp',
   ApiAccessToken: 'ApiAccessToken',
   NextActionType: 'NextActionType',
-  FormAccess: 'FormAccess'
+  FormAccess: 'FormAccess',
+  ResponseAssignment: 'ResponseAssignment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -410,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "user" | "managedUser" | "form" | "formField" | "response" | "responseAnswer" | "followUp" | "apiAccessToken" | "nextActionType" | "formAccess"
+    modelProps: "account" | "user" | "managedUser" | "form" | "formField" | "response" | "responseAnswer" | "followUp" | "apiAccessToken" | "nextActionType" | "formAccess" | "responseAssignment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1228,6 +1229,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ResponseAssignment: {
+      payload: Prisma.$ResponseAssignmentPayload<ExtArgs>
+      fields: Prisma.ResponseAssignmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ResponseAssignmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponseAssignmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ResponseAssignmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponseAssignmentPayload>
+        }
+        findFirst: {
+          args: Prisma.ResponseAssignmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponseAssignmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ResponseAssignmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponseAssignmentPayload>
+        }
+        findMany: {
+          args: Prisma.ResponseAssignmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponseAssignmentPayload>[]
+        }
+        create: {
+          args: Prisma.ResponseAssignmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponseAssignmentPayload>
+        }
+        createMany: {
+          args: Prisma.ResponseAssignmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ResponseAssignmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponseAssignmentPayload>[]
+        }
+        delete: {
+          args: Prisma.ResponseAssignmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponseAssignmentPayload>
+        }
+        update: {
+          args: Prisma.ResponseAssignmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponseAssignmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.ResponseAssignmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ResponseAssignmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ResponseAssignmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponseAssignmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.ResponseAssignmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ResponseAssignmentPayload>
+        }
+        aggregate: {
+          args: Prisma.ResponseAssignmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateResponseAssignment>
+        }
+        groupBy: {
+          args: Prisma.ResponseAssignmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ResponseAssignmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ResponseAssignmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ResponseAssignmentCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1341,10 +1416,7 @@ export type FormFieldScalarFieldEnum = (typeof FormFieldScalarFieldEnum)[keyof t
 export const ResponseScalarFieldEnum = {
   id: 'id',
   formId: 'formId',
-  submittedAt: 'submittedAt',
-  assignedToId: 'assignedToId',
-  assignedAt: 'assignedAt',
-  assignedById: 'assignedById'
+  submittedAt: 'submittedAt'
 } as const
 
 export type ResponseScalarFieldEnum = (typeof ResponseScalarFieldEnum)[keyof typeof ResponseScalarFieldEnum]
@@ -1412,6 +1484,18 @@ export const FormAccessScalarFieldEnum = {
 } as const
 
 export type FormAccessScalarFieldEnum = (typeof FormAccessScalarFieldEnum)[keyof typeof FormAccessScalarFieldEnum]
+
+
+export const ResponseAssignmentScalarFieldEnum = {
+  id: 'id',
+  responseId: 'responseId',
+  userId: 'userId',
+  isActive: 'isActive',
+  assignedAt: 'assignedAt',
+  assignedById: 'assignedById'
+} as const
+
+export type ResponseAssignmentScalarFieldEnum = (typeof ResponseAssignmentScalarFieldEnum)[keyof typeof ResponseAssignmentScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1669,6 +1753,7 @@ export type GlobalOmitConfig = {
   apiAccessToken?: Prisma.ApiAccessTokenOmit
   nextActionType?: Prisma.NextActionTypeOmit
   formAccess?: Prisma.FormAccessOmit
+  responseAssignment?: Prisma.ResponseAssignmentOmit
 }
 
 /* Types for Logging */

@@ -72,3 +72,8 @@ export type NextActionType = Prisma.NextActionTypeModel
  * 
  */
 export type FormAccess = Prisma.FormAccessModel
+/**
+ * Model ResponseAssignment
+ * 
+ */
+export type ResponseAssignment = Prisma.ResponseAssignmentModel

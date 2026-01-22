@@ -243,7 +243,7 @@ export default function FormsList({ accountId }: { accountId?: string }) {
                 </div>
             )}
             <Suspense fallback={<Spinner />} >
-                <ViewForm />
+                <ViewForm account_id={accountId ?? ""} />
                 <EditForm />
                 <Toaster />
                 <ConfigureWapCampaign

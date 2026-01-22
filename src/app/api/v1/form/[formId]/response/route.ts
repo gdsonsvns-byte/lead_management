@@ -77,7 +77,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             );
         }
 
-        const form = await prisma.form.findFirst({
+        const form = await prisma.form.findUnique({
             where: { id: formId },
             select: {
                 id: true,
@@ -99,6 +99,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
 
         const formData = await req.formData();
         const incoming: Record<string, any> = {};
+        const super_admin = await prisma.user.findFirst({ where: { role: "SUPERADMIN" }, select: { id: true } });
 
         for (const ff of form.fields) {
             const values = formData.getAll(ff.id);
@@ -188,6 +189,28 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                         responseId: response.id,
                         fieldId: ff.id,
                         value: finalValue,
+                    },
+                });
+            }
+
+            const assigneeIds = new Set<string>();
+            assigneeIds.add(form.userId);
+            assigneeIds.add(super_admin?.id!);
+
+            for (const uid of assigneeIds) {
+                await tx.responseAssignment.upsert({
+                    where: {
+                        responseId_userId: {
+                            responseId: response.id,
+                            userId: uid,
+                        },
+                    },
+                    update: { isActive: true },
+                    create: {
+                        responseId: response.id,
+                        userId: uid,
+                        assignedById: form.userId ?? null,
+                        isActive: true,
                     },
                 });
             }

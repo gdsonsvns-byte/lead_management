@@ -5,6 +5,8 @@ import { isRateLimited } from "@/src/lib/limiter";
 import prisma from "@/src/lib/prisma";
 import { sendResponseAlertEmail, sendResponseAlertEmailToUser } from "@/src/lib/sendResponseAlertEmail";
 import { sendWhatsappToAdmin, sendWhatsappToUser } from "@/src/lib/whatsapp";
+import { verifyRole } from "@/src/lib/verifyRole";
+import { verifyApiAccessToken } from "@/src/lib/verifyApiAccessToken";
 
 export const runtime = "nodejs";
 
@@ -52,7 +54,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             );
         }
 
+        const user = await verifyRole(["ADMIN", "SUPERADMIN", "MANAGER"]);
+        const apiClient = await verifyApiAccessToken(req);
+
+        if (!user && !apiClient) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+
+        const { searchParams } = new URL(req.url);
+        const queryAccountId = searchParams.get("account_id")?.trim();
         const { formId } = await params;
+        const accountId = user?.role === "SUPERADMIN" ? queryAccountId! : user?.accountId ?? apiClient?.accountId;
+
+        if (user && user.role === "SUPERADMIN" && !queryAccountId) {
+            return NextResponse.json(
+                { error: "Account not found." },
+                { status: 404 }
+            );
+        }
 
         if (!formId || formId.trim() === "") {
             return NextResponse.json(
@@ -61,8 +83,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             );
         }
 
-        const form = await prisma.form.findFirst({
-            where: { id: formId },
+        const form = await prisma.form.findUnique({
+            where: { id: formId, accountId },
             select: {
                 id: true,
                 title: true,
@@ -81,9 +103,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             );
         }
 
+        const super_admin = await prisma.user.findFirst({ where: { role: "SUPERADMIN" }, select: { id: true } });
+
         const formData = await req.formData();
         const nextActionLabel = formData.get("nextAction")?.toString() || null;
         const nextFollowUpDate = formData.get("nextFollowUpDate")?.toString() || null;
+        const assignUserId = formData.get("assignUserId")?.toString() || null;
         const incoming: Record<string, any> = {};
 
         for (const ff of form.fields) {
@@ -165,15 +190,38 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                 if (ff.label.toLowerCase().includes("phone") || ff.label.toLowerCase().includes("mobile") || ff.label.toLowerCase().includes("phone no.") || ff.label.toLowerCase().includes("contact no.") || ff.label.toLowerCase().includes("contact")) {
                     userPhone = finalValue;
                 }
-                if (ff.label.toLowerCase().includes("email") || ff.label.toLowerCase().includes("email id") || ff.label.toLowerCase().includes("emailId") || ff.label.toLowerCase().includes("email Id")) {
-                    userEmail = finalValue;
-                }
+                // if (ff.label.toLowerCase().includes("email") || ff.label.toLowerCase().includes("email id") || ff.label.toLowerCase().includes("emailId") || ff.label.toLowerCase().includes("email Id")) {
+                //     userEmail = finalValue;
+                // }
 
                 await tx.responseAnswer.create({
                     data: {
                         responseId: response.id,
                         fieldId: ff.id,
                         value: finalValue,
+                    },
+                });
+            }
+
+            const assigneeIds = new Set<string>();
+            assigneeIds.add(form.userId);
+            assigneeIds.add(super_admin?.id!);
+            if (assignUserId) assigneeIds.add(assignUserId)
+
+            for (const uid of assigneeIds) {
+                await tx.responseAssignment.upsert({
+                    where: {
+                        responseId_userId: {
+                            responseId: response.id,
+                            userId: uid,
+                        },
+                    },
+                    update: { isActive: true },
+                    create: {
+                        responseId: response.id,
+                        userId: uid,
+                        assignedById: user?.sub ?? null,
+                        isActive: true,
                     },
                 });
             }
