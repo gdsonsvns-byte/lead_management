@@ -295,6 +295,7 @@ export async function POST(req: NextRequest) {
                         formId: createdForm.id,
                         order: a.order,
                         isDefault: true,
+                        autoApplyOnFirstFollowUp: a.autoApplyOnFirstFollowUp
                     })),
                     skipDuplicates: true,
                 });
