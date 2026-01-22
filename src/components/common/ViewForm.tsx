@@ -6,8 +6,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { TextField } from "@mui/material";
-import { FollowUpStatus } from "@/src/app/generated/prisma/enums";
+import { MenuItem, TextField } from "@mui/material";
+import { FollowUpStatus, Role } from "@/src/app/generated/prisma/enums";
+import { useAuth } from "@/src/hooks/useAuth";
 
 interface Field {
     id: string;
@@ -17,7 +18,9 @@ interface Field {
     options?: string | null;
     order?: number;
 }
-export default function ViewForm() {
+export default function ViewForm({ account_id }: { account_id?: string }) {
+    const { user } = useAuth();
+    const isAdmin = user && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
     const searchParams = useSearchParams();
     const router = useRouter();
     const formId = searchParams.get("view");
@@ -27,6 +30,7 @@ export default function ViewForm() {
         nextAction: "",
         nextFollowUpDate: "",
     });
+    const [assignUserId, setAssignUserId] = useState<string>("");
     const [formValues, setFormValues] = useState<Record<string, any>>({});
     const handleChange = (field: Field, value: any) => {
         setFormValues((prev) => ({
@@ -35,17 +39,13 @@ export default function ViewForm() {
         }));
     };
 
-    const { data, isLoading, isError } = useQuery<Form>({
+    const { data, isLoading, isError } = useQuery<MainForm>({
         queryKey: ["view-form", formId],
         queryFn: async () => {
-            const res = await axios.get<MainForm>(`/api/v1/form/${formId}`, {
+            const res = await axios.get<MainForm>(`/api/v1/form/${formId}/internal?account_id=${account_id ?? ""}`, {
                 withCredentials: true,
             });
-
-            res.data.form.fields.sort(
-                (a: Field, b: Field) => (a.order ?? 0) - (b.order ?? 0)
-            );
-            return res.data.form;
+            return res.data;
         },
         enabled: hasFormId,
         staleTime: 1000 * 60 * 60,
@@ -168,7 +168,7 @@ export default function ViewForm() {
     const submitMutation = useMutation({
         mutationFn: async (formData: FormData) => {
             const res = await axios.post(
-                `/api/v1/form/${formId}/response/internal`,
+                `/api/v1/form/${formId}/response/internal?account_id=${account_id ?? ""}`,
                 formData,
                 {
                     withCredentials: true,
@@ -211,11 +211,13 @@ export default function ViewForm() {
         });
         if (initialFollowUp?.nextAction) {
             formData.append("nextAction", initialFollowUp.nextAction);
-            formData.append("nextFollowStatus", data?.nextActions?.find((a) => a.label === initialFollowUp.nextAction)?.status!);
+            formData.append("nextFollowStatus", data?.form.nextActions?.find((a) => a.label === initialFollowUp.nextAction)?.status!);
         }
-
         if (initialFollowUp?.nextFollowUpDate) {
             formData.append("nextFollowUpDate", initialFollowUp.nextFollowUpDate);
+        }
+        if (assignUserId) {
+            formData.append("assignUserId", assignUserId);
         }
         // console.log(initialFollowUp);
         submitMutation.mutate(formData);
@@ -223,10 +225,10 @@ export default function ViewForm() {
 
     const selectedAction = useMemo(
         () =>
-            data?.nextActions?.find(
+            data?.form?.nextActions?.find(
                 (a) => a.label === initialFollowUp.nextAction
             ),
-        [data?.nextActions, initialFollowUp.nextAction]
+        [data?.form.nextActions, initialFollowUp.nextAction]
     );
 
     if (!hasFormId) return null;
@@ -258,15 +260,15 @@ export default function ViewForm() {
                 {!isLoading && data && (
                     <>
                         <h2 className="text-2xl font-semibold text-zinc-800 mb-1">
-                            {data.title}
+                            {data.form.title}
                         </h2>
 
                         <p className="text-sm text-zinc-600 mb-6">
-                            {data.description || "No description provided."}
+                            {data.form.description || "No description provided."}
                         </p>
 
                         <div className="space-y-3 animate-fadeIn">
-                            {[...data.fields].sort((a: Field, b: Field) => (a.order ?? 0) - (b.order ?? 0)).map((field: Field, index: number) => {
+                            {[...data.form.fields].sort((a: Field, b: Field) => (a.order ?? 0) - (b.order ?? 0)).map((field: Field, index: number) => {
                                 let options: string[] = [];
 
                                 if (field.options) {
@@ -316,7 +318,7 @@ export default function ViewForm() {
                                                 ...prev,
                                                 nextAction: selectedLabel
                                             }));
-                                            const selectedAction = data.nextActions.find(
+                                            const selectedAction = data.form.nextActions.find(
                                                 (a) => a.label === selectedLabel
                                             );
 
@@ -336,7 +338,7 @@ export default function ViewForm() {
                                     >
                                         <option value="">Select status</option>
 
-                                        {data.nextActions.map((action) => (
+                                        {data.form.nextActions.map((action) => (
                                             <option key={action.id} value={action.label}>
                                                 {action.label}
                                             </option>
@@ -363,8 +365,55 @@ export default function ViewForm() {
                                 </div>
 
                             </div>
-                        </div>
+                            {isAdmin && <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp flex flex-col gap-8"
+                            >
+                                <span>Lead Assignment</span>
+                                <div className="flex flex-col sm:flex-row gap-5">
+                                    <TextField
+                                        label="Assign to"
+                                        select
+                                        value={assignUserId}
+                                        onChange={(e) => setAssignUserId(e.target.value)}
+                                        fullWidth
+                                        InputLabelProps={{ shrink: true }}
+                                        SelectProps={{
+                                            displayEmpty: true,
+                                        }}
+                                    >
+                                        <MenuItem value="">
+                                            <em>Select User</em>
+                                        </MenuItem>
 
+                                        {data.users.map((user) => (
+                                            <MenuItem key={user.id} value={user.id}>
+                                                <div className="flex w-full items-center justify-between gap-3">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-medium text-zinc-800">
+                                                            {user.name}
+                                                        </span>
+                                                        <span className="text-xs text-zinc-500">
+                                                            {user.email}
+                                                        </span>
+                                                    </div>
+
+                                                    <span
+                                                        className={`text-xs px-2 py-0.5 rounded-full border font-medium not-visited:${user.role === "ADMIN"
+                                                            ? "border-blue-500 text-blue-600"
+                                                            : user.role === "MANAGER"
+                                                                ? "border-green-500 text-green-600"
+                                                                : "border-zinc-400 text-zinc-600"
+                                                            }`}
+                                                    >
+                                                        {user.role}
+                                                    </span>
+                                                </div>
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+
+                                </div>
+                            </div>}
+                        </div>
 
                         <div className="space-y-3 animate-fadeIn mt-5">
                             <button
@@ -395,6 +444,13 @@ export default function ViewForm() {
 
 interface MainForm {
     form: Form
+    users: Users[]
+}
+interface Users {
+    id: string;
+    name: string;
+    email: string;
+    role: Role
 }
 export interface Form {
     id: string;

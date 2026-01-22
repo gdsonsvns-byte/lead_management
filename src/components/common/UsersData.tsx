@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import { useMemo, useState, useEffect, JSX } from "react";
+import { useMemo, useState, useEffect, JSX, Dispatch, SetStateAction } from "react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -24,6 +24,7 @@ import {
     Alert,
     Chip,
     Input,
+    MenuItem,
 } from "@mui/material";
 import {
     Select,
@@ -42,6 +43,7 @@ import EventIcon from "@mui/icons-material/Event";
 import NoteIcon from "@mui/icons-material/Note";
 import toast, { Toaster } from "react-hot-toast";
 import Spinner from "../ui/spinner";
+import { useAuth } from "@/src/hooks/useAuth";
 
 const TYPE_ICONS: Record<string, JSX.Element> = {
     CALL: <LocalPhoneIcon fontSize="small" color="primary" />,
@@ -118,7 +120,9 @@ const allState: State[] = [
     { key: "Completed", status: "completed" },
     { key: "Cancelled", status: "cancelled" },
 ]
-export default function UsersData({ formId }: { formId: string }) {
+export default function UsersData({ formId, account_id }: { formId: string, account_id?: string }) {
+    const { user } = useAuth();
+    const isAdmin = user && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
     const STORAGE_KEY = `form_${formId}_column_visibility`;
     const queryClient = useQueryClient();
     const hasFormId = !!formId;
@@ -132,6 +136,7 @@ export default function UsersData({ formId }: { formId: string }) {
     const [openResponse, setOpenResponse] = useState<FormResponseItem | null>(null);
     const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
     const [reportData, setReportData] = useState<string>(new Date().toISOString().split("T")[0]);
+    const [selectedResponseId, setSelectedResponseId] = useState<string | null>(null);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -199,6 +204,29 @@ export default function UsersData({ formId }: { formId: string }) {
                 field: "_index", headerName: "#", width: 70, sortable: false,
                 valueGetter: (value, row) => row.idx
             },
+            ...(isAdmin
+                ? [{
+                    field: "assign_user",
+                    headerName: "Assign User",
+                    width: 120,
+                    sortable: false,
+                    renderCell: (params: GridRenderCellParams) => {
+                        const responseId = params.row.responseId;
+                        return (
+                            <Button
+                                size="small"
+                                variant="contained"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedResponseId(responseId);
+                                }}
+                            >
+                                Assign
+                            </Button>
+                        );
+                    },
+                }]
+                : []),
             ...dynamicFields,
             {
                 field: "submittedAt",
@@ -633,7 +661,137 @@ export default function UsersData({ formId }: { formId: string }) {
                     <Button onClick={() => setOpenResponse(null)}>Close</Button>
                 </DialogActions>
             </Dialog>
+            <AssignUserDialog
+                open={!!selectedResponseId}
+                onClose={() => setSelectedResponseId(null)}
+                formId={formId}
+                responseId={selectedResponseId}
+                account_id={account_id}
+            />
             <Toaster />
         </div>
     );
 }
+interface Props {
+    open: boolean;
+    onClose: () => void;
+    formId: string;
+    responseId: string | null;
+    account_id?: string;
+}
+function AssignUserDialog({ open, onClose, formId, responseId, account_id }: Props) {
+    const { data, isLoading, isError, isFetching } = useQuery<User[]>({
+        queryKey: ["responses", formId, responseId, account_id],
+        queryFn: async () => {
+            const res = await axios.get<User[]>(`/api/v1/form/users`, {
+                params: { account_id: account_id ?? "", form_id: formId },
+                withCredentials: true,
+            });
+            return res.data;
+        },
+        enabled: open,
+        retry: 1,
+        placeholderData: (old) => old,
+    });
+    const [assignUserId, setAssignUserId] = useState<string>("");
+
+    const assignUserMutation = useMutation({
+        mutationFn: async () => {
+            const res = await axios.post(`/api/v1/form/response/assign`, {
+                form_id: formId,
+                response_id: responseId,
+                user_id: assignUserId,
+            }, {
+                withCredentials: true,
+            });
+            return res.data;
+        },
+        onSuccess: () => {
+            onClose();
+            setAssignUserId("");
+            toast.success("User assigned successfully");
+        },
+        onError(error: any) {
+            toast.error(error?.response?.data?.error || "Something went wrong");
+        },
+    });
+
+    const handleAssignUser = () => {
+        assignUserMutation.mutate();
+    };
+
+    return (
+        <Dialog open={open} onClose={() => { onClose(), setAssignUserId("") }} maxWidth="sm" fullWidth>
+            <DialogTitle>Assign User</DialogTitle>
+            {isLoading && (
+                <div className="py-10 flex justify-center">
+                    <Spinner />
+                </div>
+            )}
+            {!isLoading && data &&
+                <>
+                    <DialogContent>
+                        <div className="flex flex-col sm:flex-row gap-5 mt-10">
+                            <TextField
+                                label="Assign to"
+                                select
+                                value={assignUserId}
+                                onChange={(e) => setAssignUserId(e.target.value)}
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                                SelectProps={{
+                                    displayEmpty: true,
+                                }}
+                            >
+                                <MenuItem value="">
+                                    <em>Select User</em>
+                                </MenuItem>
+
+                                {data && data.map((user) => (
+                                    <MenuItem key={user.id} value={user.id}>
+                                        <div className="flex w-full items-center justify-between gap-3">
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-medium text-zinc-800">
+                                                    {user.name}
+                                                </span>
+                                                <span className="text-xs text-zinc-500">
+                                                    {user.email}
+                                                </span>
+                                            </div>
+
+                                            <span
+                                                className={`text-xs px-2 py-0.5 rounded-full border font-medium not-visited:${user.role === "ADMIN"
+                                                    ? "border-blue-500 text-blue-600"
+                                                    : user.role === "MANAGER"
+                                                        ? "border-green-500 text-green-600"
+                                                        : "border-zinc-400 text-zinc-600"
+                                                    }`}
+                                            >
+                                                {user.role}
+                                            </span>
+                                        </div>
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+
+                        </div>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => { onClose(), setAssignUserId("") }}>Close</Button>
+                        <Button variant="contained" onClick={handleAssignUser} disabled={assignUserMutation.isPending}>
+                            {assignUserMutation.isPending ? <Spinner color="white" /> : "Assign"}
+                        </Button>
+                    </DialogActions>
+                </>
+            }
+        </Dialog>
+    );
+}
+
+
+interface User {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+}   

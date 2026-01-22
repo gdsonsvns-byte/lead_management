@@ -28,27 +28,18 @@ export type ResponseMinAggregateOutputType = {
   id: string | null
   formId: string | null
   submittedAt: Date | null
-  assignedToId: string | null
-  assignedAt: Date | null
-  assignedById: string | null
 }
 
 export type ResponseMaxAggregateOutputType = {
   id: string | null
   formId: string | null
   submittedAt: Date | null
-  assignedToId: string | null
-  assignedAt: Date | null
-  assignedById: string | null
 }
 
 export type ResponseCountAggregateOutputType = {
   id: number
   formId: number
   submittedAt: number
-  assignedToId: number
-  assignedAt: number
-  assignedById: number
   _all: number
 }
 
@@ -57,27 +48,18 @@ export type ResponseMinAggregateInputType = {
   id?: true
   formId?: true
   submittedAt?: true
-  assignedToId?: true
-  assignedAt?: true
-  assignedById?: true
 }
 
 export type ResponseMaxAggregateInputType = {
   id?: true
   formId?: true
   submittedAt?: true
-  assignedToId?: true
-  assignedAt?: true
-  assignedById?: true
 }
 
 export type ResponseCountAggregateInputType = {
   id?: true
   formId?: true
   submittedAt?: true
-  assignedToId?: true
-  assignedAt?: true
-  assignedById?: true
   _all?: true
 }
 
@@ -157,9 +139,6 @@ export type ResponseGroupByOutputType = {
   id: string
   formId: string
   submittedAt: Date
-  assignedToId: string | null
-  assignedAt: Date | null
-  assignedById: string | null
   _count: ResponseCountAggregateOutputType | null
   _min: ResponseMinAggregateOutputType | null
   _max: ResponseMaxAggregateOutputType | null
@@ -187,28 +166,20 @@ export type ResponseWhereInput = {
   id?: Prisma.StringFilter<"Response"> | string
   formId?: Prisma.StringFilter<"Response"> | string
   submittedAt?: Prisma.DateTimeFilter<"Response"> | Date | string
-  assignedToId?: Prisma.StringNullableFilter<"Response"> | string | null
-  assignedAt?: Prisma.DateTimeNullableFilter<"Response"> | Date | string | null
-  assignedById?: Prisma.StringNullableFilter<"Response"> | string | null
   form?: Prisma.XOR<Prisma.FormScalarRelationFilter, Prisma.FormWhereInput>
   answers?: Prisma.ResponseAnswerListRelationFilter
   followUps?: Prisma.FollowUpListRelationFilter
-  assignedTo?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-  assignedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  assignments?: Prisma.ResponseAssignmentListRelationFilter
 }
 
 export type ResponseOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   formId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
-  assignedToId?: Prisma.SortOrderInput | Prisma.SortOrder
-  assignedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  assignedById?: Prisma.SortOrderInput | Prisma.SortOrder
   form?: Prisma.FormOrderByWithRelationInput
   answers?: Prisma.ResponseAnswerOrderByRelationAggregateInput
   followUps?: Prisma.FollowUpOrderByRelationAggregateInput
-  assignedTo?: Prisma.UserOrderByWithRelationInput
-  assignedBy?: Prisma.UserOrderByWithRelationInput
+  assignments?: Prisma.ResponseAssignmentOrderByRelationAggregateInput
 }
 
 export type ResponseWhereUniqueInput = Prisma.AtLeast<{
@@ -218,23 +189,16 @@ export type ResponseWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ResponseWhereInput | Prisma.ResponseWhereInput[]
   formId?: Prisma.StringFilter<"Response"> | string
   submittedAt?: Prisma.DateTimeFilter<"Response"> | Date | string
-  assignedToId?: Prisma.StringNullableFilter<"Response"> | string | null
-  assignedAt?: Prisma.DateTimeNullableFilter<"Response"> | Date | string | null
-  assignedById?: Prisma.StringNullableFilter<"Response"> | string | null
   form?: Prisma.XOR<Prisma.FormScalarRelationFilter, Prisma.FormWhereInput>
   answers?: Prisma.ResponseAnswerListRelationFilter
   followUps?: Prisma.FollowUpListRelationFilter
-  assignedTo?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-  assignedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  assignments?: Prisma.ResponseAssignmentListRelationFilter
 }, "id">
 
 export type ResponseOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   formId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
-  assignedToId?: Prisma.SortOrderInput | Prisma.SortOrder
-  assignedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  assignedById?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ResponseCountOrderByAggregateInput
   _max?: Prisma.ResponseMaxOrderByAggregateInput
   _min?: Prisma.ResponseMinOrderByAggregateInput
@@ -247,77 +211,59 @@ export type ResponseScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Response"> | string
   formId?: Prisma.StringWithAggregatesFilter<"Response"> | string
   submittedAt?: Prisma.DateTimeWithAggregatesFilter<"Response"> | Date | string
-  assignedToId?: Prisma.StringNullableWithAggregatesFilter<"Response"> | string | null
-  assignedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Response"> | Date | string | null
-  assignedById?: Prisma.StringNullableWithAggregatesFilter<"Response"> | string | null
 }
 
 export type ResponseCreateInput = {
   id?: string
   submittedAt?: Date | string
-  assignedAt?: Date | string | null
   form: Prisma.FormCreateNestedOneWithoutResponsesInput
   answers?: Prisma.ResponseAnswerCreateNestedManyWithoutResponseInput
   followUps?: Prisma.FollowUpCreateNestedManyWithoutResponseInput
-  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedResponsesInput
-  assignedBy?: Prisma.UserCreateNestedOneWithoutAssignedByResponsesInput
+  assignments?: Prisma.ResponseAssignmentCreateNestedManyWithoutResponseInput
 }
 
 export type ResponseUncheckedCreateInput = {
   id?: string
   formId: string
   submittedAt?: Date | string
-  assignedToId?: string | null
-  assignedAt?: Date | string | null
-  assignedById?: string | null
   answers?: Prisma.ResponseAnswerUncheckedCreateNestedManyWithoutResponseInput
   followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutResponseInput
+  assignments?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutResponseInput
 }
 
 export type ResponseUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   form?: Prisma.FormUpdateOneRequiredWithoutResponsesNestedInput
   answers?: Prisma.ResponseAnswerUpdateManyWithoutResponseNestedInput
   followUps?: Prisma.FollowUpUpdateManyWithoutResponseNestedInput
-  assignedTo?: Prisma.UserUpdateOneWithoutAssignedResponsesNestedInput
-  assignedBy?: Prisma.UserUpdateOneWithoutAssignedByResponsesNestedInput
+  assignments?: Prisma.ResponseAssignmentUpdateManyWithoutResponseNestedInput
 }
 
 export type ResponseUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   formId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answers?: Prisma.ResponseAnswerUncheckedUpdateManyWithoutResponseNestedInput
   followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutResponseNestedInput
+  assignments?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutResponseNestedInput
 }
 
 export type ResponseCreateManyInput = {
   id?: string
   formId: string
   submittedAt?: Date | string
-  assignedToId?: string | null
-  assignedAt?: Date | string | null
-  assignedById?: string | null
 }
 
 export type ResponseUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ResponseUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   formId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ResponseListRelationFilter = {
@@ -334,116 +280,23 @@ export type ResponseCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   formId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
-  assignedToId?: Prisma.SortOrder
-  assignedAt?: Prisma.SortOrder
-  assignedById?: Prisma.SortOrder
 }
 
 export type ResponseMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   formId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
-  assignedToId?: Prisma.SortOrder
-  assignedAt?: Prisma.SortOrder
-  assignedById?: Prisma.SortOrder
 }
 
 export type ResponseMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   formId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
-  assignedToId?: Prisma.SortOrder
-  assignedAt?: Prisma.SortOrder
-  assignedById?: Prisma.SortOrder
 }
 
 export type ResponseScalarRelationFilter = {
   is?: Prisma.ResponseWhereInput
   isNot?: Prisma.ResponseWhereInput
-}
-
-export type ResponseCreateNestedManyWithoutAssignedToInput = {
-  create?: Prisma.XOR<Prisma.ResponseCreateWithoutAssignedToInput, Prisma.ResponseUncheckedCreateWithoutAssignedToInput> | Prisma.ResponseCreateWithoutAssignedToInput[] | Prisma.ResponseUncheckedCreateWithoutAssignedToInput[]
-  connectOrCreate?: Prisma.ResponseCreateOrConnectWithoutAssignedToInput | Prisma.ResponseCreateOrConnectWithoutAssignedToInput[]
-  createMany?: Prisma.ResponseCreateManyAssignedToInputEnvelope
-  connect?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-}
-
-export type ResponseCreateNestedManyWithoutAssignedByInput = {
-  create?: Prisma.XOR<Prisma.ResponseCreateWithoutAssignedByInput, Prisma.ResponseUncheckedCreateWithoutAssignedByInput> | Prisma.ResponseCreateWithoutAssignedByInput[] | Prisma.ResponseUncheckedCreateWithoutAssignedByInput[]
-  connectOrCreate?: Prisma.ResponseCreateOrConnectWithoutAssignedByInput | Prisma.ResponseCreateOrConnectWithoutAssignedByInput[]
-  createMany?: Prisma.ResponseCreateManyAssignedByInputEnvelope
-  connect?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-}
-
-export type ResponseUncheckedCreateNestedManyWithoutAssignedToInput = {
-  create?: Prisma.XOR<Prisma.ResponseCreateWithoutAssignedToInput, Prisma.ResponseUncheckedCreateWithoutAssignedToInput> | Prisma.ResponseCreateWithoutAssignedToInput[] | Prisma.ResponseUncheckedCreateWithoutAssignedToInput[]
-  connectOrCreate?: Prisma.ResponseCreateOrConnectWithoutAssignedToInput | Prisma.ResponseCreateOrConnectWithoutAssignedToInput[]
-  createMany?: Prisma.ResponseCreateManyAssignedToInputEnvelope
-  connect?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-}
-
-export type ResponseUncheckedCreateNestedManyWithoutAssignedByInput = {
-  create?: Prisma.XOR<Prisma.ResponseCreateWithoutAssignedByInput, Prisma.ResponseUncheckedCreateWithoutAssignedByInput> | Prisma.ResponseCreateWithoutAssignedByInput[] | Prisma.ResponseUncheckedCreateWithoutAssignedByInput[]
-  connectOrCreate?: Prisma.ResponseCreateOrConnectWithoutAssignedByInput | Prisma.ResponseCreateOrConnectWithoutAssignedByInput[]
-  createMany?: Prisma.ResponseCreateManyAssignedByInputEnvelope
-  connect?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-}
-
-export type ResponseUpdateManyWithoutAssignedToNestedInput = {
-  create?: Prisma.XOR<Prisma.ResponseCreateWithoutAssignedToInput, Prisma.ResponseUncheckedCreateWithoutAssignedToInput> | Prisma.ResponseCreateWithoutAssignedToInput[] | Prisma.ResponseUncheckedCreateWithoutAssignedToInput[]
-  connectOrCreate?: Prisma.ResponseCreateOrConnectWithoutAssignedToInput | Prisma.ResponseCreateOrConnectWithoutAssignedToInput[]
-  upsert?: Prisma.ResponseUpsertWithWhereUniqueWithoutAssignedToInput | Prisma.ResponseUpsertWithWhereUniqueWithoutAssignedToInput[]
-  createMany?: Prisma.ResponseCreateManyAssignedToInputEnvelope
-  set?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  disconnect?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  delete?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  connect?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  update?: Prisma.ResponseUpdateWithWhereUniqueWithoutAssignedToInput | Prisma.ResponseUpdateWithWhereUniqueWithoutAssignedToInput[]
-  updateMany?: Prisma.ResponseUpdateManyWithWhereWithoutAssignedToInput | Prisma.ResponseUpdateManyWithWhereWithoutAssignedToInput[]
-  deleteMany?: Prisma.ResponseScalarWhereInput | Prisma.ResponseScalarWhereInput[]
-}
-
-export type ResponseUpdateManyWithoutAssignedByNestedInput = {
-  create?: Prisma.XOR<Prisma.ResponseCreateWithoutAssignedByInput, Prisma.ResponseUncheckedCreateWithoutAssignedByInput> | Prisma.ResponseCreateWithoutAssignedByInput[] | Prisma.ResponseUncheckedCreateWithoutAssignedByInput[]
-  connectOrCreate?: Prisma.ResponseCreateOrConnectWithoutAssignedByInput | Prisma.ResponseCreateOrConnectWithoutAssignedByInput[]
-  upsert?: Prisma.ResponseUpsertWithWhereUniqueWithoutAssignedByInput | Prisma.ResponseUpsertWithWhereUniqueWithoutAssignedByInput[]
-  createMany?: Prisma.ResponseCreateManyAssignedByInputEnvelope
-  set?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  disconnect?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  delete?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  connect?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  update?: Prisma.ResponseUpdateWithWhereUniqueWithoutAssignedByInput | Prisma.ResponseUpdateWithWhereUniqueWithoutAssignedByInput[]
-  updateMany?: Prisma.ResponseUpdateManyWithWhereWithoutAssignedByInput | Prisma.ResponseUpdateManyWithWhereWithoutAssignedByInput[]
-  deleteMany?: Prisma.ResponseScalarWhereInput | Prisma.ResponseScalarWhereInput[]
-}
-
-export type ResponseUncheckedUpdateManyWithoutAssignedToNestedInput = {
-  create?: Prisma.XOR<Prisma.ResponseCreateWithoutAssignedToInput, Prisma.ResponseUncheckedCreateWithoutAssignedToInput> | Prisma.ResponseCreateWithoutAssignedToInput[] | Prisma.ResponseUncheckedCreateWithoutAssignedToInput[]
-  connectOrCreate?: Prisma.ResponseCreateOrConnectWithoutAssignedToInput | Prisma.ResponseCreateOrConnectWithoutAssignedToInput[]
-  upsert?: Prisma.ResponseUpsertWithWhereUniqueWithoutAssignedToInput | Prisma.ResponseUpsertWithWhereUniqueWithoutAssignedToInput[]
-  createMany?: Prisma.ResponseCreateManyAssignedToInputEnvelope
-  set?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  disconnect?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  delete?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  connect?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  update?: Prisma.ResponseUpdateWithWhereUniqueWithoutAssignedToInput | Prisma.ResponseUpdateWithWhereUniqueWithoutAssignedToInput[]
-  updateMany?: Prisma.ResponseUpdateManyWithWhereWithoutAssignedToInput | Prisma.ResponseUpdateManyWithWhereWithoutAssignedToInput[]
-  deleteMany?: Prisma.ResponseScalarWhereInput | Prisma.ResponseScalarWhereInput[]
-}
-
-export type ResponseUncheckedUpdateManyWithoutAssignedByNestedInput = {
-  create?: Prisma.XOR<Prisma.ResponseCreateWithoutAssignedByInput, Prisma.ResponseUncheckedCreateWithoutAssignedByInput> | Prisma.ResponseCreateWithoutAssignedByInput[] | Prisma.ResponseUncheckedCreateWithoutAssignedByInput[]
-  connectOrCreate?: Prisma.ResponseCreateOrConnectWithoutAssignedByInput | Prisma.ResponseCreateOrConnectWithoutAssignedByInput[]
-  upsert?: Prisma.ResponseUpsertWithWhereUniqueWithoutAssignedByInput | Prisma.ResponseUpsertWithWhereUniqueWithoutAssignedByInput[]
-  createMany?: Prisma.ResponseCreateManyAssignedByInputEnvelope
-  set?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  disconnect?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  delete?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  connect?: Prisma.ResponseWhereUniqueInput | Prisma.ResponseWhereUniqueInput[]
-  update?: Prisma.ResponseUpdateWithWhereUniqueWithoutAssignedByInput | Prisma.ResponseUpdateWithWhereUniqueWithoutAssignedByInput[]
-  updateMany?: Prisma.ResponseUpdateManyWithWhereWithoutAssignedByInput | Prisma.ResponseUpdateManyWithWhereWithoutAssignedByInput[]
-  deleteMany?: Prisma.ResponseScalarWhereInput | Prisma.ResponseScalarWhereInput[]
 }
 
 export type ResponseCreateNestedManyWithoutFormInput = {
@@ -516,128 +369,34 @@ export type ResponseUpdateOneRequiredWithoutFollowUpsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ResponseUpdateToOneWithWhereWithoutFollowUpsInput, Prisma.ResponseUpdateWithoutFollowUpsInput>, Prisma.ResponseUncheckedUpdateWithoutFollowUpsInput>
 }
 
-export type ResponseCreateWithoutAssignedToInput = {
-  id?: string
-  submittedAt?: Date | string
-  assignedAt?: Date | string | null
-  form: Prisma.FormCreateNestedOneWithoutResponsesInput
-  answers?: Prisma.ResponseAnswerCreateNestedManyWithoutResponseInput
-  followUps?: Prisma.FollowUpCreateNestedManyWithoutResponseInput
-  assignedBy?: Prisma.UserCreateNestedOneWithoutAssignedByResponsesInput
+export type ResponseCreateNestedOneWithoutAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.ResponseCreateWithoutAssignmentsInput, Prisma.ResponseUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.ResponseCreateOrConnectWithoutAssignmentsInput
+  connect?: Prisma.ResponseWhereUniqueInput
 }
 
-export type ResponseUncheckedCreateWithoutAssignedToInput = {
-  id?: string
-  formId: string
-  submittedAt?: Date | string
-  assignedAt?: Date | string | null
-  assignedById?: string | null
-  answers?: Prisma.ResponseAnswerUncheckedCreateNestedManyWithoutResponseInput
-  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutResponseInput
-}
-
-export type ResponseCreateOrConnectWithoutAssignedToInput = {
-  where: Prisma.ResponseWhereUniqueInput
-  create: Prisma.XOR<Prisma.ResponseCreateWithoutAssignedToInput, Prisma.ResponseUncheckedCreateWithoutAssignedToInput>
-}
-
-export type ResponseCreateManyAssignedToInputEnvelope = {
-  data: Prisma.ResponseCreateManyAssignedToInput | Prisma.ResponseCreateManyAssignedToInput[]
-  skipDuplicates?: boolean
-}
-
-export type ResponseCreateWithoutAssignedByInput = {
-  id?: string
-  submittedAt?: Date | string
-  assignedAt?: Date | string | null
-  form: Prisma.FormCreateNestedOneWithoutResponsesInput
-  answers?: Prisma.ResponseAnswerCreateNestedManyWithoutResponseInput
-  followUps?: Prisma.FollowUpCreateNestedManyWithoutResponseInput
-  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedResponsesInput
-}
-
-export type ResponseUncheckedCreateWithoutAssignedByInput = {
-  id?: string
-  formId: string
-  submittedAt?: Date | string
-  assignedToId?: string | null
-  assignedAt?: Date | string | null
-  answers?: Prisma.ResponseAnswerUncheckedCreateNestedManyWithoutResponseInput
-  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutResponseInput
-}
-
-export type ResponseCreateOrConnectWithoutAssignedByInput = {
-  where: Prisma.ResponseWhereUniqueInput
-  create: Prisma.XOR<Prisma.ResponseCreateWithoutAssignedByInput, Prisma.ResponseUncheckedCreateWithoutAssignedByInput>
-}
-
-export type ResponseCreateManyAssignedByInputEnvelope = {
-  data: Prisma.ResponseCreateManyAssignedByInput | Prisma.ResponseCreateManyAssignedByInput[]
-  skipDuplicates?: boolean
-}
-
-export type ResponseUpsertWithWhereUniqueWithoutAssignedToInput = {
-  where: Prisma.ResponseWhereUniqueInput
-  update: Prisma.XOR<Prisma.ResponseUpdateWithoutAssignedToInput, Prisma.ResponseUncheckedUpdateWithoutAssignedToInput>
-  create: Prisma.XOR<Prisma.ResponseCreateWithoutAssignedToInput, Prisma.ResponseUncheckedCreateWithoutAssignedToInput>
-}
-
-export type ResponseUpdateWithWhereUniqueWithoutAssignedToInput = {
-  where: Prisma.ResponseWhereUniqueInput
-  data: Prisma.XOR<Prisma.ResponseUpdateWithoutAssignedToInput, Prisma.ResponseUncheckedUpdateWithoutAssignedToInput>
-}
-
-export type ResponseUpdateManyWithWhereWithoutAssignedToInput = {
-  where: Prisma.ResponseScalarWhereInput
-  data: Prisma.XOR<Prisma.ResponseUpdateManyMutationInput, Prisma.ResponseUncheckedUpdateManyWithoutAssignedToInput>
-}
-
-export type ResponseScalarWhereInput = {
-  AND?: Prisma.ResponseScalarWhereInput | Prisma.ResponseScalarWhereInput[]
-  OR?: Prisma.ResponseScalarWhereInput[]
-  NOT?: Prisma.ResponseScalarWhereInput | Prisma.ResponseScalarWhereInput[]
-  id?: Prisma.StringFilter<"Response"> | string
-  formId?: Prisma.StringFilter<"Response"> | string
-  submittedAt?: Prisma.DateTimeFilter<"Response"> | Date | string
-  assignedToId?: Prisma.StringNullableFilter<"Response"> | string | null
-  assignedAt?: Prisma.DateTimeNullableFilter<"Response"> | Date | string | null
-  assignedById?: Prisma.StringNullableFilter<"Response"> | string | null
-}
-
-export type ResponseUpsertWithWhereUniqueWithoutAssignedByInput = {
-  where: Prisma.ResponseWhereUniqueInput
-  update: Prisma.XOR<Prisma.ResponseUpdateWithoutAssignedByInput, Prisma.ResponseUncheckedUpdateWithoutAssignedByInput>
-  create: Prisma.XOR<Prisma.ResponseCreateWithoutAssignedByInput, Prisma.ResponseUncheckedCreateWithoutAssignedByInput>
-}
-
-export type ResponseUpdateWithWhereUniqueWithoutAssignedByInput = {
-  where: Prisma.ResponseWhereUniqueInput
-  data: Prisma.XOR<Prisma.ResponseUpdateWithoutAssignedByInput, Prisma.ResponseUncheckedUpdateWithoutAssignedByInput>
-}
-
-export type ResponseUpdateManyWithWhereWithoutAssignedByInput = {
-  where: Prisma.ResponseScalarWhereInput
-  data: Prisma.XOR<Prisma.ResponseUpdateManyMutationInput, Prisma.ResponseUncheckedUpdateManyWithoutAssignedByInput>
+export type ResponseUpdateOneRequiredWithoutAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.ResponseCreateWithoutAssignmentsInput, Prisma.ResponseUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.ResponseCreateOrConnectWithoutAssignmentsInput
+  upsert?: Prisma.ResponseUpsertWithoutAssignmentsInput
+  connect?: Prisma.ResponseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ResponseUpdateToOneWithWhereWithoutAssignmentsInput, Prisma.ResponseUpdateWithoutAssignmentsInput>, Prisma.ResponseUncheckedUpdateWithoutAssignmentsInput>
 }
 
 export type ResponseCreateWithoutFormInput = {
   id?: string
   submittedAt?: Date | string
-  assignedAt?: Date | string | null
   answers?: Prisma.ResponseAnswerCreateNestedManyWithoutResponseInput
   followUps?: Prisma.FollowUpCreateNestedManyWithoutResponseInput
-  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedResponsesInput
-  assignedBy?: Prisma.UserCreateNestedOneWithoutAssignedByResponsesInput
+  assignments?: Prisma.ResponseAssignmentCreateNestedManyWithoutResponseInput
 }
 
 export type ResponseUncheckedCreateWithoutFormInput = {
   id?: string
   submittedAt?: Date | string
-  assignedToId?: string | null
-  assignedAt?: Date | string | null
-  assignedById?: string | null
   answers?: Prisma.ResponseAnswerUncheckedCreateNestedManyWithoutResponseInput
   followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutResponseInput
+  assignments?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutResponseInput
 }
 
 export type ResponseCreateOrConnectWithoutFormInput = {
@@ -666,24 +425,29 @@ export type ResponseUpdateManyWithWhereWithoutFormInput = {
   data: Prisma.XOR<Prisma.ResponseUpdateManyMutationInput, Prisma.ResponseUncheckedUpdateManyWithoutFormInput>
 }
 
+export type ResponseScalarWhereInput = {
+  AND?: Prisma.ResponseScalarWhereInput | Prisma.ResponseScalarWhereInput[]
+  OR?: Prisma.ResponseScalarWhereInput[]
+  NOT?: Prisma.ResponseScalarWhereInput | Prisma.ResponseScalarWhereInput[]
+  id?: Prisma.StringFilter<"Response"> | string
+  formId?: Prisma.StringFilter<"Response"> | string
+  submittedAt?: Prisma.DateTimeFilter<"Response"> | Date | string
+}
+
 export type ResponseCreateWithoutAnswersInput = {
   id?: string
   submittedAt?: Date | string
-  assignedAt?: Date | string | null
   form: Prisma.FormCreateNestedOneWithoutResponsesInput
   followUps?: Prisma.FollowUpCreateNestedManyWithoutResponseInput
-  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedResponsesInput
-  assignedBy?: Prisma.UserCreateNestedOneWithoutAssignedByResponsesInput
+  assignments?: Prisma.ResponseAssignmentCreateNestedManyWithoutResponseInput
 }
 
 export type ResponseUncheckedCreateWithoutAnswersInput = {
   id?: string
   formId: string
   submittedAt?: Date | string
-  assignedToId?: string | null
-  assignedAt?: Date | string | null
-  assignedById?: string | null
   followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutResponseInput
+  assignments?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutResponseInput
 }
 
 export type ResponseCreateOrConnectWithoutAnswersInput = {
@@ -705,41 +469,33 @@ export type ResponseUpdateToOneWithWhereWithoutAnswersInput = {
 export type ResponseUpdateWithoutAnswersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   form?: Prisma.FormUpdateOneRequiredWithoutResponsesNestedInput
   followUps?: Prisma.FollowUpUpdateManyWithoutResponseNestedInput
-  assignedTo?: Prisma.UserUpdateOneWithoutAssignedResponsesNestedInput
-  assignedBy?: Prisma.UserUpdateOneWithoutAssignedByResponsesNestedInput
+  assignments?: Prisma.ResponseAssignmentUpdateManyWithoutResponseNestedInput
 }
 
 export type ResponseUncheckedUpdateWithoutAnswersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   formId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutResponseNestedInput
+  assignments?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutResponseNestedInput
 }
 
 export type ResponseCreateWithoutFollowUpsInput = {
   id?: string
   submittedAt?: Date | string
-  assignedAt?: Date | string | null
   form: Prisma.FormCreateNestedOneWithoutResponsesInput
   answers?: Prisma.ResponseAnswerCreateNestedManyWithoutResponseInput
-  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedResponsesInput
-  assignedBy?: Prisma.UserCreateNestedOneWithoutAssignedByResponsesInput
+  assignments?: Prisma.ResponseAssignmentCreateNestedManyWithoutResponseInput
 }
 
 export type ResponseUncheckedCreateWithoutFollowUpsInput = {
   id?: string
   formId: string
   submittedAt?: Date | string
-  assignedToId?: string | null
-  assignedAt?: Date | string | null
-  assignedById?: string | null
   answers?: Prisma.ResponseAnswerUncheckedCreateNestedManyWithoutResponseInput
+  assignments?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutResponseInput
 }
 
 export type ResponseCreateOrConnectWithoutFollowUpsInput = {
@@ -761,129 +517,91 @@ export type ResponseUpdateToOneWithWhereWithoutFollowUpsInput = {
 export type ResponseUpdateWithoutFollowUpsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   form?: Prisma.FormUpdateOneRequiredWithoutResponsesNestedInput
   answers?: Prisma.ResponseAnswerUpdateManyWithoutResponseNestedInput
-  assignedTo?: Prisma.UserUpdateOneWithoutAssignedResponsesNestedInput
-  assignedBy?: Prisma.UserUpdateOneWithoutAssignedByResponsesNestedInput
+  assignments?: Prisma.ResponseAssignmentUpdateManyWithoutResponseNestedInput
 }
 
 export type ResponseUncheckedUpdateWithoutFollowUpsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   formId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answers?: Prisma.ResponseAnswerUncheckedUpdateManyWithoutResponseNestedInput
+  assignments?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutResponseNestedInput
 }
 
-export type ResponseCreateManyAssignedToInput = {
+export type ResponseCreateWithoutAssignmentsInput = {
+  id?: string
+  submittedAt?: Date | string
+  form: Prisma.FormCreateNestedOneWithoutResponsesInput
+  answers?: Prisma.ResponseAnswerCreateNestedManyWithoutResponseInput
+  followUps?: Prisma.FollowUpCreateNestedManyWithoutResponseInput
+}
+
+export type ResponseUncheckedCreateWithoutAssignmentsInput = {
   id?: string
   formId: string
   submittedAt?: Date | string
-  assignedAt?: Date | string | null
-  assignedById?: string | null
+  answers?: Prisma.ResponseAnswerUncheckedCreateNestedManyWithoutResponseInput
+  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutResponseInput
 }
 
-export type ResponseCreateManyAssignedByInput = {
-  id?: string
-  formId: string
-  submittedAt?: Date | string
-  assignedToId?: string | null
-  assignedAt?: Date | string | null
+export type ResponseCreateOrConnectWithoutAssignmentsInput = {
+  where: Prisma.ResponseWhereUniqueInput
+  create: Prisma.XOR<Prisma.ResponseCreateWithoutAssignmentsInput, Prisma.ResponseUncheckedCreateWithoutAssignmentsInput>
 }
 
-export type ResponseUpdateWithoutAssignedToInput = {
+export type ResponseUpsertWithoutAssignmentsInput = {
+  update: Prisma.XOR<Prisma.ResponseUpdateWithoutAssignmentsInput, Prisma.ResponseUncheckedUpdateWithoutAssignmentsInput>
+  create: Prisma.XOR<Prisma.ResponseCreateWithoutAssignmentsInput, Prisma.ResponseUncheckedCreateWithoutAssignmentsInput>
+  where?: Prisma.ResponseWhereInput
+}
+
+export type ResponseUpdateToOneWithWhereWithoutAssignmentsInput = {
+  where?: Prisma.ResponseWhereInput
+  data: Prisma.XOR<Prisma.ResponseUpdateWithoutAssignmentsInput, Prisma.ResponseUncheckedUpdateWithoutAssignmentsInput>
+}
+
+export type ResponseUpdateWithoutAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   form?: Prisma.FormUpdateOneRequiredWithoutResponsesNestedInput
   answers?: Prisma.ResponseAnswerUpdateManyWithoutResponseNestedInput
   followUps?: Prisma.FollowUpUpdateManyWithoutResponseNestedInput
-  assignedBy?: Prisma.UserUpdateOneWithoutAssignedByResponsesNestedInput
 }
 
-export type ResponseUncheckedUpdateWithoutAssignedToInput = {
+export type ResponseUncheckedUpdateWithoutAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   formId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answers?: Prisma.ResponseAnswerUncheckedUpdateManyWithoutResponseNestedInput
   followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutResponseNestedInput
-}
-
-export type ResponseUncheckedUpdateManyWithoutAssignedToInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  formId?: Prisma.StringFieldUpdateOperationsInput | string
-  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-}
-
-export type ResponseUpdateWithoutAssignedByInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  form?: Prisma.FormUpdateOneRequiredWithoutResponsesNestedInput
-  answers?: Prisma.ResponseAnswerUpdateManyWithoutResponseNestedInput
-  followUps?: Prisma.FollowUpUpdateManyWithoutResponseNestedInput
-  assignedTo?: Prisma.UserUpdateOneWithoutAssignedResponsesNestedInput
-}
-
-export type ResponseUncheckedUpdateWithoutAssignedByInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  formId?: Prisma.StringFieldUpdateOperationsInput | string
-  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  answers?: Prisma.ResponseAnswerUncheckedUpdateManyWithoutResponseNestedInput
-  followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutResponseNestedInput
-}
-
-export type ResponseUncheckedUpdateManyWithoutAssignedByInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  formId?: Prisma.StringFieldUpdateOperationsInput | string
-  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ResponseCreateManyFormInput = {
   id?: string
   submittedAt?: Date | string
-  assignedToId?: string | null
-  assignedAt?: Date | string | null
-  assignedById?: string | null
 }
 
 export type ResponseUpdateWithoutFormInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   answers?: Prisma.ResponseAnswerUpdateManyWithoutResponseNestedInput
   followUps?: Prisma.FollowUpUpdateManyWithoutResponseNestedInput
-  assignedTo?: Prisma.UserUpdateOneWithoutAssignedResponsesNestedInput
-  assignedBy?: Prisma.UserUpdateOneWithoutAssignedByResponsesNestedInput
+  assignments?: Prisma.ResponseAssignmentUpdateManyWithoutResponseNestedInput
 }
 
 export type ResponseUncheckedUpdateWithoutFormInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answers?: Prisma.ResponseAnswerUncheckedUpdateManyWithoutResponseNestedInput
   followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutResponseNestedInput
+  assignments?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutResponseNestedInput
 }
 
 export type ResponseUncheckedUpdateManyWithoutFormInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  assignedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -894,11 +612,13 @@ export type ResponseUncheckedUpdateManyWithoutFormInput = {
 export type ResponseCountOutputType = {
   answers: number
   followUps: number
+  assignments: number
 }
 
 export type ResponseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   answers?: boolean | ResponseCountOutputTypeCountAnswersArgs
   followUps?: boolean | ResponseCountOutputTypeCountFollowUpsArgs
+  assignments?: boolean | ResponseCountOutputTypeCountAssignmentsArgs
 }
 
 /**
@@ -925,19 +645,22 @@ export type ResponseCountOutputTypeCountFollowUpsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.FollowUpWhereInput
 }
 
+/**
+ * ResponseCountOutputType without action
+ */
+export type ResponseCountOutputTypeCountAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ResponseAssignmentWhereInput
+}
+
 
 export type ResponseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   formId?: boolean
   submittedAt?: boolean
-  assignedToId?: boolean
-  assignedAt?: boolean
-  assignedById?: boolean
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
   answers?: boolean | Prisma.Response$answersArgs<ExtArgs>
   followUps?: boolean | Prisma.Response$followUpsArgs<ExtArgs>
-  assignedTo?: boolean | Prisma.Response$assignedToArgs<ExtArgs>
-  assignedBy?: boolean | Prisma.Response$assignedByArgs<ExtArgs>
+  assignments?: boolean | Prisma.Response$assignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.ResponseCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["response"]>
 
@@ -945,53 +668,35 @@ export type ResponseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   formId?: boolean
   submittedAt?: boolean
-  assignedToId?: boolean
-  assignedAt?: boolean
-  assignedById?: boolean
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
-  assignedTo?: boolean | Prisma.Response$assignedToArgs<ExtArgs>
-  assignedBy?: boolean | Prisma.Response$assignedByArgs<ExtArgs>
 }, ExtArgs["result"]["response"]>
 
 export type ResponseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   formId?: boolean
   submittedAt?: boolean
-  assignedToId?: boolean
-  assignedAt?: boolean
-  assignedById?: boolean
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
-  assignedTo?: boolean | Prisma.Response$assignedToArgs<ExtArgs>
-  assignedBy?: boolean | Prisma.Response$assignedByArgs<ExtArgs>
 }, ExtArgs["result"]["response"]>
 
 export type ResponseSelectScalar = {
   id?: boolean
   formId?: boolean
   submittedAt?: boolean
-  assignedToId?: boolean
-  assignedAt?: boolean
-  assignedById?: boolean
 }
 
-export type ResponseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "formId" | "submittedAt" | "assignedToId" | "assignedAt" | "assignedById", ExtArgs["result"]["response"]>
+export type ResponseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "formId" | "submittedAt", ExtArgs["result"]["response"]>
 export type ResponseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
   answers?: boolean | Prisma.Response$answersArgs<ExtArgs>
   followUps?: boolean | Prisma.Response$followUpsArgs<ExtArgs>
-  assignedTo?: boolean | Prisma.Response$assignedToArgs<ExtArgs>
-  assignedBy?: boolean | Prisma.Response$assignedByArgs<ExtArgs>
+  assignments?: boolean | Prisma.Response$assignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.ResponseCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ResponseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
-  assignedTo?: boolean | Prisma.Response$assignedToArgs<ExtArgs>
-  assignedBy?: boolean | Prisma.Response$assignedByArgs<ExtArgs>
 }
 export type ResponseIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
-  assignedTo?: boolean | Prisma.Response$assignedToArgs<ExtArgs>
-  assignedBy?: boolean | Prisma.Response$assignedByArgs<ExtArgs>
 }
 
 export type $ResponsePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1000,16 +705,12 @@ export type $ResponsePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     form: Prisma.$FormPayload<ExtArgs>
     answers: Prisma.$ResponseAnswerPayload<ExtArgs>[]
     followUps: Prisma.$FollowUpPayload<ExtArgs>[]
-    assignedTo: Prisma.$UserPayload<ExtArgs> | null
-    assignedBy: Prisma.$UserPayload<ExtArgs> | null
+    assignments: Prisma.$ResponseAssignmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     formId: string
     submittedAt: Date
-    assignedToId: string | null
-    assignedAt: Date | null
-    assignedById: string | null
   }, ExtArgs["result"]["response"]>
   composites: {}
 }
@@ -1407,8 +1108,7 @@ export interface Prisma__ResponseClient<T, Null = never, ExtArgs extends runtime
   form<T extends Prisma.FormDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FormDefaultArgs<ExtArgs>>): Prisma.Prisma__FormClient<runtime.Types.Result.GetResult<Prisma.$FormPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   answers<T extends Prisma.Response$answersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Response$answersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ResponseAnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   followUps<T extends Prisma.Response$followUpsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Response$followUpsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  assignedTo<T extends Prisma.Response$assignedToArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Response$assignedToArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  assignedBy<T extends Prisma.Response$assignedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Response$assignedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  assignments<T extends Prisma.Response$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Response$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ResponseAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1441,9 +1141,6 @@ export interface ResponseFieldRefs {
   readonly id: Prisma.FieldRef<"Response", 'String'>
   readonly formId: Prisma.FieldRef<"Response", 'String'>
   readonly submittedAt: Prisma.FieldRef<"Response", 'DateTime'>
-  readonly assignedToId: Prisma.FieldRef<"Response", 'String'>
-  readonly assignedAt: Prisma.FieldRef<"Response", 'DateTime'>
-  readonly assignedById: Prisma.FieldRef<"Response", 'String'>
 }
     
 
@@ -1888,41 +1585,27 @@ export type Response$followUpsArgs<ExtArgs extends runtime.Types.Extensions.Inte
 }
 
 /**
- * Response.assignedTo
+ * Response.assignments
  */
-export type Response$assignedToArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Response$assignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the User
+   * Select specific fields to fetch from the ResponseAssignment
    */
-  select?: Prisma.UserSelect<ExtArgs> | null
+  select?: Prisma.ResponseAssignmentSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the User
+   * Omit specific fields from the ResponseAssignment
    */
-  omit?: Prisma.UserOmit<ExtArgs> | null
+  omit?: Prisma.ResponseAssignmentOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.UserInclude<ExtArgs> | null
-  where?: Prisma.UserWhereInput
-}
-
-/**
- * Response.assignedBy
- */
-export type Response$assignedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the User
-   */
-  select?: Prisma.UserSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the User
-   */
-  omit?: Prisma.UserOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserInclude<ExtArgs> | null
-  where?: Prisma.UserWhereInput
+  include?: Prisma.ResponseAssignmentInclude<ExtArgs> | null
+  where?: Prisma.ResponseAssignmentWhereInput
+  orderBy?: Prisma.ResponseAssignmentOrderByWithRelationInput | Prisma.ResponseAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.ResponseAssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ResponseAssignmentScalarFieldEnum | Prisma.ResponseAssignmentScalarFieldEnum[]
 }
 
 /**

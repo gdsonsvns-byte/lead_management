@@ -230,8 +230,8 @@ export type UserWhereInput = {
   followUps?: Prisma.FollowUpListRelationFilter
   apiAccessTokens?: Prisma.ApiAccessTokenListRelationFilter
   formAccesses?: Prisma.FormAccessListRelationFilter
-  assignedResponses?: Prisma.ResponseListRelationFilter
-  assignedByResponses?: Prisma.ResponseListRelationFilter
+  assignments?: Prisma.ResponseAssignmentListRelationFilter
+  assignedBy?: Prisma.ResponseAssignmentListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -253,8 +253,8 @@ export type UserOrderByWithRelationInput = {
   followUps?: Prisma.FollowUpOrderByRelationAggregateInput
   apiAccessTokens?: Prisma.ApiAccessTokenOrderByRelationAggregateInput
   formAccesses?: Prisma.FormAccessOrderByRelationAggregateInput
-  assignedResponses?: Prisma.ResponseOrderByRelationAggregateInput
-  assignedByResponses?: Prisma.ResponseOrderByRelationAggregateInput
+  assignments?: Prisma.ResponseAssignmentOrderByRelationAggregateInput
+  assignedBy?: Prisma.ResponseAssignmentOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -279,8 +279,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   followUps?: Prisma.FollowUpListRelationFilter
   apiAccessTokens?: Prisma.ApiAccessTokenListRelationFilter
   formAccesses?: Prisma.FormAccessListRelationFilter
-  assignedResponses?: Prisma.ResponseListRelationFilter
-  assignedByResponses?: Prisma.ResponseListRelationFilter
+  assignments?: Prisma.ResponseAssignmentListRelationFilter
+  assignedBy?: Prisma.ResponseAssignmentListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -332,8 +332,8 @@ export type UserCreateInput = {
   followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
   apiAccessTokens?: Prisma.ApiAccessTokenCreateNestedManyWithoutCreatedByInput
   formAccesses?: Prisma.FormAccessCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -353,8 +353,8 @@ export type UserUncheckedCreateInput = {
   followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedCreateNestedManyWithoutCreatedByInput
   formAccesses?: Prisma.FormAccessUncheckedCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserUpdateInput = {
@@ -374,8 +374,8 @@ export type UserUpdateInput = {
   followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUpdateManyWithoutCreatedByNestedInput
   formAccesses?: Prisma.FormAccessUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -395,8 +395,8 @@ export type UserUncheckedUpdateInput = {
   followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   formAccesses?: Prisma.FormAccessUncheckedUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -631,38 +631,6 @@ export type UserUpdateOneRequiredWithoutFormsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutFormsInput, Prisma.UserUpdateWithoutFormsInput>, Prisma.UserUncheckedUpdateWithoutFormsInput>
 }
 
-export type UserCreateNestedOneWithoutAssignedResponsesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedResponsesInput, Prisma.UserUncheckedCreateWithoutAssignedResponsesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedResponsesInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserCreateNestedOneWithoutAssignedByResponsesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedByResponsesInput, Prisma.UserUncheckedCreateWithoutAssignedByResponsesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedByResponsesInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneWithoutAssignedResponsesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedResponsesInput, Prisma.UserUncheckedCreateWithoutAssignedResponsesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedResponsesInput
-  upsert?: Prisma.UserUpsertWithoutAssignedResponsesInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignedResponsesInput, Prisma.UserUpdateWithoutAssignedResponsesInput>, Prisma.UserUncheckedUpdateWithoutAssignedResponsesInput>
-}
-
-export type UserUpdateOneWithoutAssignedByResponsesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedByResponsesInput, Prisma.UserUncheckedCreateWithoutAssignedByResponsesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedByResponsesInput
-  upsert?: Prisma.UserUpsertWithoutAssignedByResponsesInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignedByResponsesInput, Prisma.UserUpdateWithoutAssignedByResponsesInput>, Prisma.UserUncheckedUpdateWithoutAssignedByResponsesInput>
-}
-
 export type UserCreateNestedOneWithoutFollowUpsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutFollowUpsInput, Prisma.UserUncheckedCreateWithoutFollowUpsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutFollowUpsInput
@@ -705,6 +673,36 @@ export type UserUpdateOneRequiredWithoutFormAccessesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutFormAccessesInput, Prisma.UserUpdateWithoutFormAccessesInput>, Prisma.UserUncheckedUpdateWithoutFormAccessesInput>
 }
 
+export type UserCreateNestedOneWithoutAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignmentsInput, Prisma.UserUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutAssignedByInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedByInput, Prisma.UserUncheckedCreateWithoutAssignedByInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedByInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignmentsInput, Prisma.UserUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignmentsInput
+  upsert?: Prisma.UserUpsertWithoutAssignmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignmentsInput, Prisma.UserUpdateWithoutAssignmentsInput>, Prisma.UserUncheckedUpdateWithoutAssignmentsInput>
+}
+
+export type UserUpdateOneWithoutAssignedByNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedByInput, Prisma.UserUncheckedCreateWithoutAssignedByInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedByInput
+  upsert?: Prisma.UserUpsertWithoutAssignedByInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignedByInput, Prisma.UserUpdateWithoutAssignedByInput>, Prisma.UserUncheckedUpdateWithoutAssignedByInput>
+}
+
 export type UserCreateWithoutAccountInput = {
   id?: string
   name: string
@@ -721,8 +719,8 @@ export type UserCreateWithoutAccountInput = {
   followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
   apiAccessTokens?: Prisma.ApiAccessTokenCreateNestedManyWithoutCreatedByInput
   formAccesses?: Prisma.FormAccessCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserUncheckedCreateWithoutAccountInput = {
@@ -741,8 +739,8 @@ export type UserUncheckedCreateWithoutAccountInput = {
   followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedCreateNestedManyWithoutCreatedByInput
   formAccesses?: Prisma.FormAccessUncheckedCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserCreateOrConnectWithoutAccountInput = {
@@ -803,8 +801,8 @@ export type UserCreateWithoutCreatedAdminsInput = {
   followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
   apiAccessTokens?: Prisma.ApiAccessTokenCreateNestedManyWithoutCreatedByInput
   formAccesses?: Prisma.FormAccessCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserUncheckedCreateWithoutCreatedAdminsInput = {
@@ -823,8 +821,8 @@ export type UserUncheckedCreateWithoutCreatedAdminsInput = {
   followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedCreateNestedManyWithoutCreatedByInput
   formAccesses?: Prisma.FormAccessUncheckedCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserCreateOrConnectWithoutCreatedAdminsInput = {
@@ -848,8 +846,8 @@ export type UserCreateWithoutCreatedByInput = {
   followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
   apiAccessTokens?: Prisma.ApiAccessTokenCreateNestedManyWithoutCreatedByInput
   formAccesses?: Prisma.FormAccessCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserUncheckedCreateWithoutCreatedByInput = {
@@ -868,8 +866,8 @@ export type UserUncheckedCreateWithoutCreatedByInput = {
   followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedCreateNestedManyWithoutCreatedByInput
   formAccesses?: Prisma.FormAccessUncheckedCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserCreateOrConnectWithoutCreatedByInput = {
@@ -909,8 +907,8 @@ export type UserUpdateWithoutCreatedAdminsInput = {
   followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUpdateManyWithoutCreatedByNestedInput
   formAccesses?: Prisma.FormAccessUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedAdminsInput = {
@@ -929,8 +927,8 @@ export type UserUncheckedUpdateWithoutCreatedAdminsInput = {
   followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   formAccesses?: Prisma.FormAccessUncheckedUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutCreatedByInput = {
@@ -965,8 +963,8 @@ export type UserCreateWithoutManagedUsersInput = {
   followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
   apiAccessTokens?: Prisma.ApiAccessTokenCreateNestedManyWithoutCreatedByInput
   formAccesses?: Prisma.FormAccessCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserUncheckedCreateWithoutManagedUsersInput = {
@@ -985,8 +983,8 @@ export type UserUncheckedCreateWithoutManagedUsersInput = {
   followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedCreateNestedManyWithoutCreatedByInput
   formAccesses?: Prisma.FormAccessUncheckedCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserCreateOrConnectWithoutManagedUsersInput = {
@@ -1021,8 +1019,8 @@ export type UserUpdateWithoutManagedUsersInput = {
   followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUpdateManyWithoutCreatedByNestedInput
   formAccesses?: Prisma.FormAccessUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutManagedUsersInput = {
@@ -1041,8 +1039,8 @@ export type UserUncheckedUpdateWithoutManagedUsersInput = {
   followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   formAccesses?: Prisma.FormAccessUncheckedUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserCreateWithoutFormsInput = {
@@ -1061,8 +1059,8 @@ export type UserCreateWithoutFormsInput = {
   followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
   apiAccessTokens?: Prisma.ApiAccessTokenCreateNestedManyWithoutCreatedByInput
   formAccesses?: Prisma.FormAccessCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserUncheckedCreateWithoutFormsInput = {
@@ -1081,8 +1079,8 @@ export type UserUncheckedCreateWithoutFormsInput = {
   followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedCreateNestedManyWithoutCreatedByInput
   formAccesses?: Prisma.FormAccessUncheckedCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserCreateOrConnectWithoutFormsInput = {
@@ -1117,8 +1115,8 @@ export type UserUpdateWithoutFormsInput = {
   followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUpdateManyWithoutCreatedByNestedInput
   formAccesses?: Prisma.FormAccessUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFormsInput = {
@@ -1137,200 +1135,8 @@ export type UserUncheckedUpdateWithoutFormsInput = {
   followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   formAccesses?: Prisma.FormAccessUncheckedUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedByNestedInput
-}
-
-export type UserCreateWithoutAssignedResponsesInput = {
-  id?: string
-  name: string
-  email: string
-  password: string
-  role?: $Enums.Role
-  resetToken?: string | null
-  resetTokenExpiresAt?: Date | string | null
-  createdAt?: Date | string
-  createdBy?: Prisma.UserCreateNestedOneWithoutCreatedAdminsInput
-  createdAdmins?: Prisma.UserCreateNestedManyWithoutCreatedByInput
-  account: Prisma.AccountCreateNestedOneWithoutUsersInput
-  managedUsers?: Prisma.ManagedUserCreateNestedManyWithoutAdminInput
-  forms?: Prisma.FormCreateNestedManyWithoutUserInput
-  followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
-  apiAccessTokens?: Prisma.ApiAccessTokenCreateNestedManyWithoutCreatedByInput
-  formAccesses?: Prisma.FormAccessCreateNestedManyWithoutUserInput
-  assignedByResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedByInput
-}
-
-export type UserUncheckedCreateWithoutAssignedResponsesInput = {
-  id?: string
-  name: string
-  email: string
-  password: string
-  role?: $Enums.Role
-  createdById?: string | null
-  accountId: string
-  resetToken?: string | null
-  resetTokenExpiresAt?: Date | string | null
-  createdAt?: Date | string
-  createdAdmins?: Prisma.UserUncheckedCreateNestedManyWithoutCreatedByInput
-  managedUsers?: Prisma.ManagedUserUncheckedCreateNestedManyWithoutAdminInput
-  forms?: Prisma.FormUncheckedCreateNestedManyWithoutUserInput
-  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
-  apiAccessTokens?: Prisma.ApiAccessTokenUncheckedCreateNestedManyWithoutCreatedByInput
-  formAccesses?: Prisma.FormAccessUncheckedCreateNestedManyWithoutUserInput
-  assignedByResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedByInput
-}
-
-export type UserCreateOrConnectWithoutAssignedResponsesInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedResponsesInput, Prisma.UserUncheckedCreateWithoutAssignedResponsesInput>
-}
-
-export type UserCreateWithoutAssignedByResponsesInput = {
-  id?: string
-  name: string
-  email: string
-  password: string
-  role?: $Enums.Role
-  resetToken?: string | null
-  resetTokenExpiresAt?: Date | string | null
-  createdAt?: Date | string
-  createdBy?: Prisma.UserCreateNestedOneWithoutCreatedAdminsInput
-  createdAdmins?: Prisma.UserCreateNestedManyWithoutCreatedByInput
-  account: Prisma.AccountCreateNestedOneWithoutUsersInput
-  managedUsers?: Prisma.ManagedUserCreateNestedManyWithoutAdminInput
-  forms?: Prisma.FormCreateNestedManyWithoutUserInput
-  followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
-  apiAccessTokens?: Prisma.ApiAccessTokenCreateNestedManyWithoutCreatedByInput
-  formAccesses?: Prisma.FormAccessCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedToInput
-}
-
-export type UserUncheckedCreateWithoutAssignedByResponsesInput = {
-  id?: string
-  name: string
-  email: string
-  password: string
-  role?: $Enums.Role
-  createdById?: string | null
-  accountId: string
-  resetToken?: string | null
-  resetTokenExpiresAt?: Date | string | null
-  createdAt?: Date | string
-  createdAdmins?: Prisma.UserUncheckedCreateNestedManyWithoutCreatedByInput
-  managedUsers?: Prisma.ManagedUserUncheckedCreateNestedManyWithoutAdminInput
-  forms?: Prisma.FormUncheckedCreateNestedManyWithoutUserInput
-  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
-  apiAccessTokens?: Prisma.ApiAccessTokenUncheckedCreateNestedManyWithoutCreatedByInput
-  formAccesses?: Prisma.FormAccessUncheckedCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedToInput
-}
-
-export type UserCreateOrConnectWithoutAssignedByResponsesInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedByResponsesInput, Prisma.UserUncheckedCreateWithoutAssignedByResponsesInput>
-}
-
-export type UserUpsertWithoutAssignedResponsesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignedResponsesInput, Prisma.UserUncheckedUpdateWithoutAssignedResponsesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedResponsesInput, Prisma.UserUncheckedCreateWithoutAssignedResponsesInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutAssignedResponsesInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignedResponsesInput, Prisma.UserUncheckedUpdateWithoutAssignedResponsesInput>
-}
-
-export type UserUpdateWithoutAssignedResponsesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  resetTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  createdBy?: Prisma.UserUpdateOneWithoutCreatedAdminsNestedInput
-  createdAdmins?: Prisma.UserUpdateManyWithoutCreatedByNestedInput
-  account?: Prisma.AccountUpdateOneRequiredWithoutUsersNestedInput
-  managedUsers?: Prisma.ManagedUserUpdateManyWithoutAdminNestedInput
-  forms?: Prisma.FormUpdateManyWithoutUserNestedInput
-  followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
-  apiAccessTokens?: Prisma.ApiAccessTokenUpdateManyWithoutCreatedByNestedInput
-  formAccesses?: Prisma.FormAccessUpdateManyWithoutUserNestedInput
-  assignedByResponses?: Prisma.ResponseUpdateManyWithoutAssignedByNestedInput
-}
-
-export type UserUncheckedUpdateWithoutAssignedResponsesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  accountId?: Prisma.StringFieldUpdateOperationsInput | string
-  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  resetTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  createdAdmins?: Prisma.UserUncheckedUpdateManyWithoutCreatedByNestedInput
-  managedUsers?: Prisma.ManagedUserUncheckedUpdateManyWithoutAdminNestedInput
-  forms?: Prisma.FormUncheckedUpdateManyWithoutUserNestedInput
-  followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
-  apiAccessTokens?: Prisma.ApiAccessTokenUncheckedUpdateManyWithoutCreatedByNestedInput
-  formAccesses?: Prisma.FormAccessUncheckedUpdateManyWithoutUserNestedInput
-  assignedByResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedByNestedInput
-}
-
-export type UserUpsertWithoutAssignedByResponsesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignedByResponsesInput, Prisma.UserUncheckedUpdateWithoutAssignedByResponsesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedByResponsesInput, Prisma.UserUncheckedCreateWithoutAssignedByResponsesInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutAssignedByResponsesInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignedByResponsesInput, Prisma.UserUncheckedUpdateWithoutAssignedByResponsesInput>
-}
-
-export type UserUpdateWithoutAssignedByResponsesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  resetTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  createdBy?: Prisma.UserUpdateOneWithoutCreatedAdminsNestedInput
-  createdAdmins?: Prisma.UserUpdateManyWithoutCreatedByNestedInput
-  account?: Prisma.AccountUpdateOneRequiredWithoutUsersNestedInput
-  managedUsers?: Prisma.ManagedUserUpdateManyWithoutAdminNestedInput
-  forms?: Prisma.FormUpdateManyWithoutUserNestedInput
-  followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
-  apiAccessTokens?: Prisma.ApiAccessTokenUpdateManyWithoutCreatedByNestedInput
-  formAccesses?: Prisma.FormAccessUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUpdateManyWithoutAssignedToNestedInput
-}
-
-export type UserUncheckedUpdateWithoutAssignedByResponsesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  accountId?: Prisma.StringFieldUpdateOperationsInput | string
-  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  resetTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  createdAdmins?: Prisma.UserUncheckedUpdateManyWithoutCreatedByNestedInput
-  managedUsers?: Prisma.ManagedUserUncheckedUpdateManyWithoutAdminNestedInput
-  forms?: Prisma.FormUncheckedUpdateManyWithoutUserNestedInput
-  followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
-  apiAccessTokens?: Prisma.ApiAccessTokenUncheckedUpdateManyWithoutCreatedByNestedInput
-  formAccesses?: Prisma.FormAccessUncheckedUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedToNestedInput
+  assignments?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserCreateWithoutFollowUpsInput = {
@@ -1349,8 +1155,8 @@ export type UserCreateWithoutFollowUpsInput = {
   forms?: Prisma.FormCreateNestedManyWithoutUserInput
   apiAccessTokens?: Prisma.ApiAccessTokenCreateNestedManyWithoutCreatedByInput
   formAccesses?: Prisma.FormAccessCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserUncheckedCreateWithoutFollowUpsInput = {
@@ -1369,8 +1175,8 @@ export type UserUncheckedCreateWithoutFollowUpsInput = {
   forms?: Prisma.FormUncheckedCreateNestedManyWithoutUserInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedCreateNestedManyWithoutCreatedByInput
   formAccesses?: Prisma.FormAccessUncheckedCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserCreateOrConnectWithoutFollowUpsInput = {
@@ -1405,8 +1211,8 @@ export type UserUpdateWithoutFollowUpsInput = {
   forms?: Prisma.FormUpdateManyWithoutUserNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUpdateManyWithoutCreatedByNestedInput
   formAccesses?: Prisma.FormAccessUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFollowUpsInput = {
@@ -1425,8 +1231,8 @@ export type UserUncheckedUpdateWithoutFollowUpsInput = {
   forms?: Prisma.FormUncheckedUpdateManyWithoutUserNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   formAccesses?: Prisma.FormAccessUncheckedUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserCreateWithoutApiAccessTokensInput = {
@@ -1445,8 +1251,8 @@ export type UserCreateWithoutApiAccessTokensInput = {
   forms?: Prisma.FormCreateNestedManyWithoutUserInput
   followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
   formAccesses?: Prisma.FormAccessCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserUncheckedCreateWithoutApiAccessTokensInput = {
@@ -1465,8 +1271,8 @@ export type UserUncheckedCreateWithoutApiAccessTokensInput = {
   forms?: Prisma.FormUncheckedCreateNestedManyWithoutUserInput
   followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
   formAccesses?: Prisma.FormAccessUncheckedCreateNestedManyWithoutUserInput
-  assignedResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserCreateOrConnectWithoutApiAccessTokensInput = {
@@ -1501,8 +1307,8 @@ export type UserUpdateWithoutApiAccessTokensInput = {
   forms?: Prisma.FormUpdateManyWithoutUserNestedInput
   followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
   formAccesses?: Prisma.FormAccessUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutApiAccessTokensInput = {
@@ -1521,8 +1327,8 @@ export type UserUncheckedUpdateWithoutApiAccessTokensInput = {
   forms?: Prisma.FormUncheckedUpdateManyWithoutUserNestedInput
   followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
   formAccesses?: Prisma.FormAccessUncheckedUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserCreateWithoutFormAccessesInput = {
@@ -1541,8 +1347,8 @@ export type UserCreateWithoutFormAccessesInput = {
   forms?: Prisma.FormCreateNestedManyWithoutUserInput
   followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
   apiAccessTokens?: Prisma.ApiAccessTokenCreateNestedManyWithoutCreatedByInput
-  assignedResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserUncheckedCreateWithoutFormAccessesInput = {
@@ -1561,8 +1367,8 @@ export type UserUncheckedCreateWithoutFormAccessesInput = {
   forms?: Prisma.FormUncheckedCreateNestedManyWithoutUserInput
   followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedCreateNestedManyWithoutCreatedByInput
-  assignedResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedToInput
-  assignedByResponses?: Prisma.ResponseUncheckedCreateNestedManyWithoutAssignedByInput
+  assignments?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
 }
 
 export type UserCreateOrConnectWithoutFormAccessesInput = {
@@ -1597,8 +1403,8 @@ export type UserUpdateWithoutFormAccessesInput = {
   forms?: Prisma.FormUpdateManyWithoutUserNestedInput
   followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUpdateManyWithoutCreatedByNestedInput
-  assignedResponses?: Prisma.ResponseUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFormAccessesInput = {
@@ -1617,8 +1423,200 @@ export type UserUncheckedUpdateWithoutFormAccessesInput = {
   forms?: Prisma.FormUncheckedUpdateManyWithoutUserNestedInput
   followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedUpdateManyWithoutCreatedByNestedInput
-  assignedResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+}
+
+export type UserCreateWithoutAssignmentsInput = {
+  id?: string
+  name: string
+  email: string
+  password: string
+  role?: $Enums.Role
+  resetToken?: string | null
+  resetTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  createdBy?: Prisma.UserCreateNestedOneWithoutCreatedAdminsInput
+  createdAdmins?: Prisma.UserCreateNestedManyWithoutCreatedByInput
+  account: Prisma.AccountCreateNestedOneWithoutUsersInput
+  managedUsers?: Prisma.ManagedUserCreateNestedManyWithoutAdminInput
+  forms?: Prisma.FormCreateNestedManyWithoutUserInput
+  followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
+  apiAccessTokens?: Prisma.ApiAccessTokenCreateNestedManyWithoutCreatedByInput
+  formAccesses?: Prisma.FormAccessCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentCreateNestedManyWithoutAssignedByInput
+}
+
+export type UserUncheckedCreateWithoutAssignmentsInput = {
+  id?: string
+  name: string
+  email: string
+  password: string
+  role?: $Enums.Role
+  createdById?: string | null
+  accountId: string
+  resetToken?: string | null
+  resetTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  createdAdmins?: Prisma.UserUncheckedCreateNestedManyWithoutCreatedByInput
+  managedUsers?: Prisma.ManagedUserUncheckedCreateNestedManyWithoutAdminInput
+  forms?: Prisma.FormUncheckedCreateNestedManyWithoutUserInput
+  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
+  apiAccessTokens?: Prisma.ApiAccessTokenUncheckedCreateNestedManyWithoutCreatedByInput
+  formAccesses?: Prisma.FormAccessUncheckedCreateNestedManyWithoutUserInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutAssignedByInput
+}
+
+export type UserCreateOrConnectWithoutAssignmentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignmentsInput, Prisma.UserUncheckedCreateWithoutAssignmentsInput>
+}
+
+export type UserCreateWithoutAssignedByInput = {
+  id?: string
+  name: string
+  email: string
+  password: string
+  role?: $Enums.Role
+  resetToken?: string | null
+  resetTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  createdBy?: Prisma.UserCreateNestedOneWithoutCreatedAdminsInput
+  createdAdmins?: Prisma.UserCreateNestedManyWithoutCreatedByInput
+  account: Prisma.AccountCreateNestedOneWithoutUsersInput
+  managedUsers?: Prisma.ManagedUserCreateNestedManyWithoutAdminInput
+  forms?: Prisma.FormCreateNestedManyWithoutUserInput
+  followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
+  apiAccessTokens?: Prisma.ApiAccessTokenCreateNestedManyWithoutCreatedByInput
+  formAccesses?: Prisma.FormAccessCreateNestedManyWithoutUserInput
+  assignments?: Prisma.ResponseAssignmentCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAssignedByInput = {
+  id?: string
+  name: string
+  email: string
+  password: string
+  role?: $Enums.Role
+  createdById?: string | null
+  accountId: string
+  resetToken?: string | null
+  resetTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  createdAdmins?: Prisma.UserUncheckedCreateNestedManyWithoutCreatedByInput
+  managedUsers?: Prisma.ManagedUserUncheckedCreateNestedManyWithoutAdminInput
+  forms?: Prisma.FormUncheckedCreateNestedManyWithoutUserInput
+  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
+  apiAccessTokens?: Prisma.ApiAccessTokenUncheckedCreateNestedManyWithoutCreatedByInput
+  formAccesses?: Prisma.FormAccessUncheckedCreateNestedManyWithoutUserInput
+  assignments?: Prisma.ResponseAssignmentUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAssignedByInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedByInput, Prisma.UserUncheckedCreateWithoutAssignedByInput>
+}
+
+export type UserUpsertWithoutAssignmentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignmentsInput, Prisma.UserUncheckedUpdateWithoutAssignmentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignmentsInput, Prisma.UserUncheckedCreateWithoutAssignmentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAssignmentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignmentsInput, Prisma.UserUncheckedUpdateWithoutAssignmentsInput>
+}
+
+export type UserUpdateWithoutAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneWithoutCreatedAdminsNestedInput
+  createdAdmins?: Prisma.UserUpdateManyWithoutCreatedByNestedInput
+  account?: Prisma.AccountUpdateOneRequiredWithoutUsersNestedInput
+  managedUsers?: Prisma.ManagedUserUpdateManyWithoutAdminNestedInput
+  forms?: Prisma.FormUpdateManyWithoutUserNestedInput
+  followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
+  apiAccessTokens?: Prisma.ApiAccessTokenUpdateManyWithoutCreatedByNestedInput
+  formAccesses?: Prisma.FormAccessUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUpdateManyWithoutAssignedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAdmins?: Prisma.UserUncheckedUpdateManyWithoutCreatedByNestedInput
+  managedUsers?: Prisma.ManagedUserUncheckedUpdateManyWithoutAdminNestedInput
+  forms?: Prisma.FormUncheckedUpdateManyWithoutUserNestedInput
+  followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
+  apiAccessTokens?: Prisma.ApiAccessTokenUncheckedUpdateManyWithoutCreatedByNestedInput
+  formAccesses?: Prisma.FormAccessUncheckedUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
+}
+
+export type UserUpsertWithoutAssignedByInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignedByInput, Prisma.UserUncheckedUpdateWithoutAssignedByInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedByInput, Prisma.UserUncheckedCreateWithoutAssignedByInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAssignedByInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignedByInput, Prisma.UserUncheckedUpdateWithoutAssignedByInput>
+}
+
+export type UserUpdateWithoutAssignedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneWithoutCreatedAdminsNestedInput
+  createdAdmins?: Prisma.UserUpdateManyWithoutCreatedByNestedInput
+  account?: Prisma.AccountUpdateOneRequiredWithoutUsersNestedInput
+  managedUsers?: Prisma.ManagedUserUpdateManyWithoutAdminNestedInput
+  forms?: Prisma.FormUpdateManyWithoutUserNestedInput
+  followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
+  apiAccessTokens?: Prisma.ApiAccessTokenUpdateManyWithoutCreatedByNestedInput
+  formAccesses?: Prisma.FormAccessUpdateManyWithoutUserNestedInput
+  assignments?: Prisma.ResponseAssignmentUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAssignedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAdmins?: Prisma.UserUncheckedUpdateManyWithoutCreatedByNestedInput
+  managedUsers?: Prisma.ManagedUserUncheckedUpdateManyWithoutAdminNestedInput
+  forms?: Prisma.FormUncheckedUpdateManyWithoutUserNestedInput
+  followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
+  apiAccessTokens?: Prisma.ApiAccessTokenUncheckedUpdateManyWithoutCreatedByNestedInput
+  formAccesses?: Prisma.FormAccessUncheckedUpdateManyWithoutUserNestedInput
+  assignments?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyAccountInput = {
@@ -1649,8 +1647,8 @@ export type UserUpdateWithoutAccountInput = {
   followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUpdateManyWithoutCreatedByNestedInput
   formAccesses?: Prisma.FormAccessUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountInput = {
@@ -1669,8 +1667,8 @@ export type UserUncheckedUpdateWithoutAccountInput = {
   followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   formAccesses?: Prisma.FormAccessUncheckedUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutAccountInput = {
@@ -1713,8 +1711,8 @@ export type UserUpdateWithoutCreatedByInput = {
   followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUpdateManyWithoutCreatedByNestedInput
   formAccesses?: Prisma.FormAccessUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedByInput = {
@@ -1733,8 +1731,8 @@ export type UserUncheckedUpdateWithoutCreatedByInput = {
   followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
   apiAccessTokens?: Prisma.ApiAccessTokenUncheckedUpdateManyWithoutCreatedByNestedInput
   formAccesses?: Prisma.FormAccessUncheckedUpdateManyWithoutUserNestedInput
-  assignedResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedToNestedInput
-  assignedByResponses?: Prisma.ResponseUncheckedUpdateManyWithoutAssignedByNestedInput
+  assignments?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  assignedBy?: Prisma.ResponseAssignmentUncheckedUpdateManyWithoutAssignedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutCreatedByInput = {
@@ -1761,8 +1759,8 @@ export type UserCountOutputType = {
   followUps: number
   apiAccessTokens: number
   formAccesses: number
-  assignedResponses: number
-  assignedByResponses: number
+  assignments: number
+  assignedBy: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1772,8 +1770,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   followUps?: boolean | UserCountOutputTypeCountFollowUpsArgs
   apiAccessTokens?: boolean | UserCountOutputTypeCountApiAccessTokensArgs
   formAccesses?: boolean | UserCountOutputTypeCountFormAccessesArgs
-  assignedResponses?: boolean | UserCountOutputTypeCountAssignedResponsesArgs
-  assignedByResponses?: boolean | UserCountOutputTypeCountAssignedByResponsesArgs
+  assignments?: boolean | UserCountOutputTypeCountAssignmentsArgs
+  assignedBy?: boolean | UserCountOutputTypeCountAssignedByArgs
 }
 
 /**
@@ -1831,15 +1829,15 @@ export type UserCountOutputTypeCountFormAccessesArgs<ExtArgs extends runtime.Typ
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountAssignedResponsesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ResponseWhereInput
+export type UserCountOutputTypeCountAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ResponseAssignmentWhereInput
 }
 
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountAssignedByResponsesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ResponseWhereInput
+export type UserCountOutputTypeCountAssignedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ResponseAssignmentWhereInput
 }
 
 
@@ -1862,8 +1860,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   followUps?: boolean | Prisma.User$followUpsArgs<ExtArgs>
   apiAccessTokens?: boolean | Prisma.User$apiAccessTokensArgs<ExtArgs>
   formAccesses?: boolean | Prisma.User$formAccessesArgs<ExtArgs>
-  assignedResponses?: boolean | Prisma.User$assignedResponsesArgs<ExtArgs>
-  assignedByResponses?: boolean | Prisma.User$assignedByResponsesArgs<ExtArgs>
+  assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
+  assignedBy?: boolean | Prisma.User$assignedByArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1920,8 +1918,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   followUps?: boolean | Prisma.User$followUpsArgs<ExtArgs>
   apiAccessTokens?: boolean | Prisma.User$apiAccessTokensArgs<ExtArgs>
   formAccesses?: boolean | Prisma.User$formAccessesArgs<ExtArgs>
-  assignedResponses?: boolean | Prisma.User$assignedResponsesArgs<ExtArgs>
-  assignedByResponses?: boolean | Prisma.User$assignedByResponsesArgs<ExtArgs>
+  assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
+  assignedBy?: boolean | Prisma.User$assignedByArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1944,8 +1942,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     followUps: Prisma.$FollowUpPayload<ExtArgs>[]
     apiAccessTokens: Prisma.$ApiAccessTokenPayload<ExtArgs>[]
     formAccesses: Prisma.$FormAccessPayload<ExtArgs>[]
-    assignedResponses: Prisma.$ResponsePayload<ExtArgs>[]
-    assignedByResponses: Prisma.$ResponsePayload<ExtArgs>[]
+    assignments: Prisma.$ResponseAssignmentPayload<ExtArgs>[]
+    assignedBy: Prisma.$ResponseAssignmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2360,8 +2358,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   followUps<T extends Prisma.User$followUpsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$followUpsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   apiAccessTokens<T extends Prisma.User$apiAccessTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$apiAccessTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApiAccessTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   formAccesses<T extends Prisma.User$formAccessesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$formAccessesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormAccessPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  assignedResponses<T extends Prisma.User$assignedResponsesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedResponsesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ResponsePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  assignedByResponses<T extends Prisma.User$assignedByResponsesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedByResponsesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ResponsePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignments<T extends Prisma.User$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ResponseAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignedBy<T extends Prisma.User$assignedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedByArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ResponseAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2960,51 +2958,51 @@ export type User$formAccessesArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
- * User.assignedResponses
+ * User.assignments
  */
-export type User$assignedResponsesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$assignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Response
+   * Select specific fields to fetch from the ResponseAssignment
    */
-  select?: Prisma.ResponseSelect<ExtArgs> | null
+  select?: Prisma.ResponseAssignmentSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Response
+   * Omit specific fields from the ResponseAssignment
    */
-  omit?: Prisma.ResponseOmit<ExtArgs> | null
+  omit?: Prisma.ResponseAssignmentOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ResponseInclude<ExtArgs> | null
-  where?: Prisma.ResponseWhereInput
-  orderBy?: Prisma.ResponseOrderByWithRelationInput | Prisma.ResponseOrderByWithRelationInput[]
-  cursor?: Prisma.ResponseWhereUniqueInput
+  include?: Prisma.ResponseAssignmentInclude<ExtArgs> | null
+  where?: Prisma.ResponseAssignmentWhereInput
+  orderBy?: Prisma.ResponseAssignmentOrderByWithRelationInput | Prisma.ResponseAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.ResponseAssignmentWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.ResponseScalarFieldEnum | Prisma.ResponseScalarFieldEnum[]
+  distinct?: Prisma.ResponseAssignmentScalarFieldEnum | Prisma.ResponseAssignmentScalarFieldEnum[]
 }
 
 /**
- * User.assignedByResponses
+ * User.assignedBy
  */
-export type User$assignedByResponsesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$assignedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Response
+   * Select specific fields to fetch from the ResponseAssignment
    */
-  select?: Prisma.ResponseSelect<ExtArgs> | null
+  select?: Prisma.ResponseAssignmentSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Response
+   * Omit specific fields from the ResponseAssignment
    */
-  omit?: Prisma.ResponseOmit<ExtArgs> | null
+  omit?: Prisma.ResponseAssignmentOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ResponseInclude<ExtArgs> | null
-  where?: Prisma.ResponseWhereInput
-  orderBy?: Prisma.ResponseOrderByWithRelationInput | Prisma.ResponseOrderByWithRelationInput[]
-  cursor?: Prisma.ResponseWhereUniqueInput
+  include?: Prisma.ResponseAssignmentInclude<ExtArgs> | null
+  where?: Prisma.ResponseAssignmentWhereInput
+  orderBy?: Prisma.ResponseAssignmentOrderByWithRelationInput | Prisma.ResponseAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.ResponseAssignmentWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.ResponseScalarFieldEnum | Prisma.ResponseScalarFieldEnum[]
+  distinct?: Prisma.ResponseAssignmentScalarFieldEnum | Prisma.ResponseAssignmentScalarFieldEnum[]
 }
 
 /**
