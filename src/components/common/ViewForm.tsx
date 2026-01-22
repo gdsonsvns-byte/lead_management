@@ -8,6 +8,7 @@ import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { MenuItem, TextField } from "@mui/material";
 import { FollowUpStatus, Role } from "@/src/app/generated/prisma/enums";
+import { useAuth } from "@/src/hooks/useAuth";
 
 interface Field {
     id: string;
@@ -18,6 +19,8 @@ interface Field {
     order?: number;
 }
 export default function ViewForm({ account_id }: { account_id?: string }) {
+    const { user } = useAuth();
+    const isAdmin = user && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
     const searchParams = useSearchParams();
     const router = useRouter();
     const formId = searchParams.get("view");
@@ -165,7 +168,7 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
     const submitMutation = useMutation({
         mutationFn: async (formData: FormData) => {
             const res = await axios.post(
-                `/api/v1/form/${formId}/response/internal`,
+                `/api/v1/form/${formId}/response/internal?account_id=${account_id ?? ""}`,
                 formData,
                 {
                     withCredentials: true,
@@ -362,7 +365,7 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
                                 </div>
 
                             </div>
-                            <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp flex flex-col gap-8"
+                            {isAdmin && <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp flex flex-col gap-8"
                             >
                                 <span>Lead Assignment</span>
                                 <div className="flex flex-col sm:flex-row gap-5">
@@ -409,7 +412,7 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
                                     </TextField>
 
                                 </div>
-                            </div>
+                            </div>}
                         </div>
 
                         <div className="space-y-3 animate-fadeIn mt-5">
