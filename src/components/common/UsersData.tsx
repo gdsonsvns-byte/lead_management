@@ -94,6 +94,11 @@ export interface FormResponseItem {
     followUpCount: number;
     lastFollowUp: FollowUpItem | null;
     nextFollowUpDate: string | null;
+    assignUsers: {
+        id: string,
+        name: string,
+        role: string;
+    }[],
     leadStatus: string;
 }
 export interface FormResponsesData {
@@ -229,6 +234,40 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
                     },
                 }]
                 : []),
+            ...(isAdmin
+                ? [
+                    {
+                        field: "assigned_users",
+                        headerName: "Assigned Users",
+                        width: 260,
+                        sortable: false,
+                        renderCell: (params: GridRenderCellParams) => {
+                            const assignUsers = params.row.assignUsers || [];
+
+                            return (
+                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                                    {assignUsers.length ? (
+                                        assignUsers.map((user: any) => (
+                                            <Chip
+                                                key={user.id}
+                                                label={`${user.name} (${user.role})`}
+                                                size="small"
+                                                variant="outlined"
+                                                className="text-xs!"
+                                            />
+                                        ))
+                                    ) : (
+                                        <Typography variant="caption" color="text.secondary">
+                                            —
+                                        </Typography>
+                                    )}
+                                </Box>
+                            );
+                        },
+                    },
+                ]
+                : []),
+
             ...dynamicFields,
             {
                 field: "submittedAt",

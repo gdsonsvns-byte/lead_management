@@ -187,6 +187,11 @@ export async function GET(req: NextRequest) {
                             }
                         }
                     },
+                    assignments:{
+                        some:{
+                            userId:userId!
+                        }
+                    }
                 },
             },
             orderBy: { createdAt: "desc" },
