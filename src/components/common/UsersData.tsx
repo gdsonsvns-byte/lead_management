@@ -25,6 +25,7 @@ import {
     Chip,
     Input,
     MenuItem,
+    DialogContentText,
 } from "@mui/material";
 import {
     Select,
@@ -44,6 +45,7 @@ import NoteIcon from "@mui/icons-material/Note";
 import toast, { Toaster } from "react-hot-toast";
 import Spinner from "../ui/spinner";
 import { useAuth } from "@/src/hooks/useAuth";
+import AssignLead from "./assign_lead";
 
 const TYPE_ICONS: Record<string, JSX.Element> = {
     CALL: <LocalPhoneIcon fontSize="small" color="primary" />,
@@ -661,7 +663,8 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
                     <Button onClick={() => setOpenResponse(null)}>Close</Button>
                 </DialogActions>
             </Dialog>
-            <AssignUserDialog
+            
+            <AssignLead
                 open={!!selectedResponseId}
                 onClose={() => setSelectedResponseId(null)}
                 formId={formId}
@@ -694,6 +697,7 @@ function AssignUserDialog({ open, onClose, formId, responseId, account_id }: Pro
         placeholderData: (old) => old,
     });
     const [assignUserId, setAssignUserId] = useState<string>("");
+    const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 
     const assignUserMutation = useMutation({
         mutationFn: async () => {
@@ -723,6 +727,7 @@ function AssignUserDialog({ open, onClose, formId, responseId, account_id }: Pro
     return (
         <Dialog open={open} onClose={() => { onClose(), setAssignUserId("") }} maxWidth="sm" fullWidth>
             <DialogTitle>Assign User</DialogTitle>
+
             {isLoading && (
                 <div className="py-10 flex justify-center">
                     <Spinner />
@@ -773,7 +778,6 @@ function AssignUserDialog({ open, onClose, formId, responseId, account_id }: Pro
                                     </MenuItem>
                                 ))}
                             </TextField>
-
                         </div>
                     </DialogContent>
                     <DialogActions>

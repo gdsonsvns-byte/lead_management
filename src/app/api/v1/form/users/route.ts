@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
         const { searchParams } = new URL(req.url);
         const queryAccountId = searchParams.get("account_id")?.trim();
         const formId = searchParams.get("form_id")?.trim();
+        const responseId = searchParams.get("response_id")?.trim();
         if (user.role === "SUPERADMIN" && !queryAccountId) {
             return NextResponse.json(
                 { error: "Account not found." },
@@ -54,37 +55,54 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        const users = await prisma.user.findMany({
-            where: {
-                accountId,
-                formAccesses: {
-                    some: {
-                        formId,
-                        form: {
-                            accountId
+        const [users, responseAccess] = await Promise.all([
+            prisma.user.findMany({
+                where: {
+                    accountId,
+                    ...(user.role !== "SUPERADMIN" && { role: { not: "ADMIN" } }),
+                    formAccesses: {
+                        some: {
+                            formId,
+                            form: {
+                                accountId
+                            }
                         }
                     }
-                }
-            },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-            },
-            orderBy: {
-                createdAt: "desc"
-            }
-        })
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                    createdAt: true,
+                },
+                orderBy: { createdAt: "desc" },
+            }),
 
-        if (!users) {
-            return NextResponse.json(
-                { error: "Users not found or access denied" },
-                { status: 404 }
-            );
-        }
+            responseId
+                ? prisma.responseAssignment.findMany({
+                    where: {
+                        responseId,
+                    },
+                    select: { userId: true },
+                })
+                : Promise.resolve([]),
+        ]);
 
-        return NextResponse.json(users);
+        const responseAccessSet = new Set(responseAccess.map(a => a.userId));
+        const usersWithAccess = users.map(user => ({
+            ...user,
+            hasResponseAccess: responseAccessSet.has(user.id),
+        }));
+
+
+        return NextResponse.json(
+            {
+                users: usersWithAccess,
+            },
+            { status: 200 }
+        );
+
 
     } catch (error: any) {
         console.log("Something went wrong", error.message);
