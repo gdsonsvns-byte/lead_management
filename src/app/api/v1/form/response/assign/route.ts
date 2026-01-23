@@ -1,9 +1,11 @@
 import { isRateLimited } from "@/src/lib/limiter";
 import prisma from "@/src/lib/prisma";
 import { verifyRole } from "@/src/lib/verifyRole";
+import { assignResponseUsersSchema } from "@/src/types/form";
 import { NextRequest, NextResponse } from "next/server";
+import z from "zod";
 
-export async function POST(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";
         if (isRateLimited(ip)) {
@@ -22,35 +24,105 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { form_id, response_id, user_id } = body;
 
-        if (!form_id || !response_id || !user_id) {
+        const { success, error, data } = assignResponseUsersSchema.safeParse(body)
+        if (!success) {
+            return NextResponse.json({ error: z.prettifyError(error) }, { status: 400 })
+        }
+
+        const { responseId, userIds } = data;
+
+        const response = await prisma.response.findFirst({
+            where: {
+                id: responseId,
+                ...(user.role !== "SUPERADMIN" && { formId: data.formId }),
+            },
+            select: { id: true },
+        });
+
+        if (!response) {
             return NextResponse.json(
-                { error: "Missing required fields" },
-                { status: 400 }
+                { error: "Response not found or access denied" },
+                { status: 404 }
             );
         }
 
-        const assignUser = await prisma.responseAssignment.upsert({
+        const existingAssignments = await prisma.responseAssignment.findMany({
             where: {
-                responseId_userId: {
-                    responseId: response_id,
-                    userId: user_id,
-                },
-            },
-            update: { isActive: true },
-            create: {
-                responseId: response_id,
-                userId: user_id,
-                assignedById: user?.sub ?? null,
+                responseId,
                 isActive: true,
+            },
+            select: {
+                userId: true,
+                user: {
+                    select: { role: true },
+                },
             },
         });
 
-        return NextResponse.json({
-            message: "User assigned successfully",
-            assignUser,
-        }, { status: 200 });
+        const protectedUserIds = new Set(
+            existingAssignments
+                .filter(a => a.user.role === "ADMIN" || a.user.role === "SUPERADMIN")
+                .map(a => a.userId)
+        );
+
+        const existingUserIds = new Set(
+            existingAssignments.map(a => a.userId)
+        );
+
+        const incomingUserIds = new Set(userIds);
+        const toAdd = userIds.filter(id => !existingUserIds.has(id));
+
+        const toDisable = [...existingUserIds].filter(
+            id =>
+                !incomingUserIds.has(id) &&
+                !protectedUserIds.has(id)
+        );
+
+
+        await prisma.$transaction([
+            ...(toAdd.length
+                ? toAdd.map(uid =>
+                    prisma.responseAssignment.upsert({
+                        where: {
+                            responseId_userId: {
+                                responseId,
+                                userId: uid,
+                            },
+                        },
+                        update: {
+                            isActive: true,
+                            assignedById: user.sub,
+                        },
+                        create: {
+                            responseId,
+                            userId: uid,
+                            assignedById: user.sub,
+                            isActive: true,
+                        },
+                    })
+                )
+                : []),
+
+            ...(toDisable.length
+                ? [
+                    prisma.responseAssignment.deleteMany({
+                        where: {
+                            responseId,
+                            userId: { in: toDisable },
+                        },
+                    }),
+                ]
+                : []),
+        ]);
+
+        return NextResponse.json(
+            {
+                success: true,
+                message: "Response assignment updated successfully",
+            },
+            { status: 200 }
+        );
 
     } catch (error: any) {
         console.log("Something went wrong", error.message);

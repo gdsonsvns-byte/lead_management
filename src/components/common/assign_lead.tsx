@@ -1,10 +1,11 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Spinner from "../ui/spinner";
+import toast from "react-hot-toast";
 
 interface Props {
     open: boolean;
@@ -26,7 +27,6 @@ interface User {
 }
 
 
-
 export default function AssignLead({ open, onClose, formId, responseId, account_id }: Props) {
     const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
     const { data, isLoading, isError, isFetching } = useQuery<User>({
@@ -39,7 +39,6 @@ export default function AssignLead({ open, onClose, formId, responseId, account_
             return res.data;
         },
         enabled: open,
-        retry: 1,
     });
 
     const toggleUser = (userId: string) => {
@@ -49,6 +48,36 @@ export default function AssignLead({ open, onClose, formId, responseId, account_
                 : [...prev, userId]
         );
     };
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: async () => {
+            return axios.patch("/api/v1/form/response/assign",
+                {
+                    formId,
+                    responseId,
+                    userIds: selectedUserIds,
+                },
+                { withCredentials: true }
+            );
+        },
+        onSuccess: (data) => {
+            onClose()
+            setSelectedUserIds([])
+            toast.success(data.data?.message);
+        },
+        onError(error: any) {
+            toast.error(error?.response?.data?.error || "Something went wrong");
+        },
+    });
+    useEffect(() => {
+        if (data?.users) {
+            const preSelected = data.users
+                .filter((u) => u.hasResponseAccess)
+                .map((u) => u.id);
+
+            setSelectedUserIds(preSelected);
+        }
+    }, [data]);
 
     if (!open) return null;
     return (
@@ -110,9 +139,9 @@ export default function AssignLead({ open, onClose, formId, responseId, account_
                     ))}
                 </div>
 
-                {/* <div className="flex justify-end gap-3 mt-6">
+                <div className="flex justify-end gap-3 mt-6">
                     <button
-                        onClick={closeModal}
+                        onClick={() => (onClose(), setSelectedUserIds([]))}
                         className="px-4 py-2 rounded-md bg-zinc-800 text-white text-sm cursor-pointer"
                     >
                         Cancel
@@ -124,9 +153,9 @@ export default function AssignLead({ open, onClose, formId, responseId, account_
                         className="px-5 py-2 rounded-md bg-blue-500 text-white text-sm hover:bg-blue-500/90 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                     >
                         {isPending && <Spinner color="white" />}
-                        Save Access
+                        Assign
                     </button>
-                </div> */}
+                </div>
             </div>
         </section>
     )
