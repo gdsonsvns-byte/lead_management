@@ -29,7 +29,7 @@ interface User {
 
 export default function AssignLead({ open, onClose, formId, responseId, account_id }: Props) {
     const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
-    const { data, isLoading, isError, isFetching } = useQuery<User>({
+    const { data, isLoading, isError, isFetching, error } = useQuery<User>({
         queryKey: ["responses", formId, account_id, responseId],
         queryFn: async () => {
             const res = await axios.get<User>(`/api/v1/form/users`, {
@@ -79,7 +79,7 @@ export default function AssignLead({ open, onClose, formId, responseId, account_
         }
     }, [data]);
 
-    if (!open) return null;
+    if (!open || !account_id) return null;
     return (
         <section className="fixed inset-0 bg-black/30 z-50 flex justify-center items-center md:p-10 p-4 overflow-auto">
             <div className="bg-white w-full max-w-2xl rounded-xl shadow-xl p-6 relative">
@@ -104,7 +104,7 @@ export default function AssignLead({ open, onClose, formId, responseId, account_
 
                     {isError && (
                         <p className="text-red-500 text-sm">
-                            Failed to load users
+                            {error.message ?? ""}
                         </p>
                     )}
 
