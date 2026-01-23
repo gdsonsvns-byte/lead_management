@@ -1,8 +1,9 @@
 import UsersData from "@/src/components/common/UsersData";
 import { Toaster } from "react-hot-toast";
 
-export default async function ViewFormData({ searchParams }: { searchParams: Promise<{ id?: string, account_id: string }> }) {
-    const { id, account_id } = await searchParams;
+export default async function ViewFormData({ params, searchParams }: { searchParams: Promise<{ id?: string }>, params: Promise<{ account_id: string }> }) {
+    const { id } = await searchParams;
+    const { account_id } = await params
 
     if (!id) {
         return (

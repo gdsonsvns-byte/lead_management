@@ -134,7 +134,9 @@ export const userId = z.object({
         .max(50, { error: "You can assign max 50 users at once" }),
 })
 
-
+export const assignResponseUsersSchema = userId.extend({
+    responseId: z.uuid({ error: "Invalid responseId" }),
+});
 
 
 export type FormFieldsSchema = z.infer<typeof formFieldSchema>
