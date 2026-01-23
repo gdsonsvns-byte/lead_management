@@ -79,7 +79,7 @@ export default function AssignLead({ open, onClose, formId, responseId, account_
         }
     }, [data]);
 
-    if (!open || !account_id) return null;
+    if (!open) return null;
     return (
         <section className="fixed inset-0 bg-black/30 z-50 flex justify-center items-center md:p-10 p-4 overflow-auto">
             <div className="bg-white w-full max-w-2xl rounded-xl shadow-xl p-6 relative">
