@@ -187,9 +187,9 @@ export async function GET(req: NextRequest) {
                             }
                         }
                     },
-                    assignments:{
-                        some:{
-                            userId:userId!
+                    assignments: {
+                        some: {
+                            userId: userId!
                         }
                     }
                 },
@@ -225,6 +225,17 @@ export async function GET(req: NextRequest) {
                                 },
                             },
                         },
+                        assignments: {
+                            select: {
+                                user: {
+                                    select: {
+                                        id: true,
+                                        name: true,
+                                        role: true
+                                    }
+                                }
+                            }
+                        }
                     },
                 },
             },
@@ -239,6 +250,8 @@ export async function GET(req: NextRequest) {
                 followUpHistory: any[];
             }
         >();
+
+
 
         for (const fu of followUps) {
             if (!responseMap.has(fu.responseId)) {
@@ -307,10 +320,33 @@ export async function GET(req: NextRequest) {
         const paginated = filtered.slice(skip, skip + limit);
         const pageCount = Math.ceil(total / limit);
 
+        const formatted = paginated.map(item => {
+            const res = item.response;
+            const assignUsers = res.assignments.map((a: any) => ({
+                id: a.user.id,
+                name: a.user.name,
+                role: a.user.role,
+            }));
+
+            return {
+                responseId: item.responseId,
+                submittedAt: res.submittedAt,
+                answers: res.answers.reduce((acc: any, ans: any) => {
+                    acc[ans.field.label] = ans.value;
+                    return acc;
+                }, {}),
+                nextActions: res.form.nextActions,
+                assignUsers, 
+                lastFollowUp: item.lastFollowUp,
+                followUpHistory: item.followUpHistory,
+            };
+        });
+
+
         return NextResponse.json(
             {
                 success: true,
-                today: paginated,
+                today: formatted,
                 page,
                 limit,
                 total,
