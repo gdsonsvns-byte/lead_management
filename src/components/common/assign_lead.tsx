@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -13,6 +13,9 @@ interface Props {
     formId: string;
     responseId: string | null;
     account_id?: string;
+    currentState: string;
+    page: number;
+    pageSize: number;
 }
 
 interface User {
@@ -27,7 +30,8 @@ interface User {
 }
 
 
-export default function AssignLead({ open, onClose, formId, responseId, account_id }: Props) {
+export default function AssignLead({ open, onClose, formId, responseId, account_id, currentState, page, pageSize }: Props) {
+    const queryClient = useQueryClient();
     const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
     const { data, isLoading, isError, isFetching, error } = useQuery<User>({
         queryKey: ["responses", formId, account_id, responseId],
@@ -60,10 +64,13 @@ export default function AssignLead({ open, onClose, formId, responseId, account_
                 { withCredentials: true }
             );
         },
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
             onClose()
             setSelectedUserIds([])
             toast.success(data.data?.message);
+            await queryClient.invalidateQueries({
+                queryKey: ["form_responses", formId, page, pageSize, currentState],
+            });
         },
         onError(error: any) {
             toast.error(error?.response?.data?.error || "Something went wrong");

@@ -709,6 +709,9 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
                 formId={formId}
                 responseId={selectedResponseId}
                 account_id={account_id}
+                currentState={currentState}
+                page={paginationModel.page}
+                pageSize={paginationModel.pageSize}
             />
             <Toaster />
         </div>
