@@ -382,6 +382,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                             }
                         }
                     })
+                },
+                assignments: {
+                    some: {
+                        userId: userId!
+                    }
                 }
             },
             orderBy: { submittedAt: "desc" },
@@ -416,6 +421,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                         addedBy: { select: { id: true, name: true, email: true } },
                     },
                 },
+                assignments: {
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                role: true
+                            }
+                        }
+                    }
+                }
             },
         });
 
@@ -510,6 +526,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                 answerMap[ans.field.label] = value;
             }
 
+            const assignUsers = res.assignments.map(a => ({
+                id: a.user.id,
+                name: a.user.name,
+                role: a.user.role,
+            }));
+
             const followUps = res.followUps;
             const lastFollowUp = followUps[0] ?? null;
             const nextFollowUpDate =
@@ -525,6 +547,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                 followUpCount: followUps.length,
                 lastFollowUp,
                 nextFollowUpDate,
+                assignUsers,
                 leadStatus: lastFollowUp?.status ?? "PENDING",
             };
         });

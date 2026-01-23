@@ -12,7 +12,7 @@ import {
 import axios, { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from './ui/spinner';
-import { Clock, AlertCircle, Plus } from "lucide-react";
+import { Clock, AlertCircle, Plus, User2, CheckCircle } from "lucide-react";
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import toast, { Toaster } from 'react-hot-toast';
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
@@ -20,6 +20,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import EventIcon from "@mui/icons-material/Event";
 import NoteIcon from "@mui/icons-material/Note";
+import { useAuth } from '../hooks/useAuth';
 
 const TYPE_ICONS: Record<string, JSX.Element> = {
     CALL: <LocalPhoneIcon fontSize="small" color="primary" />,
@@ -150,20 +151,15 @@ export default function DashboardComponent() {
     )
 }
 
-function extractLeadInfo(response: LeadResponse) {
-    const answers = response.answers;
+function extractLeadInfo(item: DashboardFollowUpItem) {
     const info: Record<string, string> = {};
 
-    answers.forEach(ans => {
-        const label = ans.field?.label?.toLowerCase() || "";
-        const value = ans.value;
-        if (!value) return;
-
-        if (label.includes("name") || label.includes("contact person")) info.name = value;
-        else if (label.includes("phone") || label.includes("mobile")) info.phone = value;
-        else if (label.includes("email")) info.email = value;
-        else if (label.includes("location") || label.includes("city")) info.location = value;
-        else info[label] = value;
+    Object.entries(item.answers).forEach(([label, value]) => {
+        const key = label.toLowerCase();
+        if (key.includes("name")) info.name = value;
+        else if (key.includes("phone")) info.phone = value;
+        else if (key.includes("email")) info.email = value;
+        else if (key.includes("location")) info.location = value;
     });
 
     return info;
@@ -186,15 +182,17 @@ interface Props {
 }
 
 function FollowUpCard({ item, page, pageSize, currentState }: Props) {
+    const { user } = useAuth();
+    const isAdmin = user && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
     const [openResponse, setOpenResponse] = useState<DashboardFollowUpItem | null>(null);
     const [followType, setFollowType] = useState<string>("NOTE");
     const [followNote, setFollowNote] = useState<string>("");
     const [followNextDate, setFollowNextDate] = useState<string>("");
     const [followBusinessStatus, setFollowBusinessStatus] = useState<string>("");
 
-    const info = extractLeadInfo(item.response);
-    const queryClient = useQueryClient();
+    const info = extractLeadInfo(item);
     const last = item.lastFollowUp;
+    const queryClient = useQueryClient();
 
     const due = last.nextFollowUpDate
         ? new Date(last.nextFollowUpDate)
@@ -283,7 +281,7 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
             note: followNote || null,
             nextFollowUpDate: followNextDate || null,
             businessStatus: followBusinessStatus,
-            status: openResponse.response.form.nextActions.find((action) => action.label === followBusinessStatus)?.status!,
+            status: openResponse.nextActions.find((action) => action.label === followBusinessStatus)?.status!,
         });
     };
 
@@ -294,17 +292,18 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
         setFollowNextDate("");
         setFollowBusinessStatus("");
     }, [openResponse]);
+
     const selectedAction = useMemo(
         () =>
-            openResponse?.response.form.nextActions?.find(
+            openResponse?.nextActions?.find(
                 (a) => a.label === followBusinessStatus
             ),
-        [openResponse?.response.form.nextActions, followBusinessStatus]
+        [openResponse?.nextActions, followBusinessStatus]
     );
     const status = last.status;
 
     return (
-        <div className="relative rounded-xl bg-white p-5 shadow-md border border-zinc-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col gap-3">
+        <div className="relative rounded-xl bg-white p-5 shadow-md border border-zinc-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col gap-3 justify-between">
 
             <div className="flex justify-between">
                 <div>
@@ -328,6 +327,32 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
                     {status}
                 </span>
             </div>
+
+            {isAdmin && (
+                <div className="flex items-center gap-2 text-xs text-gray-600 flex-wrap my-1">
+                    <span className="font-medium text-sm text-gray-500">
+                        Lead Assigned to:
+                    </span>
+
+                    <div className="flex flex-wrap gap-1">
+                        {item.assignUsers.map((user) => (
+                            <span
+                                key={user.id}
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200"
+                            >
+                                <CheckCircle size={12} className='text-green-600'/>
+                                <span className="font-medium text-gray-800">
+                                    {user.name}
+                                </span>
+
+                                <span className="text-[10px] text-gray-500">
+                                    ({user.role})
+                                </span>
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {status !== "COMPLETED" && status !== "CANCELLED" && due && (
                 <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${tagStyle}`}>
@@ -383,22 +408,18 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
                 <DialogTitle>View Lead</DialogTitle>
 
                 <DialogContent dividers>
-                    {openResponse && Object.entries(openResponse?.response.answers).map(([key, val]) => {
-                        // const value = typeof val === "string" ? val : JSON.stringify(val);
-                        // console.log(JSON.parse(value));
-
+                    {openResponse && Object.entries(openResponse?.answers).map(([key, val]) => {
                         return (
                             <Box key={key} mb={0}>
                                 <Typography variant="subtitle2" color="text.secondary">
-                                    {val.field.label}
+                                    {key}
                                 </Typography>
-                                <Typography>{val.value}</Typography>
+                                <Typography>{val}</Typography>
                             </Box>
                         );
                     })}
 
                     <DialogTitle>Add Follow-Up</DialogTitle>
-
 
                     <Box mt={1} display="flex" flexDirection="column" gap={2}>
                         {openResponse?.followUpHistory.length === 0 && (
@@ -531,7 +552,7 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
                                 const selectedLabel = e.target.value;
                                 setFollowBusinessStatus(selectedLabel);
 
-                                const selectedAction = openResponse?.response.form.nextActions.find(
+                                const selectedAction = openResponse?.nextActions.find(
                                     (a) => a.label === selectedLabel
                                 );
 
@@ -546,7 +567,7 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
                             fullWidth
                         >
                             <option value="">Select Next Action</option>
-                            {openResponse?.response.form.nextActions.map((s) => (
+                            {openResponse?.nextActions.map((s) => (
                                 <option key={s.id} value={s.label} className={`${s.status === "COMPLETED" ? "text-green-600" : s.status === "CANCELLED" ? "text-red-600" : "text-zinc-600"} font-medium`}>
                                     {s.label}
                                 </option>
@@ -590,6 +611,12 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
     );
 }
 
+type UserRole = "SUPERADMIN" | "ADMIN" | "MANAGER";
+interface AssignedUser {
+    id: string;
+    name: string;
+    role: UserRole;
+}
 interface FollowUp {
     id: string;
     status: "PENDING" | "COMPLETED" | "CANCELLED";
@@ -605,27 +632,16 @@ interface FollowUp {
     };
 }
 
-interface LeadResponse {
-    id: string;
-    submittedAt: string;
-    form: {
-        nextActions: {
-            id: string;
-            label: string;
-            status: string;
-        }[];
-    }
-    answers: {
-        value: string;
-        field: {
-            label: string;
-        };
-    }[];
-}
-
 interface DashboardFollowUpItem {
     responseId: string;
-    response: LeadResponse;
+    submittedAt: string;
+    answers: Record<string, string>;
+    nextActions: {
+        id: string;
+        label: string;
+        status: "PENDING" | "COMPLETED" | "CANCELLED";
+    }[];
+    assignUsers: AssignedUser[];
     lastFollowUp: FollowUp;
     followUpHistory: FollowUp[];
 }
