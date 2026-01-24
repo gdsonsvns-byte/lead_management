@@ -46,6 +46,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Spinner from "../ui/spinner";
 import { useAuth } from "@/src/hooks/useAuth";
 import AssignLead from "./assign_lead";
+import { Check } from "lucide-react";
 
 const TYPE_ICONS: Record<string, JSX.Element> = {
     CALL: <LocalPhoneIcon fontSize="small" color="primary" />,
@@ -203,20 +204,50 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
             field: key,
             headerName: key,
             flex: 1,
-            minWidth: 180,
+            minWidth: 220,
             sortable: true,
             filterable: true,
             // @ts-ignore
             valueGetter: (value, row) => row?.answers?.[key] ?? "",
             renderCell: (params: GridRenderCellParams) => {
                 const v = params.value;
+
                 if (typeof v === "string" && v.startsWith("http")) {
-                    return <a href={v} target="_blank" rel="noreferrer">File</a>;
+                    return <a href={v} target="_blank" rel="noreferrer" className="text-blue-600 underline">
+                        File
+                    </a>;
                 }
-                if (typeof v === "string" && v.startsWith("[")) {
-                    return JSON.parse(v).join(", ");
+                if (typeof v === "string") {
+                    try {
+                        const parsed = JSON.parse(v);
+                        if (Array.isArray(parsed)) {
+                            return (
+                                <div className="flex flex-col gap-0.5">
+                                    {parsed.map((item, idx) => (
+                                        <div key={idx} className="flex gap-1 items-center">
+                                            <Check size={10} />
+                                            {String(item)}
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        }
+                    } catch {
+                    }
                 }
-                return v;
+                if (Array.isArray(v)) {
+                    return (
+                        <div className="flex flex-col gap-0.5">
+                            {v.map((item, idx) => (
+                                <div key={idx} className="flex gap-1 items-center">
+                                    <Check size={10} />
+                                    {String(item)}
+                                </div>
+                            ))}
+                        </div>
+                    );
+                }
+                return v ?? "";
             }
         }));
 
