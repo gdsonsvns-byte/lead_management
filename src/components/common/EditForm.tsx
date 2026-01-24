@@ -9,6 +9,15 @@ import { useState } from "react";
 import Input from "../ui/Input";
 import FieldItem from "../FieldItem";
 import toast from "react-hot-toast";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import {
+    SortableContext,
+    useSortable,
+    verticalListSortingStrategy,
+    arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
 
 interface CreateFormPayload {
     title: string;
@@ -24,6 +33,7 @@ interface FormField {
     options?: string[];
     optionsText?: string;
     order?: number;
+    clientId: string;
 }
 
 export interface FormData {
@@ -70,6 +80,7 @@ export default function EditForm() {
                 .sort((a: any, b: any) => a.order - b.order)
                 .map((f: any) => ({
                     id: f.id,
+                    clientId: f.id,
                     label: f.label,
                     type: f.type,
                     required: f.required,
@@ -101,6 +112,7 @@ export default function EditForm() {
                 options: [],
                 optionsText: "",
                 order: prev.length + 1,
+                clientId: crypto.randomUUID(),
             },
         ]);
     };
@@ -227,15 +239,58 @@ export default function EditForm() {
                             <div className="mt-6">
                                 <h2 className="font-medium text-lg mb-2">Fields</h2>
 
-                                {fields.map((field, index) => (
-                                    <FieldItem
-                                        key={field.id || index}
-                                        index={index}
-                                        field={field}
-                                        updateField={updateField}
-                                        removeField={removeField}
-                                    />
-                                ))}
+                                <DndContext
+                                    collisionDetection={closestCenter}
+                                    onDragEnd={(event) => {
+                                        const { active, over } = event;
+                                        if (!over || active.id === over.id) return;
+
+                                        setFields((items) => {
+                                            const oldIndex = items.findIndex(i => i.clientId === active.id);
+                                            const newIndex = items.findIndex(i => i.clientId === over.id);
+
+                                            const reordered = arrayMove(items, oldIndex, newIndex);
+
+                                            return reordered.map((f, idx) => ({
+                                                ...f,
+                                                order: idx + 1,
+                                            }));
+                                        });
+                                    }}
+                                >
+                                    <SortableContext
+                                        items={fields.map(f => f.clientId)}
+                                        strategy={verticalListSortingStrategy}
+                                    >
+                                        {fields.map((field, index) => (
+                                            <SortableField key={field.clientId} id={field.clientId}>
+                                                {({ setActivatorNodeRef, attributes, listeners }) => (
+                                                    <div className="flex gap-2 items-start bg-white py-2">
+                                                        {/* Drag Handle */}
+                                                        <span
+                                                            ref={setActivatorNodeRef}
+                                                            {...attributes}
+                                                            {...listeners}
+                                                            className="cursor-grab mt-1 text-gray-400 hover:text-gray-600"
+                                                        >
+                                                            <GripVertical size={20} />
+                                                        </span>
+
+                                                        <div className="flex-1">
+                                                            <FieldItem
+                                                                index={index}
+                                                                field={field}
+                                                                updateField={updateField}
+                                                                removeField={removeField}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </SortableField>
+                                        ))}
+                                    </SortableContext>
+                                </DndContext>
+
 
                                 <div className="flex items-center justify-between mt-5">
                                     <h2 className="font-medium text-zinc-800">Fields</h2>
@@ -272,5 +327,38 @@ export default function EditForm() {
                 }
             </div>
         </section>
+    );
+}
+
+
+function SortableField({
+    id,
+    children,
+}: {
+    id: string;
+    children: (args: {
+        setActivatorNodeRef: (node: HTMLElement | null) => void;
+        attributes: any;
+        listeners: any;
+    }) => React.ReactNode;
+}) {
+    const {
+        setNodeRef,
+        setActivatorNodeRef,
+        attributes,
+        listeners,
+        transform,
+        transition,
+    } = useSortable({ id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style}>
+            {children({ setActivatorNodeRef, attributes, listeners })}
+        </div>
     );
 }
