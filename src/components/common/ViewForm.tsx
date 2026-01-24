@@ -57,6 +57,10 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
         router.replace(`?${params.toString()}`, { scroll: false });
     };
 
+    const sortOptions = (options: string[]) =>
+        options.slice().sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+
+
     const renderField = (field: Field, options: string[]) => {
         const baseClass =
             "w-full border border-zinc-300 rounded-lg px-3 py-2 outline-none text-sm bg-white";
@@ -106,7 +110,7 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
                         required={field.required}
                     >
                         <option value="">Select...</option>
-                        {options.map((opt) => (
+                        {sortOptions(options).map((opt) => (
                             <option key={opt} value={opt}>
                                 {opt}
                             </option>
