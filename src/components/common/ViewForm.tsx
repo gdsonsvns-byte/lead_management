@@ -199,6 +199,11 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
             });
             setTimeout(closeModal, 500);
             setFormValues({})
+            setSelectedUserIds([])
+            setInitialFollowUp({
+                nextAction: "",
+                nextFollowUpDate: "",
+            })
         },
         onError: (err: any) => {
             const msg = err?.response?.data?.error || "Data submission failed";
