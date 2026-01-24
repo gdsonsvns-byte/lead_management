@@ -131,10 +131,19 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
     const { user } = useAuth();
     const isAdmin = user && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
     const STORAGE_KEY = `form_${formId}_column_visibility`;
+    const STATE_STORAGE_KEY = `form_${formId}_followup_state`;
     const queryClient = useQueryClient();
     const hasFormId = !!formId;
     const router = useRouter();
-    const [currentState, setCurrentState] = useState<string>(allState[1].status)
+
+    const [currentState, setCurrentState] = useState<string>(() => {
+        if (typeof window === "undefined") return allState[1].status;
+        return (
+            localStorage.getItem(`form_${formId}_followup_state`) ??
+            allState[1].status
+        );
+    });
+
     const [followType, setFollowType] = useState<string>("NOTE");
     const [followNote, setFollowNote] = useState<string>("");
     const [followNextDate, setFollowNextDate] = useState<string>("");
@@ -144,6 +153,11 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
     const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
     const [reportData, setReportData] = useState<string>(new Date().toISOString().split("T")[0]);
     const [selectedResponseId, setSelectedResponseId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        localStorage.setItem(STATE_STORAGE_KEY, currentState);
+    }, [currentState, STATE_STORAGE_KEY]);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
