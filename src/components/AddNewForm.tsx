@@ -15,6 +15,7 @@ interface FormField {
   required: boolean;
   options: string[];
   optionsText: string;
+  order?: number;
 }
 
 export default function AddNewForm({ accountId }: { accountId?: string }) {
@@ -71,16 +72,24 @@ function OpenForm({ onClose, accountId }: Props) {
   const addField = () => {
     setFields((prev) => [
       ...prev,
-      { label: "", type: "text", required: false, options: [], optionsText: "" },
+      { label: "", type: "text", required: false, options: [], optionsText: "", order: prev.length + 1, },
     ]);
   };
 
   const updateField = (index: number, updates: Partial<FormField>) => {
-    setFields((prev) => prev.map((f, i) => (i === index ? { ...f, ...updates } : f)));
+    setFields((prev) =>
+      prev.map((f, i) => (i === index ? { ...f, ...updates } : f))
+    );
   };
 
-  const removeField = (index: number) => {
-    setFields((prev) => prev.filter((_, i) => i !== index));
+  const removeField = (indexToRemove: number) => {
+    setFields((prev) => {
+      const updated = prev.filter((_, i) => i !== indexToRemove);
+      return updated.map((field, index) => ({
+        ...field,
+        order: index + 1,
+      }));
+    });
   };
 
   const CreateForm = useMutation({
