@@ -3,15 +3,16 @@ import { AccountSummaryResponse, ManagerResponse, NormalizedAccount } from "@/sr
 import { Button } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { Loader2, Settings, Trash2 } from "lucide-react";
+import { Loader2, Pencil, Settings, Trash2 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import GenerateApiKey from "./generate_api_key";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import ShowApiToken from "./show_api_toke";
 import Spinner from "../ui/spinner";
 import UpdatePassword from "../UpdatePassword";
 import { useAuth } from "@/src/hooks/useAuth";
+import UpdateUser from "./update_user";
 
 export default function ProfileView({ accountId }: { accountId?: string }) {
     const { user } = useAuth()
@@ -21,6 +22,7 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
     const [openFormModal, setOpenFormModal] = useState(false);
     const [openTokenModal, setOpenTokenModal] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [editUserId, setEditUserId] = useState<string | null>(null);
     const [apiKey, setapiKey] = useState({
         message: "",
         token: "",
@@ -171,22 +173,32 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
                             <span className="mt-1 inline-block text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700">
                                 {u.role}
                             </span>
-                            {
-                                u.role !== "ADMIN" && u.role !== "SUPERADMIN" && (
-                                    <button
-                                        onClick={() => deleteMutation.mutate(u.id)}
-                                        disabled={deletingId === u.id}
-                                        className=" absolute right-2 top-2 ml-auto bg-red-100 text-red-500 px-2 py-2 rounded hover:text-white hover:bg-red-600 transition duration-300 ease-in-out cursor-pointer  ">
-                                        {
-                                            deletingId === u.id ? (
-                                                <Spinner color="white" />
-                                            ) : (
-                                                <Trash2 className="w-4 h-4" />
-                                            )
-                                        }
-                                    </button>
-                                )
-                            }
+                            <div className="absolute right-2 top-2 ml-auto flex gap-2">
+                                {
+                                    u.role !== "SUPERADMIN" && (
+                                        <>
+                                            <button
+                                                onClick={() => (setEditUserId(u.id))}
+                                                disabled={editUserId === u.id}
+                                                className="bg-blue-100 text-blue-500 px-2 py-2 rounded hover:text-white hover:bg-blue-600 transition duration-300 ease-in-out cursor-pointer  ">
+                                                <Pencil className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => deleteMutation.mutate(u.id)}
+                                                disabled={deletingId === u.id}
+                                                className="bg-red-100 text-red-500 px-2 py-2 rounded hover:text-white hover:bg-red-600 transition duration-300 ease-in-out cursor-pointer  ">
+                                                {
+                                                    deletingId === u.id ? (
+                                                        <Spinner color="white" />
+                                                    ) : (
+                                                        <Trash2 className="w-4 h-4" />
+                                                    )
+                                                }
+                                            </button>
+                                        </>
+                                    )
+                                }
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -195,6 +207,13 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
             <UpdatePassword />
             {openFormModal && <GenerateApiKey setOpenFormModal={setOpenFormModal} apiKey={apiKey} setapiKey={setapiKey} setOpenTokenModal={setOpenTokenModal} />}
             {openTokenModal && <ShowApiToken setOpenTokenModal={setOpenTokenModal} apiKey={apiKey} />}
+            <Suspense fallback={<Spinner />}>
+                <UpdateUser
+                    selectedId={editUserId}
+                    setSelectedId={() => setEditUserId(null)}
+                    accountId={accountId ?? ""}
+                />
+            </Suspense>
             <Toaster />
         </div>
     );
