@@ -56,6 +56,7 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
         const params = new URLSearchParams(searchParams.toString());
         params.delete("view");
         router.replace(`?${params.toString()}`, { scroll: false });
+        setMessage(null);
     };
 
     const toggleUser = (userId: string) => {
