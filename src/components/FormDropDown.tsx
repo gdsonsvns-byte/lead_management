@@ -8,6 +8,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import Spinner from "./ui/spinner";
 import { useAuth } from "../hooks/useAuth";
+import { DeleteConfirmation } from "./common/delete_confiramation";
 
 interface FormItem {
     id: string;
@@ -30,6 +31,8 @@ export default function FormDropDown({ formData }: Props) {
     const { user } = useAuth();
     const queryClient = useQueryClient();
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [openDelete, setOpenDelete] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
     const [copyLoading, setCopyLoading] = useState<boolean>(false);
     const isAdmin = user && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
@@ -136,29 +139,37 @@ export default function FormDropDown({ formData }: Props) {
                         </button>
                     </DropdownMenuItem>
 
-                    {
-                        isAdmin && (
-                            <>
-                                <DropdownMenuSeparator className="bg-gray-300" />
-                                <DropdownMenuItem
-                                    title="Delete this form"
-                                    onSelect={(e) => e.preventDefault()}
-                                    onClick={() => deleteMutation.mutate(formData.id)}
-                                    disabled={deletingId === formData.id}
-                                    className="text-red-600 cursor-pointer hover:bg-gray-100 flex items-center w-full justify-between"
-                                >
-                                    Delete Form
-                                    {deletingId === formData.id ? (
-                                        <Spinner />
-                                    ) : (
-                                        <Trash2Icon size={14} className="text-zinc-700" />
-                                    )}
-                                </DropdownMenuItem>
-                            </>
-                        )
-                    }
+                    {isAdmin && (
+                        <>
+                            <DropdownMenuSeparator className="bg-gray-300" />
+                            <DropdownMenuItem
+                                title="Delete this form"
+                                onSelect={(e) => e.preventDefault()}
+                                onClick={() => {
+                                    setDeleteId(formData.id);
+                                    setOpenDelete(true);
+                                }}
+                                className="text-red-600 cursor-pointer hover:bg-gray-100 flex items-center w-full justify-between"
+                            >
+                                Delete Form
+                                <Trash2Icon size={14} className="text-zinc-700" />
+                            </DropdownMenuItem>
+                        </>
+                    )}
                 </DropdownMenuGroup>
             </DropdownMenuContent>
+            <DeleteConfirmation
+                open={openDelete}
+                loading={deletingId === deleteId}
+                onClose={() => {
+                    setOpenDelete(false);
+                    setDeleteId(null);
+                }}
+                onConfirm={() => {
+                    if (!deleteId) return;
+                    deleteMutation.mutate(deleteId);
+                }}
+            />
         </DropdownMenu>
     )
 }

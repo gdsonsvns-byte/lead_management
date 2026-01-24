@@ -42,7 +42,15 @@ const allState: State[] = [
 ]
 
 export default function DashboardComponent() {
-    const [currentState, setCurrentState] = useState<string>(allState[1]?.status)
+    const STATE_STORAGE_KEY = `dashboard_followup_state`;
+    const [currentState, setCurrentState] = useState<string>(() => {
+        if (typeof window === "undefined") return allState[1].status;
+        return (
+            localStorage.getItem(`dashboard_followup_state`) ??
+            allState[1].status
+        );
+    });
+
     const [paginationModel, setPaginationModel] = useState({ pageSize: 12, page: 0 });
 
     const { data, isLoading, isError, isFetching, error } = useQuery<TodayFollowUpsResponse>({
@@ -61,6 +69,11 @@ export default function DashboardComponent() {
     useEffect(() => {
         setPaginationModel({ pageSize: 12, page: 0 })
     }, [currentState])
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        localStorage.setItem(STATE_STORAGE_KEY, currentState);
+    }, [currentState, STATE_STORAGE_KEY]);
 
     return (
         <div className="w-full">
@@ -340,7 +353,7 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
                                 key={user.id}
                                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200"
                             >
-                                <CheckCircle size={12} className='text-green-600'/>
+                                <CheckCircle size={12} className='text-green-600' />
                                 <span className="font-medium text-gray-800">
                                     {user.name}
                                 </span>

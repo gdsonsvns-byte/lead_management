@@ -46,6 +46,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Spinner from "../ui/spinner";
 import { useAuth } from "@/src/hooks/useAuth";
 import AssignLead from "./assign_lead";
+import { Check } from "lucide-react";
 
 const TYPE_ICONS: Record<string, JSX.Element> = {
     CALL: <LocalPhoneIcon fontSize="small" color="primary" />,
@@ -131,10 +132,19 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
     const { user } = useAuth();
     const isAdmin = user && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
     const STORAGE_KEY = `form_${formId}_column_visibility`;
+    const STATE_STORAGE_KEY = `form_${formId}_followup_state`;
     const queryClient = useQueryClient();
     const hasFormId = !!formId;
     const router = useRouter();
-    const [currentState, setCurrentState] = useState<string>(allState[1].status)
+
+    const [currentState, setCurrentState] = useState<string>(() => {
+        if (typeof window === "undefined") return allState[1].status;
+        return (
+            localStorage.getItem(`form_${formId}_followup_state`) ??
+            allState[1].status
+        );
+    });
+
     const [followType, setFollowType] = useState<string>("NOTE");
     const [followNote, setFollowNote] = useState<string>("");
     const [followNextDate, setFollowNextDate] = useState<string>("");
@@ -144,6 +154,11 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
     const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
     const [reportData, setReportData] = useState<string>(new Date().toISOString().split("T")[0]);
     const [selectedResponseId, setSelectedResponseId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        localStorage.setItem(STATE_STORAGE_KEY, currentState);
+    }, [currentState, STATE_STORAGE_KEY]);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -189,20 +204,50 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
             field: key,
             headerName: key,
             flex: 1,
-            minWidth: 180,
+            minWidth: 220,
             sortable: true,
             filterable: true,
             // @ts-ignore
             valueGetter: (value, row) => row?.answers?.[key] ?? "",
             renderCell: (params: GridRenderCellParams) => {
                 const v = params.value;
+
                 if (typeof v === "string" && v.startsWith("http")) {
-                    return <a href={v} target="_blank" rel="noreferrer">File</a>;
+                    return <a href={v} target="_blank" rel="noreferrer" className="text-blue-600 underline">
+                        File
+                    </a>;
                 }
-                if (typeof v === "string" && v.startsWith("[")) {
-                    return JSON.parse(v).join(", ");
+                if (typeof v === "string") {
+                    try {
+                        const parsed = JSON.parse(v);
+                        if (Array.isArray(parsed)) {
+                            return (
+                                <div className="flex flex-col gap-0.5">
+                                    {parsed.map((item, idx) => (
+                                        <div key={idx} className="flex gap-1 items-center">
+                                            <Check size={10} />
+                                            {String(item)}
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        }
+                    } catch {
+                    }
                 }
-                return v;
+                if (Array.isArray(v)) {
+                    return (
+                        <div className="flex flex-col gap-0.5">
+                            {v.map((item, idx) => (
+                                <div key={idx} className="flex gap-1 items-center">
+                                    <Check size={10} />
+                                    {String(item)}
+                                </div>
+                            ))}
+                        </div>
+                    );
+                }
+                return v ?? "";
             }
         }));
 
@@ -709,6 +754,9 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
                 formId={formId}
                 responseId={selectedResponseId}
                 account_id={account_id}
+                currentState={currentState}
+                page={paginationModel.page}
+                pageSize={paginationModel.pageSize}
             />
             <Toaster />
         </div>
