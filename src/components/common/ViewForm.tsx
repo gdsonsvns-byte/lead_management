@@ -4,7 +4,7 @@ import Spinner from "../ui/spinner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { MenuItem, TextField } from "@mui/material";
 import { FollowUpStatus, Role } from "@/src/app/generated/prisma/enums";
@@ -30,7 +30,8 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
         nextAction: "",
         nextFollowUpDate: "",
     });
-    const [assignUserId, setAssignUserId] = useState<string>("");
+
+    const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
     const [formValues, setFormValues] = useState<Record<string, any>>({});
     const handleChange = (field: Field, value: any) => {
         setFormValues((prev) => ({
@@ -55,6 +56,14 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
         const params = new URLSearchParams(searchParams.toString());
         params.delete("view");
         router.replace(`?${params.toString()}`, { scroll: false });
+    };
+
+    const toggleUser = (userId: string) => {
+        setSelectedUserIds((prev) =>
+            prev.includes(userId)
+                ? prev.filter((id) => id !== userId)
+                : [...prev, userId]
+        );
     };
 
     const sortOptions = (options: string[]) =>
@@ -220,8 +229,8 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
         if (initialFollowUp?.nextFollowUpDate) {
             formData.append("nextFollowUpDate", initialFollowUp.nextFollowUpDate);
         }
-        if (assignUserId) {
-            formData.append("assignUserId", assignUserId);
+        if (selectedUserIds.length) {
+            formData.append("selectedUserId", JSON.stringify(selectedUserIds))
         }
         // console.log(initialFollowUp);
         submitMutation.mutate(formData);
@@ -241,25 +250,28 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
         <section className="fixed inset-0 bg-black/30 z-50 flex justify-center items-start md:p-10 p-4 overflow-auto">
             <div className="bg-white w-full max-w-2xl rounded-xl shadow-xl p-6 relative">
 
-                <button
-                    className="absolute right-4 top-4 w-9 h-9 rounded-full bg-zinc-200 flex justify-center items-center hover:bg-zinc-300 transition cursor-pointer"
-                    onClick={closeModal}
-                    aria-label="Close View Form Modal"
-                >
-                    <X size={18} className="text-zinc-700" />
-                </button>
+                <>
+                    <button
+                        className="absolute right-4 top-4 w-9 h-9 rounded-full bg-zinc-200 flex justify-center items-center hover:bg-zinc-300 transition cursor-pointer"
+                        onClick={closeModal}
+                        aria-label="Close View Form Modal"
+                    >
+                        <X size={18} className="text-zinc-700" />
+                    </button>
 
-                {isLoading && (
-                    <div className="py-10 flex justify-center">
-                        <Spinner />
-                    </div>
-                )}
+                    {isLoading && (
+                        <div className="py-10 flex justify-center">
+                            <Spinner />
+                        </div>
+                    )}
 
-                {isError && (
-                    <p className="text-center text-red-600 py-8">
-                        Failed to load form details.
-                    </p>
-                )}
+                    {isError && (
+                        <p className="text-center text-red-600 py-8">
+                            Failed to load form details.
+                        </p>
+                    )}
+
+                </>
 
                 {!isLoading && data && (
                     <>
@@ -369,51 +381,32 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
                                 </div>
 
                             </div>
+
                             {isAdmin && <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp flex flex-col gap-8"
                             >
-                                <span>Lead Assignment</span>
-                                <div className="flex flex-col sm:flex-row gap-5">
-                                    <TextField
-                                        label="Assign to"
-                                        select
-                                        value={assignUserId}
-                                        onChange={(e) => setAssignUserId(e.target.value)}
-                                        fullWidth
-                                        InputLabelProps={{ shrink: true }}
-                                        SelectProps={{
-                                            displayEmpty: true,
-                                        }}
-                                    >
-                                        <MenuItem value="">
-                                            <em>Select User</em>
-                                        </MenuItem>
+                                <span> Assign this lead to user.</span>
+                                <div className="flex flex-col gap-2">
+                                    {data.users.map((user) => (
+                                        <label
+                                            key={user.id}
+                                            className="flex items-center justify-between border border-blue-500 rounded-lg px-4 py-3 cursor-pointer hover:bg-zinc-50 transition"
+                                        >
+                                            <div>
+                                                <p className="font-medium text-sm">{user.name}</p>
+                                                <p className="text-xs text-zinc-500">{user.email}</p>
+                                                <span className="text-xs text-blue-600 font-medium">
+                                                    {user.role}
+                                                </span>
+                                            </div>
 
-                                        {data.users.map((user) => (
-                                            <MenuItem key={user.id} value={user.id}>
-                                                <div className="flex w-full items-center justify-between gap-3">
-                                                    <div className="flex flex-col">
-                                                        <span className="text-sm font-medium text-zinc-800">
-                                                            {user.name}
-                                                        </span>
-                                                        <span className="text-xs text-zinc-500">
-                                                            {user.email}
-                                                        </span>
-                                                    </div>
-
-                                                    <span
-                                                        className={`text-xs px-2 py-0.5 rounded-full border font-medium not-visited:${user.role === "ADMIN"
-                                                            ? "border-blue-500 text-blue-600"
-                                                            : user.role === "MANAGER"
-                                                                ? "border-green-500 text-green-600"
-                                                                : "border-zinc-400 text-zinc-600"
-                                                            }`}
-                                                    >
-                                                        {user.role}
-                                                    </span>
-                                                </div>
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedUserIds.includes(user.id)}
+                                                onChange={() => toggleUser(user.id)}
+                                                className="w-5 h-5 accent-blue-600 cursor-pointer"
+                                            />
+                                        </label>
+                                    ))}
 
                                 </div>
                             </div>}

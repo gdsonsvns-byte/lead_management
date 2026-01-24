@@ -108,7 +108,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
         const formData = await req.formData();
         const nextActionLabel = formData.get("nextAction")?.toString() || null;
         const nextFollowUpDate = formData.get("nextFollowUpDate")?.toString() || null;
-        const assignUserId = formData.get("assignUserId")?.toString() || null;
+        const selectedUserIds: string[] = formData.get("selectedUserId")
+            ? JSON.parse(formData.get("selectedUserId")!.toString())
+            : [];
+
         const incoming: Record<string, any> = {};
 
         for (const ff of form.fields) {
@@ -206,7 +209,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             const assigneeIds = new Set<string>();
             assigneeIds.add(form.userId);
             assigneeIds.add(super_admin?.id!);
-            if (assignUserId) assigneeIds.add(assignUserId)
+            for (const uid of selectedUserIds) {
+                if (uid) assigneeIds.add(uid);
+            }
 
             for (const uid of assigneeIds) {
                 await tx.responseAssignment.upsert({
