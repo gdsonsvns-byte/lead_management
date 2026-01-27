@@ -161,6 +161,10 @@ export async function GET(req: NextRequest) {
         const page = Math.max(Number(searchParams.get("page")) || 1, 1);
         const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 20, 1), 50);
         const skip = (page - 1) * limit;
+        const isAdmin =
+            (!!user && (user.role === "ADMIN" || user.role === "SUPERADMIN")) ||
+            (!!apiClient && apiClient.adminRole && ["ADMIN", "SUPERADMIN"].includes(apiClient.adminRole));
+
 
         const now = new Date();
         const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
@@ -181,17 +185,20 @@ export async function GET(req: NextRequest) {
                 response: {
                     form: {
                         accountId: accountId,
-                        accessUsers: {
-                            some: {
-                                userId: userId!
-                            }
-                        }
+                        ...(!isAdmin && {
+                            accessUsers: {
+                                some: { userId: userId! },
+                            },
+                        }),
                     },
-                    assignments: {
-                        some: {
-                            userId: userId!
-                        }
-                    }
+                    ...(!isAdmin && {
+                        assignments: {
+                            some: {
+                                userId: userId!,
+                                isActive: true,
+                            },
+                        },
+                    }),
                 },
             },
             orderBy: { createdAt: "desc" },
@@ -226,6 +233,12 @@ export async function GET(req: NextRequest) {
                             },
                         },
                         assignments: {
+                            where: {
+                                user: {
+                                    role: { not: "SUPERADMIN" }
+                                },
+                                isActive: true,
+                            },
                             select: {
                                 user: {
                                     select: {
@@ -336,7 +349,7 @@ export async function GET(req: NextRequest) {
                     return acc;
                 }, {}),
                 nextActions: res.form.nextActions,
-                assignUsers, 
+                assignUsers,
                 lastFollowUp: item.lastFollowUp,
                 followUpHistory: item.followUpHistory,
             };
