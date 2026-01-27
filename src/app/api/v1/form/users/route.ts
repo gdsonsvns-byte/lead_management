@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
             prisma.user.findMany({
                 where: {
                     accountId,
-                    ...(user.role !== "SUPERADMIN" && { role: { not: "ADMIN" } }),
+                    // ...(user.role !== "SUPERADMIN" && { role: { not: "ADMIN" } }),
                     formAccesses: {
                         some: {
                             formId,

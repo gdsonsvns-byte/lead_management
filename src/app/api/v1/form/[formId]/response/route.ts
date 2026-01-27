@@ -341,6 +341,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             23, 59, 59
         );
 
+        const isAdmin =
+            (!!user && (user.role === "ADMIN" || user.role === "SUPERADMIN")) ||
+            (!!apiClient && apiClient.adminRole && ["ADMIN", "SUPERADMIN"].includes(apiClient.adminRole));
+
         const formWhere: any = {
             id: formId,
             ...(role !== "SUPERADMIN" && {
@@ -375,19 +379,20 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             where: {
                 formId,
                 form: {
-                    ...(role !== "SUPERADMIN" && {
+                    ...(!isAdmin && {
                         accessUsers: {
-                            some: {
-                                userId: userId!
-                            }
-                        }
-                    })
+                            some: { userId: userId! },
+                        },
+                    }),
                 },
-                assignments: {
-                    some: {
-                        userId: userId!
-                    }
-                }
+                ...(!isAdmin && {
+                    assignments: {
+                        some: {
+                            userId: userId!,
+                            isActive: true,
+                        },
+                    },
+                }),
             },
             orderBy: { submittedAt: "desc" },
             include: {
@@ -422,6 +427,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                     },
                 },
                 assignments: {
+                    where: {
+                        user: {
+                            role: { not: "SUPERADMIN" }
+                        },
+                        isActive: true,
+                    },
                     select: {
                         user: {
                             select: {

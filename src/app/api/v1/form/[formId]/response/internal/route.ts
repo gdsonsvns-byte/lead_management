@@ -207,6 +207,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             }
 
             const assigneeIds = new Set<string>();
+            assigneeIds.add(super_admin?.id!);
 
             if (selectedUserIds.length > 0) {
                 for (const uid of selectedUserIds) {
@@ -214,7 +215,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                 }
             } else {
                 assigneeIds.add(form.userId);
-                assigneeIds.add(super_admin?.id!);
             }
 
             for (const uid of assigneeIds) {
