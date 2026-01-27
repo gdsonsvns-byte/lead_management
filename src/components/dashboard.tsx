@@ -236,17 +236,22 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
         tag = "OVERDUE";
         tagStyle = "bg-red-100 text-red-700";
     }
+    const MAX_FOLLOWUPS = 8;
     let progress = 0;
+    const followUpCount = item.followUpHistory?.length ?? 0;
+    const isClosed =
+        item.lastFollowUp?.status === "COMPLETED" ||
+        item.lastFollowUp?.status === "CANCELLED";
+
     if (due) {
-        const maxDays = 7;
-        const diffDays = Math.max(
-            0,
-            Math.min(
-                maxDays,
-                Math.floor((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-            )
-        );
-        progress = Math.round(((maxDays - diffDays) / maxDays) * 100);
+        if (isClosed) {
+            progress = 100;
+        } else {
+            progress = Math.min(
+                100,
+                Math.round((followUpCount / MAX_FOLLOWUPS) * 100)
+            );
+        }
     }
     const addFollowUpMutation = useMutation({
         mutationFn: async (payload: {
