@@ -123,60 +123,63 @@ export default function FollowupReport({ id, date }: { id: string, date: string 
 function FollowUpCard({ followUp }: { followUp: FollowUp }) {
     return (
         <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition">
-            <div className="flex items-start justify-between">
-                <div>
-                    {/* <p className="text-sm font-semibold text-gray-800">
+            <div className="flex flex-col items-start justify-between gap-3">
+                <div className="w-full relative">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            {/* <p className="text-sm font-semibold text-gray-800">
                         {followUp.response.form.title}
                     </p> */}
-                    <p className="text-sm text-gray-700 flex items-center gap-2">
-                        <Calendar size={14} /> {new Date(followUp.createdAt).toLocaleString()}
-                    </p>
-                </div>
+                            <p className="text-sm text-gray-700 flex items-center gap-2">
+                                <Calendar size={14} /> {new Date(followUp.createdAt).toLocaleString()}
+                            </p>
+                        </div>
 
-                <span
-                    className={`px-2 py-1 text-xs font-medium rounded-full ${followUp.status === "PENDING"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-green-100 text-green-800"
-                        }`}
-                >
-                    {followUp.status}
-                </span>
-            </div>
-
-            <div className="mt-1 flex items-center gap-2 text-sm text-gray-600">
-                <Mail size={14} />
-                <span>{followUp.type.replace("_", " ")}</span>
-            </div>
-            {followUp.note && (
-                <p className="mt-1 text-sm text-gray-700 flex items-center gap-2">
-                    <NotebookPen size={14} /> {followUp.note}
-                </p>
-            )}
-
-            <div className="mt-4 flex flex-col gap-x-4 gap-y-2 text-sm">
-                {followUp.response.answers.map((ans, idx) => (
-                    <div key={idx}>
-                        <p className="text-gray-500 text-xs">{ans.field.label}</p>
-                        <p className="text-gray-800 font-medium">
-                            {ans.value || "-"}
-                        </p>
+                        <span
+                            className={`px-2 py-1 text-xs font-medium rounded-full ${followUp.status === "PENDING"
+                                ? "bg-yellow-100 text-yellow-800" : followUp.status === "CANCELLED" ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
+                                }`}
+                        >
+                            {followUp.status}
+                        </span>
                     </div>
-                ))}
-            </div>
-
-            <div className="mt-4 flex items-center justify-between border-t pt-3 text-xs text-gray-500">
-                <span>Added by: {followUp.addedBy.name}</span>
-                <span className="flex items-center gap-1">
-                    <Clock size={12} />
-                    Follow-up
-                </span>
-            </div>
-            <div className="flex items-center justify-between pt-1 text-xs text-gray-500">
-                <span>Next Follow-up</span>
-                <span className="flex items-center gap-1">
-                    <Calendar size={12} />
-                    {new Date(followUp.nextFollowUpDate).toDateString()}
-                </span>
+                    <div className="mt-1 flex items-center gap-2 text-sm text-gray-600">
+                        <Mail size={14} />
+                        <span>{followUp.type.replace("_", " ")}</span>
+                    </div>
+                    {followUp.note && (
+                        <p className="mt-1 text-sm text-gray-700 flex items-center gap-2">
+                            <NotebookPen size={14} className="shrink-0" />
+                            {followUp.note}
+                        </p>
+                    )}
+                </div>
+                <div className="mt-4 flex flex-col gap-x-4 gap-y-2 text-sm">
+                    {followUp.response.answers.map((ans, idx) => (
+                        <div key={idx}>
+                            <p className="text-gray-500 text-xs">{ans.field.label}</p>
+                            <p className="text-gray-800 font-medium">
+                                {ans.value || "-"}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+                <div className="w-full">
+                    <div className="mt-4 flex items-center justify-between border-t pt-3 text-xs text-gray-500">
+                        <span>Added by: {followUp.addedBy.name}</span>
+                        <span className="flex items-center gap-1">
+                            <Clock size={12} />
+                            Follow-up
+                        </span>
+                    </div>
+                    <div className="flex items-center justify-between pt-1 text-xs text-gray-500">
+                        <span>Next Follow-up</span>
+                        <span className="flex items-center gap-1">
+                            <Calendar size={12} />
+                            {new Date(followUp.nextFollowUpDate).toDateString()}
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     );
