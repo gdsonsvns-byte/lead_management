@@ -5,6 +5,7 @@ import Spinner from "../ui/spinner";
 import { useState } from "react";
 import { generateNameInitials } from "@/src/lib/generatePassword";
 import { ChevronLeft, ChevronRight, Eye, Mail, Phone } from "lucide-react";
+import ViewAccountDetails from "./view_account_details";
 
 type Response = {
     accounts: Data[]
@@ -29,7 +30,8 @@ type Data = {
         email: string,
     }[],
     _count: {
-        users: number
+        users: number;
+        forms:number;
     }
 }
 
@@ -49,7 +51,7 @@ export default function SystemDashboardAccountsDetails() {
         retry: 1,
         placeholderData: (old) => old,
     })
-
+    
     return (
         <div className='mt-8'>
             <div className='w-full flex flex-col gap-6'>
@@ -140,6 +142,11 @@ export default function SystemDashboardAccountsDetails() {
                     }
                 </div>
             </div>
+            {selectedUser &&
+                <ViewAccountDetails
+                    user={selectedUser}
+                    onClose={() => setSelectedUser(null)}
+                />}
         </div>
     )
 }

@@ -46,6 +46,7 @@ export async function GET(req: NextRequest) {
                 _count: {
                     select: {
                         users: true,
+                        forms: true,
                     },
                 },
             },
