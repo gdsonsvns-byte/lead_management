@@ -54,7 +54,7 @@ function Accounts({ isFetching, isLoading, data }: Props) {
                 <span className="text-black font-medium ">
                     Total Accounts
                 </span>
-                <Building2 size={24} className="text-zinc-800 shrink-0" strokeWidth={1} />
+                <Building2 size={18} className="text-zinc-800 shrink-0" strokeWidth={1} />
             </div>
             <div className="flex flex-col gap-5">
                 <span className="block w-max font-mono text-5xl font-medium text-zinc-700">
@@ -81,7 +81,7 @@ function Users({ isFetching, isLoading, data }: Props) {
                 <span className="text-black font-medium">
                     Total Users
                 </span>
-                <UserCheck size={24} className="text-zinc shrink-0" strokeWidth={1} />
+                <UserCheck size={18} className="text-zinc shrink-0" strokeWidth={1} />
             </div>
             <div className="flex flex-col gap-5">
                 <span className="block w-max font-mono text-5xl font-medium text-zinc-700">
@@ -108,7 +108,7 @@ function Forms({ isFetching, isLoading, data }: Props) {
                 <span className="text-black font-medium">
                     Total Forms
                 </span>
-                <ClipboardList size={24} className="text-zinc shrink-0" strokeWidth={1} />
+                <ClipboardList size={18} className="text-zinc shrink-0" strokeWidth={1} />
             </div>
             <div className="flex flex-col gap-5">
                 <span className="block w-max font-mono text-5xl font-medium text-zinc-700">
@@ -135,7 +135,7 @@ function Responses({ isFetching, isLoading, data }: Props) {
                 <span className="text-black font-medium">
                     Total Responses
                 </span>
-                <Inbox size={24} className="text-zinc-800 shrink-0" strokeWidth={1} />
+                <Inbox size={18} className="text-zinc-800 shrink-0" strokeWidth={1} />
             </div>
             <div className="flex flex-col gap-5">
                 <span className="block w-max font-mono text-5xl font-medium text-zinc-700">
