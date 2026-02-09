@@ -12,7 +12,7 @@ import {
 import axios, { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from './ui/spinner';
-import { Clock, AlertCircle, Plus, User2, CheckCircle } from "lucide-react";
+import { Clock, AlertCircle, Plus, User2, CheckCircle, Calendar } from "lucide-react";
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import toast, { Toaster } from 'react-hot-toast';
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
@@ -383,14 +383,14 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
 
             <div className="space-y-2 text-sm text-gray-700">
                 <div className="flex items-center gap-2">
-                    <Clock size={16} />
+                    <Calendar size={16} />
                     Next: <strong>
                         {status !== "COMPLETED" && status !== "CANCELLED" && due ? due.toLocaleDateString() : "---"}
                     </strong>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <AlertCircle size={16} />
+                    <AlertCircle size={16} className='shrink-0'/>
                     Status: <strong>{last.businessStatus}</strong>
                 </div>
 
