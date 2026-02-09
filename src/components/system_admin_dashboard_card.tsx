@@ -49,7 +49,7 @@ interface Props {
 }
 function Accounts({ isFetching, isLoading, data }: Props) {
     return (
-        <div className='w-full min-h-36 rounded-xl bg-white border border-slate-200 p-4 flex flex-col items-start justify-between gap-5'>
+        <div className='w-full min-h-36 rounded-xl bg-white border border-black/5 p-4 flex flex-col items-start justify-between gap-5 transition-all duration-300 ease-in-out hover:shadow-[0_4px_12px_rgb(50,0,0,0.09)]'>
             <div className="w-full flex items-center justify-between">
                 <span className="text-black font-medium ">
                     Total Accounts
@@ -76,7 +76,7 @@ function Accounts({ isFetching, isLoading, data }: Props) {
 }
 function Users({ isFetching, isLoading, data }: Props) {
     return (
-        <div className='w-full min-h-36 rounded-xl bg-white border border-slate-200 p-4 flex flex-col items-start justify-between gap-5'>
+        <div className='w-full min-h-36 rounded-xl bg-white border border-black/5 p-4 flex flex-col items-start justify-between gap-5 transition-all duration-300 ease-in-out hover:shadow-[0_4px_12px_rgb(50,0,0,0.09)]'>
             <div className="w-full flex items-center justify-between">
                 <span className="text-black font-medium">
                     Total Users
@@ -103,7 +103,7 @@ function Users({ isFetching, isLoading, data }: Props) {
 }
 function Forms({ isFetching, isLoading, data }: Props) {
     return (
-        <div className='w-full min-h-36 rounded-xl bg-white border border-slate-200 p-4 flex flex-col items-start justify-between gap-5'>
+        <div className='w-full min-h-36 rounded-xl bg-white border border-black/5 p-4 flex flex-col items-start justify-between gap-5 transition-all duration-300 ease-in-out hover:shadow-[0_4px_12px_rgb(50,0,0,0.09)]'>
             <div className="w-full flex items-center justify-between">
                 <span className="text-black font-medium">
                     Total Forms
@@ -130,7 +130,7 @@ function Forms({ isFetching, isLoading, data }: Props) {
 }
 function Responses({ isFetching, isLoading, data }: Props) {
     return (
-        <div className='w-full min-h-36 rounded-xl bg-white border border-slate-200 p-4 flex flex-col items-start  gap-5'>
+        <div className='w-full min-h-36 rounded-xl bg-white border border-black/5 p-4 flex flex-col items-start  gap-5 transition-all duration-300 ease-in-out hover:shadow-[0_4px_12px_rgb(50,0,0,0.09)]'>
             <div className="w-full flex items-center justify-between">
                 <span className="text-black font-medium">
                     Total Responses
