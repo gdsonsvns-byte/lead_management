@@ -1,4 +1,5 @@
-import SystemAdminDashboard from "@/src/components/system_admin_dashboard";
+import SystemAdminDashboard from "@/src/components/system/system_admin_dashboard";
+
 
 
 export default function SystemAdminPage() {

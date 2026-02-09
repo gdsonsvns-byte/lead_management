@@ -87,7 +87,7 @@ export default function Accounts() {
                             className="relative rounded-2xl bg-white p-6 shadow-md border border-zinc-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col gap-4"
                         >
                             <div
-                                className=" pointer-events-none select-none
+                                className="pointer-events-none select-none
                                 absolute top-5 right-5 w-12 h-12 rounded-full 
                                 bg-linear-to-br from-blue-500 to-blue-700 
                                 text-white flex items-center justify-center 

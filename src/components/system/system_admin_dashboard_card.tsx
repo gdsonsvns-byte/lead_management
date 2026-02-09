@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Building2, ClipboardList, Inbox, UserCheck } from "lucide-react";
-import Spinner from "./ui/spinner";
+import Spinner from "../ui/spinner";
 
 type Response = {
     success: boolean;
