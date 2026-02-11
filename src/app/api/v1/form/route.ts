@@ -277,8 +277,14 @@ export async function POST(req: NextRequest) {
             });
 
             const accessUsers = [
-                { formId: createdForm.id, userId: adminId },
-                superAdminId && { formId: createdForm.id, userId: superAdminId },
+                {
+                    formId: createdForm.id,
+                    userId: adminId
+                },
+                superAdminId && {
+                    formId: createdForm.id,
+                    userId: superAdminId
+                },
             ].filter(Boolean) as { formId: string; userId: string }[];
 
             await tx.formAccess.createMany({

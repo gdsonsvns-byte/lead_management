@@ -12,7 +12,7 @@ import {
 import axios, { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from './ui/spinner';
-import { Clock, AlertCircle, Plus, User2, CheckCircle } from "lucide-react";
+import { Clock, AlertCircle, Plus, User2, CheckCircle, Calendar } from "lucide-react";
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import toast, { Toaster } from 'react-hot-toast';
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
@@ -202,7 +202,7 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
     const [followNote, setFollowNote] = useState<string>("");
     const [followNextDate, setFollowNextDate] = useState<string>("");
     const [followBusinessStatus, setFollowBusinessStatus] = useState<string>("");
-
+    const isYou = user && user.sub
     const info = extractLeadInfo(item);
     const last = item.lastFollowUp;
     const queryClient = useQueryClient();
@@ -252,6 +252,9 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
                 Math.round((followUpCount / MAX_FOLLOWUPS) * 100)
             );
         }
+    }
+    if (isClosed) {
+        progress = 100;
     }
     const addFollowUpMutation = useMutation({
         mutationFn: async (payload: {
@@ -359,35 +362,35 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
                                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200"
                             >
                                 <CheckCircle size={12} className='text-green-600' />
-                                <span className="font-medium text-gray-800">
-                                    {user.name}
-                                </span>
+                                {user.id === isYou ? "YOU" : <>
+                                    <span className="font-medium text-gray-800">
+                                        {user.name}
+                                    </span>
 
-                                <span className="text-[10px] text-gray-500">
-                                    ({user.role})
-                                </span>
+                                    <span className="text-[10px] text-gray-500">
+                                        ({user.role})
+                                    </span>
+                                </>}
                             </span>
                         ))}
                     </div>
                 </div>
             )}
 
-            {status !== "COMPLETED" && status !== "CANCELLED" && due && (
-                <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${tagStyle}`}>
-                    {tag}
-                </span>
-            )}
+            <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${tagStyle}`}>
+                {status !== "COMPLETED" && status !== "CANCELLED" && due ? tag : status}
+            </span>
 
             <div className="space-y-2 text-sm text-gray-700">
-                {status !== "COMPLETED" && status !== "CANCELLED" && due && (
-                    <div className="flex items-center gap-2">
-                        <Clock size={16} />
-                        Next: <strong>{due.toLocaleDateString()}</strong>
-                    </div>
-                )}
+                <div className="flex items-center gap-2">
+                    <Calendar size={16} />
+                    Next: <strong>
+                        {status !== "COMPLETED" && status !== "CANCELLED" && due ? due.toLocaleDateString() : "---"}
+                    </strong>
+                </div>
 
                 <div className="flex items-center gap-2">
-                    <AlertCircle size={16} />
+                    <AlertCircle size={16} className='shrink-0' />
                     Status: <strong>{last.businessStatus}</strong>
                 </div>
 
@@ -398,19 +401,17 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
                 )}
             </div>
 
-            {due && (
-                <div>
-                    <div className="h-2 w-full bg-gray-200 rounded-full">
-                        <div
-                            className="h-2 bg-blue-600 rounded-full"
-                            style={{ width: `${progress}%` }}
-                        />
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                        {progress}% progress
-                    </p>
+            <div>
+                <div className="h-2 w-full bg-gray-200 rounded-full">
+                    <div
+                        className="h-2 bg-blue-600 rounded-full"
+                        style={{ width: `${progress}%` }}
+                    />
                 </div>
-            )}
+                <p className="text-xs text-gray-500 mt-1">
+                    {status !== "COMPLETED" && status !== "CANCELLED" ? `${progress}% progress` : status}
+                </p>
+            </div>
 
             {status !== "COMPLETED" && status !== "CANCELLED" && (
                 <button
@@ -432,7 +433,13 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
                                 <Typography variant="subtitle2" color="text.secondary">
                                     {key}
                                 </Typography>
-                                <Typography>{val}</Typography>
+                                <Typography>
+                                    {
+                                        val.startsWith("http") ?
+                                            <img src={val} className="w-32 rounded-xl h-auto" />
+                                            : val
+                                    }
+                                </Typography>
                             </Box>
                         );
                     })}

@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
         const responseId = searchParams.get("response_id")?.trim();
         if (user.role === "SUPERADMIN" && !queryAccountId) {
             return NextResponse.json(
-                { error: "Account not found." },
+                { error: "Account Id is required." },
                 { status: 404 }
             );
         }

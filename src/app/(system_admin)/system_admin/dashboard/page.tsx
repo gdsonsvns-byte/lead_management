@@ -1,9 +1,12 @@
-import DashboardComponent from "@/src/components/dashboard";
+import SystemAdminDashboard from "@/src/components/system/system_admin_dashboard";
+
+
 
 export default function SystemAdminPage() {
   return (
-    <section className='relative w-full p-5'>
-      {/* <DashboardComponent /> */}
+    <section className='relative w-full bg-white min-h-screen p-5'>
+      <SystemAdminDashboard />
     </section>
   )
 }
+  

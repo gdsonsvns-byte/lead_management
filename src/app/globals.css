@@ -23,6 +23,11 @@ li {
   font-family: var(--montserrat);
 }
 
+@theme inline {
+  --font-mono: var(--montserrat);
+  --color-dark: #1f1f1f;
+}
+
 @layer utilities {
   .animate-fadeIn {
     animation: fadeIn 0.35s ease forwards;
@@ -51,4 +56,7 @@ li {
       transform: translateY(0);
     }
   }
+}
+.xc{
+  scrollbar-width: none;
 }

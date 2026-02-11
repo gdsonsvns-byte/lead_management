@@ -39,6 +39,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                         order: "asc",
                     },
                 },
+                account: {
+                    select: {
+                        id: true,
+                        businessName: true,
+                    }
+                }
             }
         })
         if (!form) return NextResponse.json({ error: "Form not found" }, { status: 404 })

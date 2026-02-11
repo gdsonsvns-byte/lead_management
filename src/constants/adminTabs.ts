@@ -1,4 +1,4 @@
-import { HomeIcon, FileCode2Icon, ShieldUserIcon, ClipboardPenIcon, LucideIcon, UserCheck, UserRoundPlus, SettingsIcon } from "lucide-react";
+import { HomeIcon, FileCode2Icon, ShieldUserIcon, ClipboardPenIcon, LucideIcon, UserCheck, UserRoundPlus, SettingsIcon, Bell } from "lucide-react";
 export type Role = "ADMIN" | "SUPERADMIN" | "MANAGER";
 type SidebarItem = {
     name: string;
@@ -41,6 +41,12 @@ export const ADMIN_TABS: SidebarItem[] = [
         icon: HomeIcon,
         roles: ["ADMIN", "MANAGER"],
     },
+    // {
+    //     name: "Follow Up",
+    //     page: "/admin/followup",
+    //     icon: Bell,
+    //     roles: ["ADMIN", "MANAGER"],
+    // },
     {
         name: "Forms",
         page: "/admin/forms",
