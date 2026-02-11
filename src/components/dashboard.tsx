@@ -390,7 +390,7 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <AlertCircle size={16} className='shrink-0'/>
+                    <AlertCircle size={16} className='shrink-0' />
                     Status: <strong>{last.businessStatus}</strong>
                 </div>
 
@@ -433,7 +433,13 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
                                 <Typography variant="subtitle2" color="text.secondary">
                                     {key}
                                 </Typography>
-                                <Typography>{val}</Typography>
+                                <Typography>
+                                    {
+                                        val.startsWith("http") ?
+                                            <img src={val} className="w-32 rounded-xl h-auto" />
+                                            : val
+                                    }
+                                </Typography>
                             </Box>
                         );
                     })}

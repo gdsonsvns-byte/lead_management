@@ -534,7 +534,13 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
                                         <Typography variant="subtitle2" color="text.secondary">
                                             {key}
                                         </Typography>
-                                        <Typography>{value}</Typography>
+                                        <Typography>
+                                            {
+                                                value.startsWith("http") ?
+                                                    <img src={value} className="w-32 rounded-xl h-auto" />
+                                                    : value
+                                            }
+                                        </Typography>
                                     </Box>
                                 );
                             })}

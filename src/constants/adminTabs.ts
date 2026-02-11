@@ -41,12 +41,12 @@ export const ADMIN_TABS: SidebarItem[] = [
         icon: HomeIcon,
         roles: ["ADMIN", "MANAGER"],
     },
-    {
-        name: "Follow Up",
-        page: "/admin/followup",
-        icon: Bell,
-        roles: ["ADMIN", "MANAGER"],
-    },
+    // {
+    //     name: "Follow Up",
+    //     page: "/admin/followup",
+    //     icon: Bell,
+    //     roles: ["ADMIN", "MANAGER"],
+    // },
     {
         name: "Forms",
         page: "/admin/forms",

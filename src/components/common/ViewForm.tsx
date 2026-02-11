@@ -457,7 +457,7 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
                                 onClick={handleTestSubmit}
                                 disabled={submitMutation.isPending}
                             >
-                                {submitMutation.isPending ? <Spinner color="white" /> : "Submit Test Data"}
+                                {submitMutation.isPending ? <Spinner color="white" /> : "Submit Data"}
                             </button>
 
                         </div>
