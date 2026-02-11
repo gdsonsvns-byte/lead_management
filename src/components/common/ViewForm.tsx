@@ -33,6 +33,8 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
 
     const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
     const [formValues, setFormValues] = useState<Record<string, any>>({});
+    const [fileLabel, setFileLabel] = useState<string>("");
+
     const handleChange = (field: Field, value: any) => {
         setFormValues((prev) => ({
             ...prev,
@@ -103,13 +105,41 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
 
             case "file":
                 return (
-                    <input
-                        type="file"
-                        className={baseClass}
-                        multiple
-                        onChange={(e) => handleChange(field, e.target.files)}
-                        required={field.required}
-                    />
+                    <div className="relative">
+                        <input
+                            id={field.id}
+                            type="file"
+                            className="hidden"
+                            multiple
+                            required={field.required}
+                            onChange={(e) => {
+                                const files = e.target.files;
+                                if (files && files.length > 0) {
+                                    setFileLabel(
+                                        files.length === 1
+                                            ? files[0].name
+                                            : `${files.length} files selected`
+                                    );
+                                } else {
+                                    setFileLabel("");
+                                }
+                                handleChange(field, files);
+                            }}
+                        />
+                        
+                        <label
+                            htmlFor={field.id}
+                            className="flex items-center justify-between w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer font-mono text-sm text-gray-700 hover:border-primary transition"
+                        >
+                            <span className="truncate">
+                                {fileLabel || "Choose file"}
+                            </span>
+
+                            <span className="text-xs text-gray-800">
+                                Browse
+                            </span>
+                        </label>
+                    </div>
                 );
 
             case "select":
@@ -308,14 +338,15 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
                                         style={{ animationDelay: `${index * 0.08}s` }}
                                     >
                                         <div className="flex justify-between mb-2">
-                                            {options.length > 0 ? <label
-                                                className={`relative text-sm text-zinc-800 group-hover:text-black transition ${field.required
-                                                    ? "after:content-['*'] after:text-red-600 after:ml-1"
-                                                    : ""
-                                                    }`}
-                                            >
-                                                {field.label}
-                                            </label> : ""}
+                                            {(options.length > 0 || field.type === "date" || field.type === "file") ?
+                                                <label
+                                                    className={`relative text-sm text-zinc-800 group-hover:text-black transition ${field.required
+                                                        ? "after:content-['*'] after:text-red-600 after:ml-1"
+                                                        : ""
+                                                        }`}
+                                                >
+                                                    {field.label}
+                                                </label> : ""}
                                         </div>
 
                                         <div className="transform group-hover:scale-[1.01] transition-transform">
@@ -388,34 +419,36 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
 
                             </div>
 
-                            {isAdmin && <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp flex flex-col gap-8"
-                            >
-                                <span> Assign this lead to user.</span>
-                                <div className="flex flex-col gap-2">
-                                    {data.users.map((user) => (
-                                        <label
-                                            key={user.id}
-                                            className="flex items-center justify-between border border-blue-500 rounded-lg px-4 py-3 cursor-pointer hover:bg-zinc-50 transition"
-                                        >
-                                            <div>
-                                                <p className="font-medium text-sm">{user.name}</p>
-                                                <p className="text-xs text-zinc-500">{user.email}</p>
-                                                <span className="text-xs text-blue-600 font-medium">
-                                                    {user.role}
-                                                </span>
-                                            </div>
+                            {isAdmin && data.users.length > 0 &&
+                                <div
+                                    className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp flex flex-col gap-8"
+                                >
+                                    <span> Assign this lead to user.</span>
+                                    <div className="flex flex-col gap-2">
+                                        {data.users.map((user) => (
+                                            <label
+                                                key={user.id}
+                                                className="flex items-center justify-between border border-blue-500 rounded-lg px-4 py-3 cursor-pointer hover:bg-zinc-50 transition"
+                                            >
+                                                <div>
+                                                    <p className="font-medium text-sm">{user.name}</p>
+                                                    <p className="text-xs text-zinc-500">{user.email}</p>
+                                                    <span className="text-xs text-blue-600 font-medium">
+                                                        {user.role}
+                                                    </span>
+                                                </div>
 
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedUserIds.includes(user.id)}
-                                                onChange={() => toggleUser(user.id)}
-                                                className="w-5 h-5 accent-blue-600 cursor-pointer"
-                                            />
-                                        </label>
-                                    ))}
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedUserIds.includes(user.id)}
+                                                    onChange={() => toggleUser(user.id)}
+                                                    className="w-5 h-5 accent-blue-600 cursor-pointer"
+                                                />
+                                            </label>
+                                        ))}
 
-                                </div>
-                            </div>}
+                                    </div>
+                                </div>}
                         </div>
 
                         <div className="space-y-3 animate-fadeIn mt-5">
