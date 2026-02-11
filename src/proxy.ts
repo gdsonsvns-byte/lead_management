@@ -12,6 +12,7 @@ const PUBLIC_ROUTES = [
 const ALLOWED_ORIGINS = [
     "https://forms.wizards.co.in",
     "http://localhost:3000",
+    "http://localhost:3001"
 ];
 
 type Role = "ADMIN" | "MANAGER" | "SUPERADMIN";
@@ -24,6 +25,13 @@ const ROLE_DASHBOARD: Record<Role, string> = {
     MANAGER: "/admin/dashboard",
     SUPERADMIN: "/system_admin/dashboard",
 };
+
+function setCorsHeaders(res: NextResponse, origin: string) {
+    res.headers.set("Access-Control-Allow-Origin", origin);
+    res.headers.set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+    res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.headers.set("Access-Control-Allow-Credentials", "true");
+}
 
 
 function safeVerifyToken(token: string | null) {
@@ -51,27 +59,19 @@ export function proxy(req: NextRequest) {
     if (pathname.startsWith("/api")) {
         if (origin && ALLOWED_ORIGINS.includes(origin)) {
             if (req.method === "OPTIONS") {
-                return new NextResponse(null, {
-                    status: 200,
-                    headers: {
-                        "Access-Control-Allow-Origin": origin,
-                        "Access-Control-Allow-Methods":
-                            "GET,POST,PUT,DELETE,OPTIONS",
-                        "Access-Control-Allow-Headers":
-                            "Content-Type, Authorization",
-                        "Access-Control-Allow-Credentials": "true",
-                    },
-                });
+                const res = new NextResponse(null, { status: 200 });
+                setCorsHeaders(res, origin);
+                return res;
             }
-
             const res = NextResponse.next();
-            res.headers.set("Access-Control-Allow-Origin", origin);
-            res.headers.set("Access-Control-Allow-Credentials", "true");
+            setCorsHeaders(res, origin);
             return res;
+        }
+        if (req.method === "OPTIONS") {
+            return new NextResponse(null, { status: 403 });
         }
         return NextResponse.next();
     }
-
 
     const token = req.cookies.get("token")?.value || null;
     const decoded = safeVerifyToken(token);
