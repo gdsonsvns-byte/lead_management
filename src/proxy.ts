@@ -26,13 +26,21 @@ const ROLE_DASHBOARD: Record<Role, string> = {
     SUPERADMIN: "/system_admin/dashboard",
 };
 
-function setCorsHeaders(res: NextResponse, origin: string) {
-    res.headers.set("Access-Control-Allow-Origin", origin);
-    res.headers.set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-    res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.headers.set("Access-Control-Allow-Credentials", "true");
-}
+function setCorsHeaders(res: NextResponse, origin?: string | null) {
+    if (origin && ALLOWED_ORIGINS.includes(origin)) {
+        res.headers.set("Access-Control-Allow-Origin", origin);
+        res.headers.set("Access-Control-Allow-Credentials", "true");
+    }
 
+    res.headers.set(
+        "Access-Control-Allow-Methods",
+        "GET,POST,PUT,DELETE,OPTIONS"
+    );
+    res.headers.set(
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization"
+    );
+}
 
 function safeVerifyToken(token: string | null) {
     if (!token) return null;
@@ -57,20 +65,15 @@ export function proxy(req: NextRequest) {
     }
 
     if (pathname.startsWith("/api")) {
-        if (origin && ALLOWED_ORIGINS.includes(origin)) {
-            if (req.method === "OPTIONS") {
-                const res = new NextResponse(null, { status: 200 });
-                setCorsHeaders(res, origin);
-                return res;
-            }
-            const res = NextResponse.next();
+        if (req.method === "OPTIONS") {
+            const res = new NextResponse(null, { status: 200 });
             setCorsHeaders(res, origin);
             return res;
         }
-        if (req.method === "OPTIONS") {
-            return new NextResponse(null, { status: 403 });
-        }
-        return NextResponse.next();
+
+        const res = NextResponse.next();
+        setCorsHeaders(res, origin);
+        return res;
     }
 
     const token = req.cookies.get("token")?.value || null;

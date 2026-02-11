@@ -78,6 +78,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             return withCors(
                 { error: "Too many requests. Try again later." },
                 429,
+                origin
             );
         }
 
@@ -87,6 +88,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             return withCors(
                 { error: "Invalid form ID" },
                 400,
+                origin
             );
         }
 
@@ -107,6 +109,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             return withCors(
                 { error: "Form not found" },
                 404,
+                origin
             );
         }
 
@@ -134,6 +137,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                 return withCors(
                     { error: `Field "${ff.label}" is required` },
                     400,
+                    origin
                 );
             }
         }
@@ -151,6 +155,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                     return withCors(
                         { error: `File type ${file.type} not allowed` },
                         400,
+                        origin
                     );
                 }
 
@@ -158,6 +163,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                     return withCors(
                         { error: `${file.name} exceeds 20MB limit` },
                         400,
+                        origin
                     );
                 }
 
@@ -310,6 +316,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
         return withCors(
             { success: true, responseId: result.id },
             201,
+            origin
         );
 
     } catch (err: any) {
