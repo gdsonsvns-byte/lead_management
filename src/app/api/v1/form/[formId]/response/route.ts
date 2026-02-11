@@ -10,15 +10,27 @@ import { verifyApiAccessToken } from "@/src/lib/verifyApiAccessToken";
 
 export const runtime = "nodejs";
 
-function corsHeaders() {
+function corsHeaders(origin?: string | null) {
     return {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Origin": origin ?? "*",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Credentials": "true",
     };
 }
-export async function OPTIONS() {
-    return NextResponse.json({}, { status: 200, headers: corsHeaders() });
+
+function withCors(body: any, status = 200, origin?: string | null) {
+    return NextResponse.json(body, {
+        status,
+        headers: corsHeaders(origin),
+    });
+}
+export async function OPTIONS(req: NextRequest) {
+    const origin = req.headers.get("origin");
+    return new NextResponse(null, {
+        status: 200,
+        headers: corsHeaders(origin),
+    });
 }
 
 
@@ -53,27 +65,30 @@ async function uploadToCloudinaryBuffer(buffer: Buffer, fieldId: string) {
     });
 }
 
+
 // Saving form data in DB(any one).
 export async function POST(req: NextRequest, { params }: { params: Promise<{ formId: string }> }) {
-    const headers = corsHeaders();
+    const origin = req.headers.get("origin");
 
     const fileMap: Record<string, File[]> = {};
     try {
-        const ip = req.headers.get("x-forwarded-for") || "unknown";
+        const ip = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown";
 
         if (isRateLimited(ip)) {
-            return NextResponse.json(
+            return withCors(
                 { error: "Too many requests. Try again later." },
-                { status: 429 }
+                429,
+                origin
             );
         }
 
         const { formId } = await params;
 
-        if (!formId || formId.trim() === "") {
-            return NextResponse.json(
+        if (!formId?.trim()) {
+            return withCors(
                 { error: "Invalid form ID" },
-                { status: 400, headers }
+                400,
+                origin
             );
         }
 
@@ -91,9 +106,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
         });
 
         if (!form) {
-            return NextResponse.json(
+            return withCors(
                 { error: "Form not found" },
-                { status: 404, headers }
+                404,
+                origin
             );
         }
 
@@ -118,12 +134,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             const file = fileMap[ff.id];
 
             if (ff.required && !simple && (!file || file.length === 0)) {
-                return NextResponse.json(
+                return withCors(
                     { error: `Field "${ff.label}" is required` },
-                    { status: 400, headers }
+                    400,
+                    origin
                 );
             }
         }
+
         const uploadedFiles: Record<string, string[]> = {};
 
         for (const ff of form.fields) {
@@ -134,16 +152,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
 
             for (const file of fileList) {
                 if (!ALLOWED_MIME.includes(file.type)) {
-                    return NextResponse.json(
+                    return withCors(
                         { error: `File type ${file.type} not allowed` },
-                        { status: 400, headers }
+                        400,
+                        origin
                     );
                 }
 
                 if (file.size > MAX_FILE_SIZE) {
-                    return NextResponse.json(
-                        { error: `File ${file.name} exceeds 20MB limit` },
-                        { status: 400, headers }
+                    return withCors(
+                        { error: `${file.name} exceeds 20MB limit` },
+                        400,
+                        origin
                     );
                 }
 
@@ -293,18 +313,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             await Promise.allSettled(sendNotificationMessage);
         }
 
-        return NextResponse.json(
+        return withCors(
             { success: true, responseId: result.id },
-            { status: 201, headers }
+            201,
+            origin
         );
 
     } catch (err: any) {
         console.error("Submit error:", err);
-        return NextResponse.json(
+        return withCors(
             { error: err.message || "Submission failed" },
-            { status: 500 }
+            500
         );
     }
+
 }
 
 // Getting all the response for the single form provided according to form id(Only admin and superadmin).
