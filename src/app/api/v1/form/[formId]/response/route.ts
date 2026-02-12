@@ -246,11 +246,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
         });
 
         if (!nextActionData) {
-            return NextResponse.json(
+            return withCors(
                 { error: "No default follow-up configured for this form" },
-                { status: 400 }
+                400,
+                origin
             );
         }
+
         const internalStatus: FollowUpStatus = nextActionData.status;
         await prisma.followUp.create({
             data: {
@@ -322,8 +324,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
         console.error("Submit error:", err);
         return withCors(
             { error: err.message || "Submission failed" },
-            500
+            500,
+            origin
         );
+
     }
 
 }
