@@ -38,7 +38,7 @@ function setCorsHeaders(res: NextResponse, origin?: string | null) {
     );
     res.headers.set(
         "Access-Control-Allow-Headers",
-        "Content-Type, Authorization"
+        "Content-Type"
     );
 }
 

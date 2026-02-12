@@ -8,45 +8,11 @@ import { sendWhatsappToAdmin, sendWhatsappToUser } from "@/src/lib/whatsapp";
 import { verifyRole } from "@/src/lib/verifyRole";
 import { verifyApiAccessToken } from "@/src/lib/verifyApiAccessToken";
 
-export const runtime = "nodejs";
-
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
-    api_key: process.env.CLOUDINARY_API_KEY!,
-    api_secret: process.env.CLOUDINARY_API_SECRET!,
-});
-
-const MAX_FILE_SIZE = Number(20 * 1024 * 1024);
-const ALLOWED_MIME = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "application/pdf",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-];
-
-async function uploadToCloudinaryBuffer(buffer: Buffer, fieldId: string) {
-    return new Promise<{ url: string; public_id: string }>((resolve, reject) => {
-        cloudinary.uploader.upload_stream(
-            { folder: `forms/${fieldId}`, resource_type: "auto" },
-            (err, result) => {
-                if (err || !result) reject(err);
-                else resolve({
-                    url: result.secure_url,
-                    public_id: result.public_id,
-                });
-            }
-        ).end(buffer);
-    });
-}
-
 // Saving form data in DB(any one).
 export async function POST(req: NextRequest, { params }: { params: Promise<{ formId: string }> }) {
-    const fileMap: Record<string, File[]> = {};
+
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";
-
         if (isRateLimited(ip)) {
             return NextResponse.json(
                 { error: "Too many requests. Try again later." },
@@ -64,22 +30,23 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             );
         }
 
+        const { formId } = await params;
+        if (!formId?.trim()) {
+            return NextResponse.json(
+                { error: "Invalid form ID" },
+                { status: 400 }
+            );
+        }
+
         const { searchParams } = new URL(req.url);
         const queryAccountId = searchParams.get("account_id")?.trim();
-        const { formId } = await params;
+
         const accountId = user?.role === "SUPERADMIN" ? queryAccountId! : user?.accountId ?? apiClient?.accountId;
 
         if (user && user.role === "SUPERADMIN" && !queryAccountId) {
             return NextResponse.json(
                 { error: "Account not found." },
                 { status: 404 }
-            );
-        }
-
-        if (!formId || formId.trim() === "") {
-            return NextResponse.json(
-                { error: "Invalid form ID" },
-                { status: 400 }
             );
         }
 
@@ -103,131 +70,86 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             );
         }
 
-        const super_admin = await prisma.user.findFirst({ where: { role: "SUPERADMIN" }, select: { id: true } });
+        const body = await req.json();
 
-        const formData = await req.formData();
-        const nextActionLabel = formData.get("nextAction")?.toString() || null;
-        const nextFollowUpDate = formData.get("nextFollowUpDate")?.toString() || null;
-        const selectedUserIds: string[] = formData.get("selectedUserId")
-            ? JSON.parse(formData.get("selectedUserId")!.toString())
-            : [];
+        const { nextAction, nextFollowUpDate, selectedUserIds = [], ...fieldPayload } = body;
 
-        const incoming: Record<string, any> = {};
+        for (const field of form.fields) {
+            const value = fieldPayload[field.id];
 
-        for (const ff of form.fields) {
-            const values = formData.getAll(ff.id);
-
-            const files = values.filter((v) => v instanceof File) as File[];
-            const texts = values.filter((v) => typeof v === "string") as string[];
-
-            if (texts.length === 1) incoming[ff.id] = texts[0];
-            else if (texts.length > 1) incoming[ff.id] = texts;
-
-            if (files.length > 0) fileMap[ff.id] = files;
-        }
-
-        for (const ff of form.fields) {
-            const simple = incoming[ff.id];
-            const file = fileMap[ff.id];
-
-            if (ff.required && !simple && (!file || file.length === 0)) {
+            if (field.required && (value === undefined || value === null || (Array.isArray(value) && value.length === 0) ||
+                value === "")) {
                 return NextResponse.json(
-                    { error: `Field "${ff.label}" is required` },
+                    { error: `Field "${field.label}" is required` },
                     { status: 400 }
                 );
             }
         }
-        const uploadedFiles: Record<string, string[]> = {};
 
-        for (const ff of form.fields) {
-            const fileList = fileMap[ff.id];
-            if (!fileList) continue;
-
-            uploadedFiles[ff.id] = [];
-
-            for (const file of fileList) {
-                if (!ALLOWED_MIME.includes(file.type)) {
-                    return NextResponse.json(
-                        { error: `File type ${file.type} not allowed` },
-                        { status: 400 }
-                    );
-                }
-
-                if (file.size > MAX_FILE_SIZE) {
-                    return NextResponse.json(
-                        { error: `File ${file.name} exceeds 20MB limit` },
-                        { status: 400 }
-                    );
-                }
-
-                const buffer = Buffer.from(await file.arrayBuffer());
-                const uploaded = await uploadToCloudinaryBuffer(buffer, ff.id);
-                uploadedFiles[ff.id].push(uploaded.url);
-            }
-        }
+        const super_admin = await prisma.user.findFirst({
+            where: {
+                role: "SUPERADMIN"
+            },
+            select: { id: true }
+        });
 
         let userPhone: string | null = null;
         let userEmail: string | null = null;
         const fieldValuesForAdmin: string[] = [];
 
-        const result = await prisma.$transaction(async (tx) => {
-            const response = await tx.response.create({
+        const response = await prisma.$transaction(async (tx) => {
+            const res = await tx.response.create({
                 data: { formId: form.id },
             });
 
-
-            for (const ff of form.fields) {
-                const simpleValue = incoming[ff.id];
-                const urls = uploadedFiles[ff.id];
-
+            for (const field of form.fields) {
+                const value = fieldPayload[field.id];
                 let finalValue = "";
 
-                if (urls?.length) {
-                    finalValue = urls.length === 1 ? urls[0] : JSON.stringify(urls);
-                } else if (simpleValue) {
-                    finalValue = Array.isArray(simpleValue)
-                        ? JSON.stringify(simpleValue)
-                        : String(simpleValue);
+                if (Array.isArray(value)) {
+                    finalValue = JSON.stringify(value);
+                } else if (value) {
+                    finalValue = String(value);
                 }
-                fieldValuesForAdmin.push(finalValue || "");
-                if (ff.label.toLowerCase().includes("phone") || ff.label.toLowerCase().includes("mobile") || ff.label.toLowerCase().includes("phone no.") || ff.label.toLowerCase().includes("contact no.") || ff.label.toLowerCase().includes("contact")) {
+
+                fieldValuesForAdmin.push(finalValue);
+
+                if (
+                    field.label.toLowerCase().includes("phone") ||
+                    field.label.toLowerCase().includes("mobile")
+                ) {
                     userPhone = finalValue;
                 }
-                // if (ff.label.toLowerCase().includes("email") || ff.label.toLowerCase().includes("email id") || ff.label.toLowerCase().includes("emailId") || ff.label.toLowerCase().includes("email Id")) {
-                //     userEmail = finalValue;
-                // }
 
                 await tx.responseAnswer.create({
                     data: {
-                        responseId: response.id,
-                        fieldId: ff.id,
+                        responseId: res.id,
+                        fieldId: field.id,
                         value: finalValue,
                     },
                 });
             }
 
-            const assigneeIds = new Set<string>();
-            assigneeIds.add(super_admin?.id!);
+            const assignees = new Set<string>();
+            assignees.add(super_admin?.id!);
 
-            if (selectedUserIds.length > 0) {
-                for (const uid of selectedUserIds) {
-                    if (uid) assigneeIds.add(uid);
-                }
+            if (selectedUserIds.length) {
+                selectedUserIds.forEach((id: string) => assignees.add(id));
             } else {
-                assigneeIds.add(form.userId);
+                assignees.add(form.userId);
             }
 
-            for (const uid of assigneeIds) {
+            for (const uid of assignees) {
                 await tx.responseAssignment.upsert({
                     where: {
                         responseId_userId: {
-                            responseId: response.id,
+                            responseId: res.id,
                             userId: uid,
                         },
                     },
                     update: { isActive: true },
                     create: {
-                        responseId: response.id,
+                        responseId: res.id,
                         userId: uid,
                         assignedById: user?.sub ?? null,
                         isActive: true,
@@ -235,14 +157,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                 });
             }
 
-            return response;
+            return res;
         });
 
         const nextActionData = await prisma.nextActionType.findFirst({
             where: {
                 formId,
-                ...(nextActionLabel
-                    ? { label: nextActionLabel }
+                ...(nextAction
+                    ? { label: nextAction }
                     : { autoApplyOnFirstFollowUp: true }),
             },
             orderBy: { isDefault: "desc" },
@@ -255,29 +177,25 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             );
         }
 
-        const internalStatus: FollowUpStatus = nextActionData.status;
-
-        const nextDate = internalStatus === FollowUpStatus.COMPLETED ||
-            internalStatus === FollowUpStatus.CANCELLED
-            ? null
-            : nextFollowUpDate
-                ? new Date(nextFollowUpDate)
-                : new Date();
-
-        const note = nextActionLabel
-            ? "Follow-up added by user"
-            : "Auto follow-up added by system";
+        const status: FollowUpStatus = nextActionData.status;
+        const nextDate =
+            status === FollowUpStatus.COMPLETED ||
+                status === FollowUpStatus.CANCELLED
+                ? null
+                : nextFollowUpDate
+                    ? new Date(nextFollowUpDate)
+                    : new Date();
 
         await prisma.followUp.create({
             data: {
-                responseId: result.id,
+                responseId: response.id,
                 addedByUserId: form.userId,
                 type: FollowUpType.STATUS_CHANGE,
-                note,
+                note: nextAction ? "Follow-up added by user" : "Auto follow-up",
                 nextFollowUpDate: nextDate,
                 businessStatus: nextActionData.label,
-                status: internalStatus,
-            }
+                status,
+            },
         });
 
         const sendNotificationMessage: Promise<any>[] = [];
@@ -329,7 +247,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
         }
 
         return NextResponse.json(
-            { success: true, responseId: result.id },
+            { success: true, responseId: response.id },
             { status: 201 }
         );
 

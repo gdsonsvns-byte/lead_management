@@ -4,11 +4,12 @@ import Spinner from "../ui/spinner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { MenuItem, TextField } from "@mui/material";
+import { TextField } from "@mui/material";
 import { FollowUpStatus, Role } from "@/src/app/generated/prisma/enums";
 import { useAuth } from "@/src/hooks/useAuth";
+import { uploadToCloudinary } from "@/src/lib/cloudinaryUpload";
 
 interface Field {
     id: string;
@@ -34,6 +35,8 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
     const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
     const [formValues, setFormValues] = useState<Record<string, any>>({});
     const [fileLabels, setFileLabels] = useState<Record<string, string>>({});
+    const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
 
     const handleChange = (field: Field, value: any) => {
         setFormValues((prev) => ({
@@ -130,16 +133,21 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
 
                         <label
                             htmlFor={field.id}
-                            className="flex items-center justify-between w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer font-mono text-sm text-gray-700 hover:border-primary transition"
+                            className="flex items-center justify-between w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer font-mono text-sm text-gray-700"
                         >
                             <span className="truncate">
-                                {fileLabels[field.id] || "Choose file"}
+                                {uploading && uploadProgress[field.id] !== undefined
+                                    ? `Uploading ${uploadProgress[field.id]}%`
+                                    : fileLabels[field.id] || "Choose file"}
                             </span>
 
-                            <span className="text-xs text-gray-800">
-                                Browse
-                            </span>
+                            {uploading && uploadProgress[field.id] !== undefined ? (
+                                <Spinner />
+                            ) : (
+                                <span className="text-xs text-gray-800">Browse</span>
+                            )}
                         </label>
+
                     </div>
                 );
 
@@ -211,14 +219,14 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
     };
 
     const submitMutation = useMutation({
-        mutationFn: async (formData: FormData) => {
+        mutationFn: async (payload: Record<string, any>) => {
             const res = await axios.post(
                 `/api/v1/form/${formId}/response/internal?account_id=${account_id ?? ""}`,
-                formData,
+                payload,
                 {
                     withCredentials: true,
                     headers: {
-                        "Content-Type": "multipart/form-data",
+                        "Content-Type": "application/json",
                     },
                 }
             );
@@ -246,31 +254,66 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
         },
     });
 
-    const handleTestSubmit = () => {
-        const formData = new FormData();
-        Object.entries(formValues).forEach(([fieldId, value]) => {
-            if (value instanceof FileList) {
-                for (let i = 0; i < value.length; i++) {
-                    formData.append(fieldId, value[i]);
+    const handleTestSubmit = async () => {
+        try {
+            setUploading(true);
+            setUploadProgress({});
+            const payload: Record<string, any> = {};
+
+            for (const field of data!.form.fields) {
+                const value = formValues[field.id];
+
+                if (field.type === "file" && value instanceof FileList) {
+                    if (value.length === 0) {
+                        payload[field.id] = [];
+                        continue;
+                    }
+
+                    const uploads = Array.from(value).map((file) =>
+                        uploadToCloudinary(
+                            file,
+                            `forms/${formId}`,
+                            (percent) => {
+                                setUploadProgress((prev) => ({
+                                    ...prev,
+                                    [field.id]: percent,
+                                }));
+                            }
+                        )
+                    );
+
+                    const results = await Promise.all(uploads);
+                    payload[field.id] = results.map((r) => r.secure_url);
                 }
-            } else if (Array.isArray(value)) {
-                value.forEach((v) => formData.append(fieldId, v));
-            } else {
-                formData.append(fieldId, value);
+                else if (value !== undefined) {
+                    payload[field.id] = value;
+                }
             }
-        });
-        if (initialFollowUp?.nextAction) {
-            formData.append("nextAction", initialFollowUp.nextAction);
-            formData.append("nextFollowStatus", data?.form.nextActions?.find((a) => a.label === initialFollowUp.nextAction)?.status!);
+
+            if (initialFollowUp?.nextAction) {
+                payload.nextAction = initialFollowUp.nextAction;
+                payload.nextFollowStatus = data?.form.nextActions?.find(
+                    (a) => a.label === initialFollowUp.nextAction
+                )?.status;
+            }
+            if (initialFollowUp?.nextFollowUpDate) {
+                payload.nextFollowUpDate = initialFollowUp.nextFollowUpDate;
+            }
+            if (selectedUserIds.length) {
+                payload.selectedUserIds = selectedUserIds;
+            }
+
+            await submitMutation.mutateAsync(payload);
+        } catch (err: any) {
+            setMessage({
+                type: "error",
+                text: err?.message || "Upload failed",
+            });
         }
-        if (initialFollowUp?.nextFollowUpDate) {
-            formData.append("nextFollowUpDate", initialFollowUp.nextFollowUpDate);
+        finally {
+            setUploading(false);
+            setUploadProgress({});
         }
-        if (selectedUserIds.length) {
-            formData.append("selectedUserId", JSON.stringify(selectedUserIds))
-        }
-        // console.log(initialFollowUp);
-        submitMutation.mutate(formData);
     };
 
     const selectedAction = useMemo(
@@ -456,9 +499,9 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
                             <button
                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg cursor-pointer"
                                 onClick={handleTestSubmit}
-                                disabled={submitMutation.isPending}
+                                disabled={submitMutation.isPending || uploading}
                             >
-                                {submitMutation.isPending ? <Spinner color="white" /> : "Submit Data"}
+                                {(submitMutation.isPending || uploading) ? <Spinner color="white" /> : "Submit Data"}
                             </button>
 
                         </div>
