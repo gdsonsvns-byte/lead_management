@@ -10,26 +10,24 @@ import { verifyApiAccessToken } from "@/src/lib/verifyApiAccessToken";
 
 export const runtime = "nodejs";
 
-function corsHeaders(origin?: string | null) {
+function corsHeaders() {
     return {
-        "Access-Control-Allow-Origin": origin ?? "*",
+        "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "Content-Type",
     };
 }
 
-function withCors(body: any, status = 200, origin?: string | null) {
+function withCors(body: any, status = 200) {
     return NextResponse.json(body, {
         status,
-        headers: corsHeaders(origin),
+        headers: corsHeaders(),
     });
 }
-export async function OPTIONS(req: NextRequest) {
-    const origin = req.headers.get("origin");
+export async function OPTIONS() {
     return new NextResponse(null, {
         status: 200,
-        headers: corsHeaders(origin),
+        headers: corsHeaders(),
     });
 }
 
@@ -68,8 +66,6 @@ async function uploadToCloudinaryBuffer(buffer: Buffer, fieldId: string) {
 
 // Saving form data in DB(any one).
 export async function POST(req: NextRequest, { params }: { params: Promise<{ formId: string }> }) {
-    const origin = req.headers.get("origin");
-
     const fileMap: Record<string, File[]> = {};
     try {
         const ip = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown";
@@ -78,7 +74,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             return withCors(
                 { error: "Too many requests. Try again later." },
                 429,
-                origin
             );
         }
 
@@ -87,8 +82,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
         if (!formId?.trim()) {
             return withCors(
                 { error: "Invalid form ID" },
-                400,
-                origin
+                400
             );
         }
 
@@ -108,8 +102,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
         if (!form) {
             return withCors(
                 { error: "Form not found" },
-                404,
-                origin
+                404
             );
         }
 
@@ -137,7 +130,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                 return withCors(
                     { error: `Field "${ff.label}" is required` },
                     400,
-                    origin
                 );
             }
         }
@@ -155,7 +147,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                     return withCors(
                         { error: `File type ${file.type} not allowed` },
                         400,
-                        origin
                     );
                 }
 
@@ -163,7 +154,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                     return withCors(
                         { error: `${file.name} exceeds 20MB limit` },
                         400,
-                        origin
                     );
                 }
 
@@ -316,7 +306,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
         return withCors(
             { success: true, responseId: result.id },
             201,
-            origin
         );
 
     } catch (err: any) {
