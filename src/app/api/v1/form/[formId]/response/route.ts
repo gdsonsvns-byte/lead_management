@@ -8,7 +8,9 @@ import { sendResponseAlertEmail, sendResponseAlertEmailToUser } from "@/src/lib/
 import { sendWhatsappToAdmin, sendWhatsappToUser } from "@/src/lib/whatsapp";
 import { verifyApiAccessToken } from "@/src/lib/verifyApiAccessToken";
 
+
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 function corsHeaders(origin?: string | null) {
     return {
@@ -33,43 +35,9 @@ export async function OPTIONS(req: NextRequest) {
 }
 
 
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
-    api_key: process.env.CLOUDINARY_API_KEY!,
-    api_secret: process.env.CLOUDINARY_API_SECRET!,
-});
-
-const MAX_FILE_SIZE = Number(20 * 1024 * 1024);
-const ALLOWED_MIME = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "application/pdf",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-];
-
-async function uploadToCloudinaryBuffer(buffer: Buffer, fieldId: string) {
-    return new Promise<{ url: string; public_id: string }>((resolve, reject) => {
-        cloudinary.uploader.upload_stream(
-            { folder: `forms/${fieldId}`, resource_type: "auto" },
-            (err, result) => {
-                if (err || !result) reject(err);
-                else resolve({
-                    url: result.secure_url,
-                    public_id: result.public_id,
-                });
-            }
-        ).end(buffer);
-    });
-}
-
-
 // Saving form data in DB(any one).
 export async function POST(req: NextRequest, { params }: { params: Promise<{ formId: string }> }) {
     const origin = req.headers.get("origin");
-
-    const fileMap: Record<string, File[]> = {};
     try {
         const ip = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown";
 
@@ -112,101 +80,56 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             );
         }
 
-        const formData = await req.formData();
-        const incoming: Record<string, any> = {};
-        const super_admin = await prisma.user.findFirst({ where: { role: "SUPERADMIN" }, select: { id: true } });
+        const body = await req.json();
+        const { nextAction, nextFollowUpDate, selectedUserIds = [], ...fieldPayload } = body;
 
-        for (const ff of form.fields) {
-            const values = formData.getAll(ff.id);
+        for (const field of form.fields) {
+            const value = fieldPayload[field.id];
 
-            const files = values.filter((v) => v instanceof File) as File[];
-            const texts = values.filter((v) => typeof v === "string") as string[];
-
-            if (texts.length === 1) incoming[ff.id] = texts[0];
-            else if (texts.length > 1) incoming[ff.id] = texts;
-
-            if (files.length > 0) fileMap[ff.id] = files;
-        }
-
-        for (const ff of form.fields) {
-            const simple = incoming[ff.id];
-            const file = fileMap[ff.id];
-
-            if (ff.required && !simple && (!file || file.length === 0)) {
-                return withCors(
-                    { error: `Field "${ff.label}" is required` },
-                    400,
-                    origin
+            if (field.required && (value === undefined || value === null || (Array.isArray(value) && value.length === 0) ||
+                value === "")) {
+                return NextResponse.json(
+                    { error: `Field "${field.label}" is required` },
+                    { status: 400 }
                 );
             }
         }
 
-        const uploadedFiles: Record<string, string[]> = {};
-
-        for (const ff of form.fields) {
-            const fileList = fileMap[ff.id];
-            if (!fileList) continue;
-
-            uploadedFiles[ff.id] = [];
-
-            for (const file of fileList) {
-                if (!ALLOWED_MIME.includes(file.type)) {
-                    return withCors(
-                        { error: `File type ${file.type} not allowed` },
-                        400,
-                        origin
-                    );
-                }
-
-                if (file.size > MAX_FILE_SIZE) {
-                    return withCors(
-                        { error: `${file.name} exceeds 20MB limit` },
-                        400,
-                        origin
-                    );
-                }
-
-                const buffer = Buffer.from(await file.arrayBuffer());
-                const uploaded = await uploadToCloudinaryBuffer(buffer, ff.id);
-                uploadedFiles[ff.id].push(uploaded.url);
-            }
-        }
+        const super_admin = await prisma.user.findFirst({ where: { role: "SUPERADMIN" }, select: { id: true } });
 
         let userPhone: string | null = null;
         let userEmail: string | null = null;
         const fieldValuesForAdmin: string[] = [];
 
         const result = await prisma.$transaction(async (tx) => {
-            const response = await tx.response.create({
+            const res = await tx.response.create({
                 data: { formId: form.id },
             });
 
 
-            for (const ff of form.fields) {
-                const simpleValue = incoming[ff.id];
-                const urls = uploadedFiles[ff.id];
-
+            for (const field of form.fields) {
+                const value = fieldPayload[field.id];
                 let finalValue = "";
 
-                if (urls?.length) {
-                    finalValue = urls.length === 1 ? urls[0] : JSON.stringify(urls);
-                } else if (simpleValue) {
-                    finalValue = Array.isArray(simpleValue)
-                        ? JSON.stringify(simpleValue)
-                        : String(simpleValue);
+                if (Array.isArray(value)) {
+                    finalValue = JSON.stringify(value);
+                } else if (value) {
+                    finalValue = String(value);
                 }
-                fieldValuesForAdmin.push(finalValue || "");
-                if (ff.label.toLowerCase().includes("phone") || ff.label.toLowerCase().includes("mobile") || ff.label.toLowerCase().includes("phone no.") || ff.label.toLowerCase().includes("contact no.") || ff.label.toLowerCase().includes("contact")) {
+
+                fieldValuesForAdmin.push(finalValue);
+
+                if (
+                    field.label.toLowerCase().includes("phone") ||
+                    field.label.toLowerCase().includes("mobile")
+                ) {
                     userPhone = finalValue;
-                }
-                if (ff.label.toLowerCase().includes("email") || ff.label.toLowerCase().includes("email id") || ff.label.toLowerCase().includes("emailId") || ff.label.toLowerCase().includes("email Id")) {
-                    userEmail = finalValue;
                 }
 
                 await tx.responseAnswer.create({
                     data: {
-                        responseId: response.id,
-                        fieldId: ff.id,
+                        responseId: res.id,
+                        fieldId: field.id,
                         value: finalValue,
                     },
                 });
@@ -220,13 +143,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                 await tx.responseAssignment.upsert({
                     where: {
                         responseId_userId: {
-                            responseId: response.id,
+                            responseId: res.id,
                             userId: uid,
                         },
                     },
                     update: { isActive: true },
                     create: {
-                        responseId: response.id,
+                        responseId: res.id,
                         userId: uid,
                         assignedById: form.userId ?? null,
                         isActive: true,
@@ -234,7 +157,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
                 });
             }
 
-            return response;
+            return res;
         });
 
         const nextActionData = await prisma.nextActionType.findFirst({

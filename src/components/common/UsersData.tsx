@@ -182,6 +182,21 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
         setFollowBusinessStatus("");
     }, [openResponse]);
 
+    const isUrl = (val: any): val is string =>
+        typeof val === "string" && /^https?:\/\//i.test(val);
+
+    const isUrlArray = (val: any): val is string[] =>
+        Array.isArray(val) && val.length > 0 && val.every(isUrl);
+
+    const parseJsonSafely = (val: string) => {
+        try {
+            return JSON.parse(val);
+        } catch {
+            return null;
+        }
+    };
+
+    const isImageUrl = (url: string) => /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(url.split("?")[0]);
 
     const { data, isLoading, isError, isFetching } = useQuery<FormResponsesData>({
         queryKey: ["form_responses", formId, paginationModel.page, paginationModel.pageSize, currentState],
@@ -209,47 +224,64 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
             filterable: true,
             // @ts-ignore
             valueGetter: (value, row) => row?.answers?.[key] ?? "",
-            renderCell: (params: GridRenderCellParams) => {
-                const v = params.value;
 
-                if (typeof v === "string" && v.startsWith("http")) {
-                    return <a href={v} target="_blank" rel="noreferrer" className="text-blue-600 underline">
-                        File
-                    </a>;
-                }
-                if (typeof v === "string") {
-                    try {
-                        const parsed = JSON.parse(v);
-                        if (Array.isArray(parsed)) {
-                            return (
-                                <div className="flex flex-col gap-0.5">
-                                    {parsed.map((item, idx) => (
-                                        <div key={idx} className="flex gap-1 items-center">
-                                            <Check size={10} />
-                                            {String(item)}
-                                        </div>
-                                    ))}
-                                </div>
-                            );
-                        }
-                    } catch {
+            renderCell: (params: GridRenderCellParams) => {
+                let value = params.value;
+
+                if (typeof value === "string") {
+                    const parsed = parseJsonSafely(value);
+                    if (parsed !== null) {
+                        value = parsed;
                     }
                 }
-                if (Array.isArray(v)) {
+
+                if (isUrl(value)) {
+                    return (
+                        <a
+                            href={value}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-blue-600 underline"
+                        >
+                            View file
+                        </a>
+                    );
+                }
+
+                if (isUrlArray(value)) {
+                    return (
+                        <div className="flex flex-col gap-1">
+                            {value.map((url, idx) => (
+                                <a
+                                    key={idx}
+                                    href={url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-blue-600 underline"
+                                >
+                                    View File
+                                </a>
+                            ))}
+                        </div>
+                    );
+                }
+
+                if (Array.isArray(value)) {
                     return (
                         <div className="flex flex-col gap-0.5">
-                            {v.map((item, idx) => (
+                            {value.map((item, idx) => (
                                 <div key={idx} className="flex gap-1 items-center">
                                     <Check size={10} />
-                                    {String(item)}
+                                    <span>{String(item)}</span>
                                 </div>
                             ))}
                         </div>
                     );
                 }
-                return v ?? "";
-            }
+                return value ?? "";
+            },
         }));
+
 
         return [
             {
@@ -528,19 +560,73 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
                     {openResponse && (
                         <>
                             {Object.entries(openResponse.answers).map(([key, val]) => {
-                                const value = typeof val === "string" ? val : JSON.stringify(val);
+                                let value: any = val;
+                                if (typeof value === "string") {
+                                    const parsed = parseJsonSafely(value);
+                                    if (parsed !== null) value = parsed;
+                                }
                                 return (
-                                    <Box key={key} mb={0}>
+                                    <Box key={key} mb={1}>
                                         <Typography variant="subtitle2" color="text.secondary">
                                             {key}
                                         </Typography>
-                                        <Typography>
-                                            {
-                                                value.startsWith("http") ?
-                                                    <img src={value} className="w-32 rounded-xl h-auto" />
-                                                    : value
-                                            }
-                                        </Typography>
+
+                                        {isUrl(value) && (
+                                            isImageUrl(value) ? (
+                                                <img
+                                                    src={value}
+                                                    alt="uploaded"
+                                                    className="w-40 rounded-xl border mt-1"
+                                                    loading="lazy"
+                                                />
+                                            ) : (
+                                                <a
+                                                    href={value}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="text-blue-600 underline"
+                                                >
+                                                    View file
+                                                </a>
+                                            )
+                                        )}
+
+                                        {Array.isArray(value) && (
+                                            <div className="flex flex-wrap gap-2 mt-1">
+                                                {value.map((item, idx) =>
+                                                    isUrl(item) ? (
+                                                        isImageUrl(item) ? (
+                                                            <img
+                                                                key={idx}
+                                                                src={item}
+                                                                alt={`uploaded-${idx}`}
+                                                                className="w-32 rounded-xl border"
+                                                                loading="lazy"
+                                                            />
+                                                        ) : (
+                                                            <a
+                                                                key={idx}
+                                                                href={item}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                className="text-blue-600 underline text-sm"
+                                                            >
+                                                                File {idx + 1}
+                                                            </a>
+                                                        )
+                                                    ) : (
+                                                        <div key={idx} className="flex gap-1 items-center text-sm">
+                                                            <Check size={12} />
+                                                            <span>{String(item)}</span>
+                                                        </div>
+                                                    )
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {!Array.isArray(value) && !isUrl(value) && (
+                                            <Typography>{String(value)}</Typography>
+                                        )}
                                     </Box>
                                 );
                             })}
