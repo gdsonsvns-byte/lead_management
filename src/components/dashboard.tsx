@@ -22,6 +22,7 @@ import EventIcon from "@mui/icons-material/Event";
 import NoteIcon from "@mui/icons-material/Note";
 import { useAuth } from '../hooks/useAuth';
 import Image from 'next/image';
+import useFancybox from '../lib/useFancybox';
 
 const TYPE_ICONS: Record<string, JSX.Element> = {
     CALL: <LocalPhoneIcon fontSize="small" color="primary" />,
@@ -197,6 +198,7 @@ interface Props {
 
 function FollowUpCard({ item, page, pageSize, currentState }: Props) {
     const { user } = useAuth();
+    const [fancyboxRef] = useFancybox({});
     const isAdmin = user && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
     const [openResponse, setOpenResponse] = useState<DashboardFollowUpItem | null>(null);
     const [followType, setFollowType] = useState<string>("NOTE");
@@ -327,9 +329,6 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
     const isUrl = (val: any): val is string =>
         typeof val === "string" && /^https?:\/\//i.test(val);
 
-    const isUrlArray = (val: any): val is string[] =>
-        Array.isArray(val) && val.length > 0 && val.every(isUrl);
-
     const parseJsonSafely = (val: string) => {
         try {
             return JSON.parse(val);
@@ -448,7 +447,7 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
             <Dialog open={!!openResponse} onClose={() => setOpenResponse(null)} maxWidth="lg" fullWidth>
                 <DialogTitle>View Lead</DialogTitle>
 
-                <DialogContent dividers>
+                <DialogContent dividers ref={fancyboxRef}>
                     {openResponse && Object.entries(openResponse?.answers).map(([key, val]) => {
                         let value: any = val;
                         if (typeof value === "string") {
@@ -464,14 +463,19 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
 
                                 {isUrl(value) && (
                                     isImageUrl(value) ? (
-                                        <Image
-                                            src={getOptimizedImage(value, 600)}
-                                            alt="uploaded"
-                                            className="w-40 rounded-xl mt-1"
-                                            loading="lazy"
-                                            width={500}
-                                            height={500}
-                                        />
+                                        <div
+                                            data-fancybox="uploaded"
+                                            data-src={getOptimizedImage(value, 1080)}
+                                        >
+                                            <Image
+                                                src={getOptimizedImage(value, 600)}
+                                                alt="uploaded"
+                                                className="w-40 rounded-xl mt-1"
+                                                loading="lazy"
+                                                width={500}
+                                                height={500}
+                                            />
+                                        </div>
                                     ) : (
                                         <a
                                             href={value}
@@ -489,15 +493,20 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
                                         {value.map((item, idx) =>
                                             isUrl(item) ? (
                                                 isImageUrl(item) ? (
-                                                    <Image
+                                                    <div
                                                         key={idx}
-                                                        src={getOptimizedImage(item, 600)}
-                                                        alt={`uploaded-${idx}`}
-                                                        className="w-32 rounded-xl border"
-                                                        loading="lazy"
-                                                        width={500}
-                                                        height={500}
-                                                    />
+                                                        data-fancybox={`uploaded-${idx}`}
+                                                        data-src={getOptimizedImage(item, 1080)}
+                                                    >
+                                                        <Image
+                                                            src={getOptimizedImage(item, 600)}
+                                                            alt={`uploaded-${idx}`}
+                                                            className="w-32 rounded-xl border cursor-pointer"
+                                                            loading="lazy"
+                                                            width={500}
+                                                            height={500}
+                                                        />
+                                                    </div>
                                                 ) : (
                                                     <a
                                                         key={idx}
