@@ -22,11 +22,6 @@ export async function uploadToCloudinary(
     formData.append("timestamp", timestamp);
     formData.append("signature", signature);
     formData.append("folder", folder);
-    formData.append("use_filename", "true");
-    formData.append("unique_filename", "false");
-    formData.append("tags", "lead-upload,form-file");
-    formData.append("context", `alt=${file.name}|caption=Uploaded via form`);
-
     const uploadRes = await axios.post(
         `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
         formData,
