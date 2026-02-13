@@ -48,6 +48,7 @@ import { useAuth } from "@/src/hooks/useAuth";
 import AssignLead from "./assign_lead";
 import { Check } from "lucide-react";
 import Image from "next/image";
+import useFancybox from "@/src/lib/useFancybox";
 
 const TYPE_ICONS: Record<string, JSX.Element> = {
     CALL: <LocalPhoneIcon fontSize="small" color="primary" />,
@@ -155,6 +156,7 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
     const [paginationModel, setPaginationModel] = useState({ pageSize: 10, page: 0 });
     const [reportData, setReportData] = useState<string>(new Date().toISOString().split("T")[0]);
     const [selectedResponseId, setSelectedResponseId] = useState<string | null>(null);
+    const [fancyboxRef] = useFancybox({});
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -563,7 +565,7 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
             <Dialog open={!!openResponse} onClose={() => setOpenResponse(null)} maxWidth="lg" fullWidth>
                 <DialogTitle>View Lead</DialogTitle>
 
-                <DialogContent dividers>
+                <DialogContent dividers ref={fancyboxRef}>
                     {openResponse && (
                         <>
                             {Object.entries(openResponse.answers).map(([key, val]) => {
@@ -580,14 +582,19 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
 
                                         {isUrl(value) && (
                                             isImageUrl(value) ? (
-                                                <Image
-                                                    src={getOptimizedImage(value, 600)}
-                                                    alt="uploaded"
-                                                    className="w-40 rounded-xl mt-1"
-                                                    loading="lazy"
-                                                    width={500}
-                                                    height={500}
-                                                />
+                                                <div
+                                                    data-fancybox="uploaded"
+                                                    data-src={getOptimizedImage(value, 1080)}
+                                                >
+                                                    <Image
+                                                        src={getOptimizedImage(value, 600)}
+                                                        alt="uploaded"
+                                                        className="w-40 rounded-xl mt-1"
+                                                        loading="lazy"
+                                                        width={500}
+                                                        height={500}
+                                                    />
+                                                </div>
                                             ) : (
                                                 <a
                                                     href={value}
@@ -605,15 +612,20 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
                                                 {value.map((item, idx) =>
                                                     isUrl(item) ? (
                                                         isImageUrl(item) ? (
-                                                            <Image
+                                                            <div
                                                                 key={idx}
-                                                                src={getOptimizedImage(item, 600)}
-                                                                alt={`uploaded-${idx}`}
-                                                                className="w-32 rounded-xl border"
-                                                                loading="lazy"
-                                                                width={500}
-                                                                height={500}
-                                                            />
+                                                                data-fancybox={`uploaded-${idx}`}
+                                                                data-src={getOptimizedImage(item, 1080)}
+                                                            >
+                                                                <Image
+                                                                    src={getOptimizedImage(item, 600)}
+                                                                    alt={`uploaded-${idx}`}
+                                                                    className="w-32 rounded-xl border cursor-pointer"
+                                                                    loading="lazy"
+                                                                    width={500}
+                                                                    height={500}
+                                                                />
+                                                            </div>
                                                         ) : (
                                                             <a
                                                                 key={idx}
