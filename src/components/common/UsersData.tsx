@@ -47,6 +47,7 @@ import Spinner from "../ui/spinner";
 import { useAuth } from "@/src/hooks/useAuth";
 import AssignLead from "./assign_lead";
 import { Check } from "lucide-react";
+import Image from "next/image";
 
 const TYPE_ICONS: Record<string, JSX.Element> = {
     CALL: <LocalPhoneIcon fontSize="small" color="primary" />,
@@ -197,6 +198,12 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
     };
 
     const isImageUrl = (url: string) => /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(url.split("?")[0]);
+    const getOptimizedImage = (url: string, width = 800) =>
+        url.replace(
+            "/upload/",
+            `/upload/f_auto,q_auto,w_${width}/`
+        );
+
 
     const { data, isLoading, isError, isFetching } = useQuery<FormResponsesData>({
         queryKey: ["form_responses", formId, paginationModel.page, paginationModel.pageSize, currentState],
@@ -573,11 +580,13 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
 
                                         {isUrl(value) && (
                                             isImageUrl(value) ? (
-                                                <img
-                                                    src={value}
+                                                <Image
+                                                    src={getOptimizedImage(value, 600)}
                                                     alt="uploaded"
-                                                    className="w-40 rounded-xl border mt-1"
+                                                    className="w-40 rounded-xl mt-1"
                                                     loading="lazy"
+                                                    width={500}
+                                                    height={500}
                                                 />
                                             ) : (
                                                 <a
@@ -586,7 +595,7 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
                                                     rel="noreferrer"
                                                     className="text-blue-600 underline"
                                                 >
-                                                    View file
+                                                    View document
                                                 </a>
                                             )
                                         )}
@@ -596,12 +605,14 @@ export default function UsersData({ formId, account_id }: { formId: string, acco
                                                 {value.map((item, idx) =>
                                                     isUrl(item) ? (
                                                         isImageUrl(item) ? (
-                                                            <img
+                                                            <Image
                                                                 key={idx}
-                                                                src={item}
+                                                                src={getOptimizedImage(item, 600)}
                                                                 alt={`uploaded-${idx}`}
                                                                 className="w-32 rounded-xl border"
                                                                 loading="lazy"
+                                                                width={500}
+                                                                height={500}
                                                             />
                                                         ) : (
                                                             <a

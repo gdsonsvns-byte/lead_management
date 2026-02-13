@@ -12,7 +12,7 @@ import {
 import axios, { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from './ui/spinner';
-import { Clock, AlertCircle, Plus, User2, CheckCircle, Calendar } from "lucide-react";
+import { Clock, AlertCircle, Plus, User2, CheckCircle, Calendar, Check } from "lucide-react";
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import toast, { Toaster } from 'react-hot-toast';
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
@@ -21,6 +21,7 @@ import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import EventIcon from "@mui/icons-material/Event";
 import NoteIcon from "@mui/icons-material/Note";
 import { useAuth } from '../hooks/useAuth';
+import Image from 'next/image';
 
 const TYPE_ICONS: Record<string, JSX.Element> = {
     CALL: <LocalPhoneIcon fontSize="small" color="primary" />,
@@ -323,6 +324,27 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
     );
     const status = last.status;
 
+    const isUrl = (val: any): val is string =>
+        typeof val === "string" && /^https?:\/\//i.test(val);
+
+    const isUrlArray = (val: any): val is string[] =>
+        Array.isArray(val) && val.length > 0 && val.every(isUrl);
+
+    const parseJsonSafely = (val: string) => {
+        try {
+            return JSON.parse(val);
+        } catch {
+            return null;
+        }
+    };
+
+    const isImageUrl = (url: string) => /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(url.split("?")[0]);
+    const getOptimizedImage = (url: string, width = 800) =>
+        url.replace(
+            "/upload/",
+            `/upload/f_auto,q_auto,w_${width}/`
+        );
+
     return (
         <div className="relative rounded-xl bg-white p-5 shadow-md border border-zinc-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col gap-3 justify-between">
 
@@ -428,18 +450,78 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
 
                 <DialogContent dividers>
                     {openResponse && Object.entries(openResponse?.answers).map(([key, val]) => {
+                        let value: any = val;
+                        if (typeof value === "string") {
+                            const parsed = parseJsonSafely(value);
+                            if (parsed !== null) value = parsed;
+                        }
+
                         return (
-                            <Box key={key} mb={0}>
+                            <Box key={key} mb={1}>
                                 <Typography variant="subtitle2" color="text.secondary">
                                     {key}
                                 </Typography>
-                                <Typography>
-                                    {
-                                        val.startsWith("http") ?
-                                            <img src={val} className="w-32 rounded-xl h-auto" />
-                                            : val
-                                    }
-                                </Typography>
+
+                                {isUrl(value) && (
+                                    isImageUrl(value) ? (
+                                        <Image
+                                            src={getOptimizedImage(value, 600)}
+                                            alt="uploaded"
+                                            className="w-40 rounded-xl mt-1"
+                                            loading="lazy"
+                                            width={500}
+                                            height={500}
+                                        />
+                                    ) : (
+                                        <a
+                                            href={value}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-blue-600 underline"
+                                        >
+                                            View document
+                                        </a>
+                                    )
+                                )}
+
+                                {Array.isArray(value) && (
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                        {value.map((item, idx) =>
+                                            isUrl(item) ? (
+                                                isImageUrl(item) ? (
+                                                    <Image
+                                                        key={idx}
+                                                        src={getOptimizedImage(item, 600)}
+                                                        alt={`uploaded-${idx}`}
+                                                        className="w-32 rounded-xl border"
+                                                        loading="lazy"
+                                                        width={500}
+                                                        height={500}
+                                                    />
+                                                ) : (
+                                                    <a
+                                                        key={idx}
+                                                        href={item}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="text-blue-600 underline text-sm"
+                                                    >
+                                                        File {idx + 1}
+                                                    </a>
+                                                )
+                                            ) : (
+                                                <div key={idx} className="flex gap-1 items-center text-sm">
+                                                    <Check size={12} />
+                                                    <span>{String(item)}</span>
+                                                </div>
+                                            )
+                                        )}
+                                    </div>
+                                )}
+
+                                {!Array.isArray(value) && !isUrl(value) && (
+                                    <Typography>{String(value)}</Typography>
+                                )}
                             </Box>
                         );
                     })}

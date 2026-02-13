@@ -1,16 +1,25 @@
 import axios from "axios";
 
+const isImage = (file: File) => file.type.startsWith("image/");
+const isVideo = (file: File) => file.type.startsWith("video/");
+const isPdf = (file: File) => file.type === "application/pdf";
+const isDoc = (file: File) => file.type.includes("word");
+
+
 export async function uploadToCloudinary(
     file: File,
     folder: string,
     onProgress?: (percent: number) => void
 ): Promise<{ secure_url: string; public_id: string }> {
 
-    const signRes = await axios.post("/api/v1/cloudinary/sign", {
-        folder,
-    });
-
+    const signRes = await axios.post("/api/v1/cloudinary/sign", { folder, });
     const { signature, timestamp, cloudName, apiKey } = signRes.data;
+
+    let resourceType: "image" | "video" | "raw" = "raw";
+    
+    if (isImage(file)) resourceType = "image";
+    else if (isVideo(file)) resourceType = "video";
+    else resourceType = "raw"
 
     const formData = new FormData();
     formData.append("file", file);
@@ -18,6 +27,10 @@ export async function uploadToCloudinary(
     formData.append("timestamp", timestamp);
     formData.append("signature", signature);
     formData.append("folder", folder);
+    formData.append("use_filename", "true");
+    formData.append("unique_filename", "false");
+    formData.append("tags", "lead-upload,form-file");
+    formData.append("context", `alt=${file.name}|caption=Uploaded via form`);
 
     const uploadRes = await axios.post(
         `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
