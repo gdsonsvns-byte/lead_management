@@ -12,7 +12,7 @@ import {
 import axios, { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from './ui/spinner';
-import { Clock, AlertCircle, Plus, User2, CheckCircle, Calendar } from "lucide-react";
+import { Clock, AlertCircle, Plus, User2, CheckCircle, Calendar, Check } from "lucide-react";
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import toast, { Toaster } from 'react-hot-toast';
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
@@ -21,6 +21,8 @@ import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import EventIcon from "@mui/icons-material/Event";
 import NoteIcon from "@mui/icons-material/Note";
 import { useAuth } from '../hooks/useAuth';
+import Image from 'next/image';
+import useFancybox from '../lib/useFancybox';
 
 const TYPE_ICONS: Record<string, JSX.Element> = {
     CALL: <LocalPhoneIcon fontSize="small" color="primary" />,
@@ -196,6 +198,7 @@ interface Props {
 
 function FollowUpCard({ item, page, pageSize, currentState }: Props) {
     const { user } = useAuth();
+    const [fancyboxRef] = useFancybox({});
     const isAdmin = user && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
     const [openResponse, setOpenResponse] = useState<DashboardFollowUpItem | null>(null);
     const [followType, setFollowType] = useState<string>("NOTE");
@@ -323,123 +326,212 @@ function FollowUpCard({ item, page, pageSize, currentState }: Props) {
     );
     const status = last.status;
 
+    const isUrl = (val: any): val is string =>
+        typeof val === "string" && /^https?:\/\//i.test(val);
+
+    const parseJsonSafely = (val: string) => {
+        try {
+            return JSON.parse(val);
+        } catch {
+            return null;
+        }
+    };
+
+    const isImageUrl = (url: string) => /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(url.split("?")[0]);
+    const getOptimizedImage = (url: string, width = 800) =>
+        url.replace(
+            "/upload/",
+            `/upload/f_auto,q_auto,w_${width}/`
+        );
+
     return (
         <div className="relative rounded-xl bg-white p-5 shadow-md border border-zinc-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col gap-3 justify-between">
-
-            <div className="flex justify-between">
-                <div>
-                    <h2 className="text-lg font-semibold text-gray-900">
-                        {info.name || "Unknown Lead"}
-                    </h2>
-                    {info.phone && <p className="text-sm text-gray-600">{info.phone}</p>}
-                    {info.email && <p className="text-sm text-gray-600">{info.email}</p>}
-                    {info.location && <p className="text-sm text-gray-600">{info.location}</p>}
-                </div>
-
-                <span
-                    className={`max-h-max px-2 py-1 rounded-full text-xs font-semibold 
-                    ${status === "PENDING"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : status === "COMPLETED"
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-700"
-                        }`}
-                >
-                    {status}
-                </span>
-            </div>
-
-            {isAdmin && (
-                <div className="flex items-center gap-2 text-xs text-gray-600 flex-wrap my-1">
-                    <span className="font-medium text-sm text-gray-500">
-                        Lead Assigned to:
-                    </span>
-
-                    <div className="flex flex-wrap gap-1">
-                        {item.assignUsers.map((user) => (
-                            <span
-                                key={user.id}
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200"
-                            >
-                                <CheckCircle size={12} className='text-green-600' />
-                                {user.id === isYou ? "YOU" : <>
-                                    <span className="font-medium text-gray-800">
-                                        {user.name}
-                                    </span>
-
-                                    <span className="text-[10px] text-gray-500">
-                                        ({user.role})
-                                    </span>
-                                </>}
-                            </span>
-                        ))}
+            <>
+                <div className="flex justify-between">
+                    <div>
+                        <h2 className="text-lg font-semibold text-gray-900">
+                            {info.name || "Unknown Lead"}
+                        </h2>
+                        {info.phone && <p className="text-sm text-gray-600">{info.phone}</p>}
+                        {info.email && <p className="text-sm text-gray-600">{info.email}</p>}
+                        {info.location && <p className="text-sm text-gray-600">{info.location}</p>}
                     </div>
-                </div>
-            )}
 
-            <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${tagStyle}`}>
-                {status !== "COMPLETED" && status !== "CANCELLED" && due ? tag : status}
-            </span>
-
-            <div className="space-y-2 text-sm text-gray-700">
-                <div className="flex items-center gap-2">
-                    <Calendar size={16} />
-                    Next: <strong>
-                        {status !== "COMPLETED" && status !== "CANCELLED" && due ? due.toLocaleDateString() : "---"}
-                    </strong>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <AlertCircle size={16} className='shrink-0' />
-                    Status: <strong>{last.businessStatus}</strong>
+                    <span
+                        className={`max-h-max px-2 py-1 rounded-full text-xs font-semibold 
+                    ${status === "PENDING"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : status === "COMPLETED"
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-red-100 text-red-700"
+                            }`}
+                    >
+                        {status}
+                    </span>
                 </div>
 
-                {last.note && (
-                    <p className="text-gray-600 line-clamp-2 mt-2">
-                        <strong>Note:</strong> {last.note}
-                    </p>
+                {isAdmin && (
+                    <div className="flex items-center gap-2 text-xs text-gray-600 flex-wrap my-1">
+                        <span className="font-medium text-sm text-gray-500">
+                            Lead Assigned to:
+                        </span>
+
+                        <div className="flex flex-wrap gap-1">
+                            {item.assignUsers.map((user) => (
+                                <span
+                                    key={user.id}
+                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200"
+                                >
+                                    <CheckCircle size={12} className='text-green-600' />
+                                    {user.id === isYou ? "YOU" : <>
+                                        <span className="font-medium text-gray-800">
+                                            {user.name}
+                                        </span>
+
+                                        <span className="text-[10px] text-gray-500">
+                                            ({user.role})
+                                        </span>
+                                    </>}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
                 )}
-            </div>
 
-            <div>
-                <div className="h-2 w-full bg-gray-200 rounded-full">
-                    <div
-                        className="h-2 bg-blue-600 rounded-full"
-                        style={{ width: `${progress}%` }}
-                    />
+                <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${tagStyle}`}>
+                    {status !== "COMPLETED" && status !== "CANCELLED" && due ? tag : status}
+                </span>
+
+                <div className="space-y-2 text-sm text-gray-700">
+                    <div className="flex items-center gap-2">
+                        <Calendar size={16} />
+                        Next: <strong>
+                            {status !== "COMPLETED" && status !== "CANCELLED" && due ? due.toLocaleDateString() : "---"}
+                        </strong>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <AlertCircle size={16} className='shrink-0' />
+                        Status: <strong>{last.businessStatus}</strong>
+                    </div>
+
+                    {last.note && (
+                        <p className="text-gray-600 line-clamp-2 mt-2">
+                            <strong>Note:</strong> {last.note}
+                        </p>
+                    )}
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                    {status !== "COMPLETED" && status !== "CANCELLED" ? `${progress}% progress` : status}
-                </p>
-            </div>
 
-            {status !== "COMPLETED" && status !== "CANCELLED" && (
-                <button
-                    className="mt-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 flex items-center justify-center gap-1"
-                    onClick={() => setOpenResponse(item)}
-                >
-                    <Plus size={15} />
-                    Add New Follow Up
-                </button>
-            )}
+                <div>
+                    <div className="h-2 w-full bg-gray-200 rounded-full">
+                        <div
+                            className="h-2 bg-blue-600 rounded-full"
+                            style={{ width: `${progress}%` }}
+                        />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                        {status !== "COMPLETED" && status !== "CANCELLED" ? `${progress}% progress` : status}
+                    </p>
+                </div>
+
+                {status !== "COMPLETED" && status !== "CANCELLED" && (
+                    <button
+                        className="mt-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 flex items-center justify-center gap-1"
+                        onClick={() => setOpenResponse(item)}
+                    >
+                        <Plus size={15} />
+                        Add New Follow Up
+                    </button>
+                )}
+            </>
 
             <Dialog open={!!openResponse} onClose={() => setOpenResponse(null)} maxWidth="lg" fullWidth>
                 <DialogTitle>View Lead</DialogTitle>
 
-                <DialogContent dividers>
+                <DialogContent dividers ref={fancyboxRef}>
                     {openResponse && Object.entries(openResponse?.answers).map(([key, val]) => {
+                        let value: any = val;
+                        if (typeof value === "string") {
+                            const parsed = parseJsonSafely(value);
+                            if (parsed !== null) value = parsed;
+                        }
+
                         return (
-                            <Box key={key} mb={0}>
+                            <Box key={key} mb={1}>
                                 <Typography variant="subtitle2" color="text.secondary">
                                     {key}
                                 </Typography>
-                                <Typography>
-                                    {
-                                        val.startsWith("http") ?
-                                            <img src={val} className="w-32 rounded-xl h-auto" />
-                                            : val
-                                    }
-                                </Typography>
+
+                                {isUrl(value) && (
+                                    isImageUrl(value) ? (
+                                        <div
+                                            data-fancybox="uploaded"
+                                            data-src={getOptimizedImage(value, 1080)}
+                                        >
+                                            <Image
+                                                src={getOptimizedImage(value, 600)}
+                                                alt="uploaded"
+                                                className="w-40 rounded-xl mt-1"
+                                                loading="lazy"
+                                                width={500}
+                                                height={500}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <a
+                                            href={value}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-blue-600 underline"
+                                        >
+                                            View document
+                                        </a>
+                                    )
+                                )}
+
+                                {Array.isArray(value) && (
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                        {value.map((item, idx) =>
+                                            isUrl(item) ? (
+                                                isImageUrl(item) ? (
+                                                    <div
+                                                        key={idx}
+                                                        data-fancybox={`uploaded-${idx}`}
+                                                        data-src={getOptimizedImage(item, 1080)}
+                                                    >
+                                                        <Image
+                                                            src={getOptimizedImage(item, 600)}
+                                                            alt={`uploaded-${idx}`}
+                                                            className="w-32 rounded-xl border cursor-pointer"
+                                                            loading="lazy"
+                                                            width={500}
+                                                            height={500}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <a
+                                                        key={idx}
+                                                        href={item}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="text-blue-600 underline text-sm"
+                                                    >
+                                                        File {idx + 1}
+                                                    </a>
+                                                )
+                                            ) : (
+                                                <div key={idx} className="flex gap-1 items-center text-sm">
+                                                    <Check size={12} />
+                                                    <span>{String(item)}</span>
+                                                </div>
+                                            )
+                                        )}
+                                    </div>
+                                )}
+
+                                {!Array.isArray(value) && !isUrl(value) && (
+                                    <Typography>{String(value)}</Typography>
+                                )}
                             </Box>
                         );
                     })}
