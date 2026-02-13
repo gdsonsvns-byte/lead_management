@@ -20,6 +20,18 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function ContextProvider({ children, initialUser }: { children: React.ReactNode, initialUser: AuthUser | null; }) {
     const [user, setUser] = useState<AuthUser | null>(initialUser);
 
+    useEffect(() => {
+        if (user) {
+            localStorage.removeItem("dashboard_followup_state");
+        }
+
+        Object.keys(localStorage).forEach((key) => {
+            if (key.startsWith("form_") && key.endsWith("_followup_state")) {
+                localStorage.removeItem(key);
+            }
+        });
+    }, [user]);
+
     const logout = () => {
         Cookies.remove("token");
         setUser(null);
