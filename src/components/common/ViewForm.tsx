@@ -1,10 +1,10 @@
 'use client';
-import { X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import Spinner from "../ui/spinner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useMemo, useState } from "react";
+import { FormEvent, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { TextField } from "@mui/material";
 import { FollowUpStatus, Role } from "@/src/app/generated/prisma/enums";
@@ -26,6 +26,7 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
     const router = useRouter();
     const formId = searchParams.get("view");
     const hasFormId = !!formId;
+    const [formKey, setFormKey] = useState(0);
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
     const [initialFollowUp, setInitialFollowUp] = useState({
         nextAction: "",
@@ -37,6 +38,7 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
     const [fileLabels, setFileLabels] = useState<Record<string, string>>({});
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+    const formRef = useRef<HTMLFormElement>(null);
 
     const handleChange = (field: Field, value: any) => {
         setFormValues((prev) => ({
@@ -110,6 +112,7 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
                 return (
                     <div className="relative">
                         <input
+                            key={formKey}
                             id={field.id}
                             type="file"
                             className="hidden"
@@ -137,13 +140,12 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
                         >
                             <span className="truncate">
                                 {uploading && uploadProgress[field.id] !== undefined
-                                    ? `Uploading ${uploadProgress[field.id]}%`
-                                    : fileLabels[field.id] || "Choose file"}
+                                    ? `Uploading ${uploadProgress[field.id]}%` : fileLabels[field.id] || "Choose file"}
                             </span>
 
-                            {uploading && uploadProgress[field.id] !== undefined ? (
+                            {uploading && uploadProgress[field.id] !== 100 ? (
                                 <Spinner />
-                            ) : (
+                            ) : uploadProgress[field.id] === 100 ? <Check size={14} className="text-green-500" /> : (
                                 <span className="text-xs text-gray-800">Browse</span>
                             )}
                         </label>
@@ -240,6 +242,8 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
             setTimeout(closeModal, 500);
             setFormValues({})
             setSelectedUserIds([])
+            formRef.current?.reset()
+            setFormKey(prev => prev + 1)
             setInitialFollowUp({
                 nextAction: "",
                 nextFollowUpDate: "",
@@ -254,7 +258,9 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
         },
     });
 
-    const handleTestSubmit = async () => {
+    const handleTestSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        setMessage(null)
         try {
             setUploading(true);
             setUploadProgress({});
@@ -363,157 +369,158 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
                             {data.form.description || "No description provided."}
                         </p>
 
-                        <div className="space-y-3 animate-fadeIn">
-                            {[...data.form.fields].sort((a: Field, b: Field) => (a.order ?? 0) - (b.order ?? 0)).map((field: Field, index: number) => {
-                                let options: string[] = [];
+                        <form ref={formRef} onSubmit={handleTestSubmit}>
+                            <div className="space-y-3 animate-fadeIn">
+                                {[...data.form.fields].sort((a: Field, b: Field) => (a.order ?? 0) - (b.order ?? 0)).map((field: Field, index: number) => {
+                                    let options: string[] = [];
 
-                                if (field.options) {
-                                    try {
-                                        options = JSON.parse(field.options);
-                                    } catch {
-                                        options = [];
+                                    if (field.options) {
+                                        try {
+                                            options = JSON.parse(field.options);
+                                        } catch {
+                                            options = [];
+                                        }
                                     }
-                                }
 
-                                return (
-                                    <div
-                                        key={field.id}
-                                        className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp"
-                                        style={{ animationDelay: `${index * 0.08}s` }}
-                                    >
-                                        <div className="flex justify-between mb-2">
-                                            {(options.length > 0 || field.type === "date" || field.type === "file") ?
-                                                <label
-                                                    className={`relative text-sm text-zinc-800 group-hover:text-black transition ${field.required
-                                                        ? "after:content-['*'] after:text-red-600 after:ml-1"
-                                                        : ""
-                                                        }`}
-                                                >
-                                                    {field.label}
-                                                </label> : ""}
+                                    return (
+                                        <div
+                                            key={field.id}
+                                            className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp"
+                                            style={{ animationDelay: `${index * 0.08}s` }}
+                                        >
+                                            <div className="flex justify-between mb-2">
+                                                {(options.length > 0 || field.type === "date" || field.type === "file") ?
+                                                    <label
+                                                        className={`relative text-sm text-zinc-800 group-hover:text-black transition ${field.required
+                                                            ? "after:content-['*'] after:text-red-600 after:ml-1"
+                                                            : ""
+                                                            }`}
+                                                    >
+                                                        {field.label}
+                                                    </label> : ""}
+                                            </div>
+
+                                            <div className="transform group-hover:scale-[1.01] transition-transform">
+                                                {renderField(field, options)}
+                                            </div>
+
                                         </div>
+                                    );
+                                })}
 
-                                        <div className="transform group-hover:scale-[1.01] transition-transform">
-                                            {renderField(field, options)}
-                                        </div>
-
-                                    </div>
-                                );
-                            })}
-
-                            <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp flex flex-col gap-8"
-                            >
-                                <span>Initial Follow Up Details</span>
-                                <div className="flex flex-col sm:flex-row gap-5">
-                                    <TextField
-                                        label="Next Action"
-                                        select
-                                        value={initialFollowUp.nextAction}
-                                        onChange={(e) => {
-                                            const selectedLabel = e.target.value;
-                                            setInitialFollowUp((prev) => ({
-                                                ...prev,
-                                                nextAction: selectedLabel
-                                            }));
-                                            const selectedAction = data.form.nextActions.find(
-                                                (a) => a.label === selectedLabel
-                                            );
-
-                                            if (
-                                                selectedAction?.status === "COMPLETED" ||
-                                                selectedAction?.status === "CANCELLED"
-                                            ) {
+                                <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp flex flex-col gap-8"
+                                >
+                                    <span>Initial Follow Up Details</span>
+                                    <div className="flex flex-col sm:flex-row gap-5">
+                                        <TextField
+                                            label="Next Action"
+                                            select
+                                            value={initialFollowUp.nextAction}
+                                            onChange={(e) => {
+                                                const selectedLabel = e.target.value;
                                                 setInitialFollowUp((prev) => ({
                                                     ...prev,
-                                                    nextFollowUpDate: ""
+                                                    nextAction: selectedLabel
                                                 }));
-                                            }
-                                        }}
-                                        SelectProps={{ native: true }}
-                                        InputLabelProps={{ shrink: true }}
-                                        fullWidth
-                                    >
-                                        <option value="">Select status</option>
+                                                const selectedAction = data.form.nextActions.find(
+                                                    (a) => a.label === selectedLabel
+                                                );
 
-                                        {data.form.nextActions.map((action) => (
-                                            <option key={action.id} value={action.label}>
-                                                {action.label}
-                                            </option>
-                                        ))}
-                                    </TextField>
-
-                                    {selectedAction &&
-                                        selectedAction.status !== "COMPLETED" &&
-                                        selectedAction.status !== "CANCELLED" && (
-                                            <TextField
-                                                label="Next Follow-Up Date"
-                                                type="date"
-                                                value={initialFollowUp.nextFollowUpDate}
-                                                onChange={(e) => {
+                                                if (
+                                                    selectedAction?.status === "COMPLETED" ||
+                                                    selectedAction?.status === "CANCELLED"
+                                                ) {
                                                     setInitialFollowUp((prev) => ({
                                                         ...prev,
-                                                        nextFollowUpDate: e.target.value
+                                                        nextFollowUpDate: ""
                                                     }));
-                                                }}
-                                                InputLabelProps={{ shrink: true }}
-                                                fullWidth
-                                            />
-                                        )}
+                                                }
+                                            }}
+                                            SelectProps={{ native: true }}
+                                            InputLabelProps={{ shrink: true }}
+                                            fullWidth
+                                        >
+                                            <option value="">Select status</option>
+
+                                            {data.form.nextActions.map((action) => (
+                                                <option key={action.id} value={action.label}>
+                                                    {action.label}
+                                                </option>
+                                            ))}
+                                        </TextField>
+
+                                        {selectedAction &&
+                                            selectedAction.status !== "COMPLETED" &&
+                                            selectedAction.status !== "CANCELLED" && (
+                                                <TextField
+                                                    label="Next Follow-Up Date"
+                                                    type="date"
+                                                    value={initialFollowUp.nextFollowUpDate}
+                                                    onChange={(e) => {
+                                                        setInitialFollowUp((prev) => ({
+                                                            ...prev,
+                                                            nextFollowUpDate: e.target.value
+                                                        }));
+                                                    }}
+                                                    InputLabelProps={{ shrink: true }}
+                                                    fullWidth
+                                                />
+                                            )}
+                                    </div>
+
                                 </div>
+
+                                {isAdmin && data.users.length > 0 &&
+                                    <div
+                                        className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp flex flex-col gap-8"
+                                    >
+                                        <span> Assign this lead to user.</span>
+                                        <div className="flex flex-col gap-2">
+                                            {data.users.map((user) => (
+                                                <label
+                                                    key={user.id}
+                                                    className="flex items-center justify-between border border-blue-500 rounded-lg px-4 py-3 cursor-pointer hover:bg-zinc-50 transition"
+                                                >
+                                                    <div>
+                                                        <p className="font-medium text-sm">{user.name}</p>
+                                                        <p className="text-xs text-zinc-500">{user.email}</p>
+                                                        <span className="text-xs text-blue-600 font-medium">
+                                                            {user.role}
+                                                        </span>
+                                                    </div>
+
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedUserIds.includes(user.id)}
+                                                        onChange={() => toggleUser(user.id)}
+                                                        className="w-5 h-5 accent-blue-600 cursor-pointer"
+                                                    />
+                                                </label>
+                                            ))}
+
+                                        </div>
+                                    </div>}
+                            </div>
+
+                            <div className="space-y-3 animate-fadeIn mt-5">
+                                <button
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg cursor-pointer"
+                                    disabled={submitMutation.isPending || uploading}
+                                >
+                                    {(submitMutation.isPending || uploading) ? <Spinner color="white" /> : "Submit Data"}
+                                </button>
 
                             </div>
 
-                            {isAdmin && data.users.length > 0 &&
-                                <div
-                                    className="p-4 rounded-lg border border-zinc-200 bg-zinc-50 shadow-sm hover:shadow-md transition-all duration-200 group opacity-0 animate-slideUp flex flex-col gap-8"
+                            {message && (
+                                <p
+                                    className={`mt-3 text-center ${message.type === "success" ? "text-green-600" : "text-red-600"
+                                        }`}
                                 >
-                                    <span> Assign this lead to user.</span>
-                                    <div className="flex flex-col gap-2">
-                                        {data.users.map((user) => (
-                                            <label
-                                                key={user.id}
-                                                className="flex items-center justify-between border border-blue-500 rounded-lg px-4 py-3 cursor-pointer hover:bg-zinc-50 transition"
-                                            >
-                                                <div>
-                                                    <p className="font-medium text-sm">{user.name}</p>
-                                                    <p className="text-xs text-zinc-500">{user.email}</p>
-                                                    <span className="text-xs text-blue-600 font-medium">
-                                                        {user.role}
-                                                    </span>
-                                                </div>
-
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedUserIds.includes(user.id)}
-                                                    onChange={() => toggleUser(user.id)}
-                                                    className="w-5 h-5 accent-blue-600 cursor-pointer"
-                                                />
-                                            </label>
-                                        ))}
-
-                                    </div>
-                                </div>}
-                        </div>
-
-                        <div className="space-y-3 animate-fadeIn mt-5">
-                            <button
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg cursor-pointer"
-                                onClick={handleTestSubmit}
-                                disabled={submitMutation.isPending || uploading}
-                            >
-                                {(submitMutation.isPending || uploading) ? <Spinner color="white" /> : "Submit Data"}
-                            </button>
-
-                        </div>
-
-                        {message && (
-                            <p
-                                className={`mt-3 text-center ${message.type === "success" ? "text-green-600" : "text-red-600"
-                                    }`}
-                            >
-                                {message.text}
-                            </p>
-                        )}
+                                    {message.text}
+                                </p>
+                            )}
+                        </form>
                     </>
                 )}
 
