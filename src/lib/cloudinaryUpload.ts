@@ -1,8 +1,5 @@
 import axios from "axios";
 
-const isImage = (file: File) => file.type.startsWith("image/");
-const isVideo = (file: File) => file.type.startsWith("video/");
-
 export async function uploadToCloudinary(
     file: File,
     folder: string,
@@ -11,10 +8,6 @@ export async function uploadToCloudinary(
 
     const signRes = await axios.post("/api/v1/cloudinary/sign", { folder });
     const { signature, timestamp, cloudName, apiKey } = signRes.data;
-
-    let resourceType: "image" | "video" | "raw" = "raw";
-    if (isImage(file)) resourceType = "image";
-    else if (isVideo(file)) resourceType = "video";
 
     const formData = new FormData();
     formData.append("file", file);
