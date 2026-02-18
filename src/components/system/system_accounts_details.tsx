@@ -31,7 +31,7 @@ type Data = {
     }[],
     _count: {
         users: number;
-        forms:number;
+        forms: number;
     }
 }
 
@@ -51,7 +51,7 @@ export default function SystemDashboardAccountsDetails() {
         retry: 1,
         placeholderData: (old) => old,
     })
-    
+
     return (
         <div className='mt-8'>
             <div className='w-full flex flex-col gap-6'>
@@ -64,7 +64,7 @@ export default function SystemDashboardAccountsDetails() {
                     </span>
                 </div>
 
-                <div className='relative w-full min-h-80 h-full border border-black/10 rounded-lg overflow-y-auto flex flex-col'>
+                <div className='relative w-full min-h-80 max-h-110 h-full border border-black/10 rounded-lg overflow-y-auto flex flex-col'>
                     <>
                         {
                             (isFetching || isLoading) && <div className="flex-1 flex items-center justify-center">
@@ -142,11 +142,13 @@ export default function SystemDashboardAccountsDetails() {
                     }
                 </div>
             </div>
-            {selectedUser &&
+            {
+                selectedUser &&
                 <ViewAccountDetails
                     user={selectedUser}
                     onClose={() => setSelectedUser(null)}
-                />}
+                />
+            }
         </div>
     )
 }
