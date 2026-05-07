@@ -17,7 +17,7 @@ interface DecodedUser {
 export async function verifyRole(allowedRoles: string[] | string): Promise<AuthContext | null> {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
-
+    
     if (!token) {
         return null;
     }

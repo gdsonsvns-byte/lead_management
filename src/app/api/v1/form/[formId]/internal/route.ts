@@ -13,9 +13,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                 { status: 429 }
             );
         }
-        const user = await verifyRole(["ADMIN", "SUPERADMIN"])
+        const user = await verifyRole(["ADMIN", "SUPERADMIN","MANAGER"])
         const apiClient = await verifyApiAccessToken(req);
-
+        
         if (!user && !apiClient) {
             return NextResponse.json(
                 { error: "Unauthorized" },
