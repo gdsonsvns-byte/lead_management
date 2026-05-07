@@ -46,7 +46,7 @@ export function verifyToken(token: string): DecodedUser | null {
     try {
         return jwt.verify(token, JWT_SECRET) as DecodedUser
     } catch {
-        throw new Error("Invalid token")
+        throw new Error("Invalid token!!")
     }
 }
 
