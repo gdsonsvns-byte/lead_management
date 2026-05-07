@@ -158,7 +158,6 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
                     <select
                         className={baseClass}
                         onChange={(e) => handleChange(field, e.target.value)}
-                        required={field.required}
                     >
                         <option value="">Select...</option>
                         {sortOptions(options).map((opt) => (
@@ -179,7 +178,6 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
                                     name={field.id}
                                     value={opt}
                                     onChange={() => handleChange(field, opt)}
-                                    required={field.required}
                                 />
                                 <span>{opt}</span>
                             </label>
@@ -195,7 +193,6 @@ export default function ViewForm({ account_id }: { account_id?: string }) {
                                 <input
                                     type="checkbox"
                                     value={opt}
-                                    required={field.required}
                                     onChange={(e) => {
                                         const checked = e.target.checked;
                                         setFormValues((prev) => {
