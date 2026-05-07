@@ -320,7 +320,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
         });
 
         if (!form) {
-            return NextResponse.json({ error: "Form not found" }, { status: 404 });
+            return NextResponse.json({ error: "Form not found" }, { status: 200 });
         }
 
         const responses = await prisma.response.findMany({
@@ -465,7 +465,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
         if (totalResponse === 0) {
             return NextResponse.json(
                 { message: "No response found." },
-                { status: 404 }
+                { status: 200 }
             );
         }
         const paginatedResponses = finalResponses.slice(skip, skip + limit);
