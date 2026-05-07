@@ -132,6 +132,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
 
             const assignees = new Set<string>();
             assignees.add(super_admin?.id!);
+            user?.role === "MANAGER" && assignees.add(user?.sub!);
 
             if (selectedUserIds.length) {
                 selectedUserIds.forEach((id: string) => assignees.add(id));
